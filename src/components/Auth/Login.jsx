@@ -27,7 +27,9 @@ const Login = () => {
           <h2>Sistema de gestión de CIMA</h2>
           <h3>Inicia sesión con tu credenciales asignadas</h3>
           <form onSubmit={handleSubmit}>
+            <label htmlFor="email" className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: '0', margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', border: '0' }}>Correo electrónico</label>
             <input
+              id="email"
               type="email"
               className="input"
               placeholder="Correo"
@@ -35,7 +37,9 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
+            <label htmlFor="password" className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: '0', margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', border: '0' }}>Contraseña</label>
             <input
+              id="password"
               type="password"
               className="input"
               placeholder="Contraseña"
@@ -43,7 +47,7 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <button type="submit" disabled={status === 'loading'}>
+            <button type="submit" disabled={status === 'loading'} aria-busy={status === 'loading'}>
               {status === 'loading' ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </button>
             {error && <p className="error-message">{error}</p>}

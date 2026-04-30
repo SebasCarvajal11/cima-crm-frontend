@@ -1,21 +1,25 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import Login from './components/Auth/Login';
-import AdminDashboard from './components/Dashboard/AdminDashboard';
-import CreateClient from './components/Client/CreateClient';
-import EditClient from './components/Client/EditClient';
-import UserManagement from './components/Client/UserManagement';
-import RoleManagement from './components/Roles/RoleManagement'; // Nueva gestión de roles
 import ProtectedRoute from './routes/ProtectedRoute';
-import Dashboard from './components/Dashboard/Dashboard'; // Importa el Dashboard aquí
-import CreateUser from './components/Client/CreateUser';
+
+// Lazy loading para mejorar el rendimiento inicial (Code Splitting)
+const Login = lazy(() => import('./components/Auth/Login'));
+const AdminDashboard = lazy(() => import('./components/Dashboard/AdminDashboard'));
+const EditClient = lazy(() => import('./components/Client/EditClient'));
+const UserManagement = lazy(() => import('./components/Client/UserManagement'));
+const RoleManagement = lazy(() => import('./components/Roles/RoleManagement')); // Nueva gestión de roles
+const Dashboard = lazy(() => import('./components/Dashboard/Dashboard')); // Importa el Dashboard aquí
+const CreateUser = lazy(() => import('./components/Client/CreateUser'));
+
+const LoadingFallback = () => <div style={{ display: 'flex', justifyContent: 'center', padding: '50px' }}>Cargando...</div>;
 const App = () => {
   const { user } = useSelector((state) => state.auth);
 
   return (
     <div>
-      <Routes>
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes>
         {/* Ruta para el login */}
         <Route path="/login" element={<Login />} />
 
@@ -87,6 +91,7 @@ const App = () => {
         {/* Ruta de acceso denegado */}
         <Route path="/unauthorized" element={<h1>Acceso no autorizado</h1>} />
       </Routes>
+      </Suspense>
     </div>
   );
 };

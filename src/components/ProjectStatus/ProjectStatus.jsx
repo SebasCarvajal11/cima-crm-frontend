@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import './ProjectStatus.css';
 import { 
@@ -110,9 +110,11 @@ const ProjectStatus = ({ userRole }) => {
     );
   }
 
-  const filteredProjects = projects.filter(project =>
-    project.projectName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProjects = useMemo(() => {
+    return projects.filter(project =>
+      project.projectName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [projects, searchTerm]);
 
   return (
     <Box className="project-status-container" sx={{ p: 3 }}>

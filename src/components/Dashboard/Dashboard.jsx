@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, Suspense, lazy } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom'; 
 
-import WorkerDashboard from './WorkerDashboard';
-import ClientDashboard from './ClientDashboard';
-import AdminDashboard from './AdminDashboard';
-import ExcelImport from '../Excel/ExcelImport';
-import ExcelExport from '../Excel/ExcelExport';
-import ProjectStatus from '../ProjectStatus/ProjectStatus'; 
-import CustomerSupport from '../CustomerSupport/CustomerSupport';
-import ClientProjects from '../ClientProjects/ClientProjects'; 
-import WorkerProjects from '../WorkerProjects/WorkerProjects';  
-import WorkerTasks from '../WorkerTasks/WorkerTasks';
-import FaqClient from '../FaqClient/FaqClient';
-import FaqAdmin from '../FaqAdmin/FaqAdmin';
+const WorkerDashboard = lazy(() => import('./WorkerDashboard'));
+const ClientDashboard = lazy(() => import('./ClientDashboard'));
+const AdminDashboard = lazy(() => import('./AdminDashboard'));
+const ExcelImport = lazy(() => import('../Excel/ExcelImport'));
+const ExcelExport = lazy(() => import('../Excel/ExcelExport'));
+const ProjectStatus = lazy(() => import('../ProjectStatus/ProjectStatus')); 
+const CustomerSupport = lazy(() => import('../CustomerSupport/CustomerSupport'));
+const ClientProjects = lazy(() => import('../ClientProjects/ClientProjects')); 
+const WorkerProjects = lazy(() => import('../WorkerProjects/WorkerProjects'));  
+const WorkerTasks = lazy(() => import('../WorkerTasks/WorkerTasks'));
+const FaqClient = lazy(() => import('../FaqClient/FaqClient'));
+const FaqAdmin = lazy(() => import('../FaqAdmin/FaqAdmin'));
 import './Dashboard.css'; 
 import { logout } from '../../redux/slices/authSlice';
 
@@ -30,9 +30,9 @@ const Dashboard = () => {
   }
 
   // Función para cambiar la vista activa
-  const changeView = (view) => {
+  const changeView = useCallback((view) => {
     setActiveView(view);
-  };
+  }, []);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -80,23 +80,25 @@ const Dashboard = () => {
         </header>
 
         <section className="dashboard-content">
-          {activeView === 'adminDashboard' && user.role === 'Admin' && <AdminDashboard />}
-          {activeView === 'excelImport' && <ExcelImport />}
-          {activeView === 'excelExport' && <ExcelExport />}
-          {(activeView === 'projectStatus' || activeView.startsWith('project-status/')) && (
-            <ProjectStatus 
-              userRole={user.role} 
-              projectId={activeView.startsWith('project-status/') ? activeView.split('/')[1] : null}
-            />
-          )}
-          {activeView === 'customerSupport' && <CustomerSupport />}
-          {activeView === 'clientProjects' && user.role === 'Client' && (
-            <ClientProjects onChangeView={changeView} />
-          )}
-          {activeView === 'faqClient' && user.role === 'Client' && <FaqClient />}
-          {activeView === 'workerProjects' && user.role === 'Worker' && <WorkerProjects />}
-          {activeView === 'workerTasks' && user.role === 'Worker' && <WorkerTasks />}
-          {activeView === 'faqAdmin' && user.role === 'Admin' && <FaqAdmin />}
+          <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>Cargando panel...</div>}>
+            {activeView === 'adminDashboard' && user.role === 'Admin' && <AdminDashboard />}
+            {activeView === 'excelImport' && <ExcelImport />}
+            {activeView === 'excelExport' && <ExcelExport />}
+            {(activeView === 'projectStatus' || activeView.startsWith('project-status/')) && (
+              <ProjectStatus 
+                userRole={user.role} 
+                projectId={activeView.startsWith('project-status/') ? activeView.split('/')[1] : null}
+              />
+            )}
+            {activeView === 'customerSupport' && <CustomerSupport />}
+            {activeView === 'clientProjects' && user.role === 'Client' && (
+              <ClientProjects onChangeView={changeView} />
+            )}
+            {activeView === 'faqClient' && user.role === 'Client' && <FaqClient />}
+            {activeView === 'workerProjects' && user.role === 'Worker' && <WorkerProjects />}
+            {activeView === 'workerTasks' && user.role === 'Worker' && <WorkerTasks />}
+            {activeView === 'faqAdmin' && user.role === 'Admin' && <FaqAdmin />}
+          </Suspense>
         </section>
       </main>
     </div>

@@ -46,10 +46,11 @@ const WorkerTasks = () => {
     const updatedStatus = statusUpdates[taskId];
     const taskComment = comments[taskId];
     if (updatedStatus || taskComment) {
-      const updatedTasks = tasks.map((task) =>
-        task.id === taskId ? { ...task, status: updatedStatus || task.status, comment: taskComment || '' } : task
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === taskId ? { ...task, status: updatedStatus || task.status, comment: taskComment || '' } : task
+        )
       );
-      setTasks(updatedTasks);
       alert(`Tarea ${taskId} actualizada.`);
     }
   };

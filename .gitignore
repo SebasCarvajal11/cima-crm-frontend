@@ -7,14 +7,43 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Configuración y dependencias
 node_modules
+node_modules/
+package-lock.json
+# Opcional: descomenta la línea de arriba si prefieres usar yarn.lock o pnpm-lock.yaml y no quieres subir el package-lock.json, aunque en general se recomienda subir el lockfile de tu gestor de paquetes.
+
+# Build de producción
 dist
 dist-ssr
+build/
+
+# Archivos locales de entorno (Environment Variables)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 *.local
 
-# Editor directories and files
+# Cache y archivos temporales
+.npm
+.eslintcache
+.stylelintcache
+.vite
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Reportes de Testing
+coverage/
+
+# Directorios y archivos de Editores e IDEs
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 .idea
 .DS_Store
 *.suo
@@ -22,5 +51,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-node_modules/
-.env
+*.tmp
+
+# Archivos de la plataforma de agentes / AI
+.agents/
+CLAUDE.md
