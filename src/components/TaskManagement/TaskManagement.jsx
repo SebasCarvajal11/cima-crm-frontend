@@ -1,19 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';  
+
 import {
-  Box,
   Button,
-  Card,
-  CardContent,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
   MenuItem,
   IconButton,
   Typography,
-  Chip,
+
   InputAdornment,
   Select,
   FormControl,
@@ -22,12 +15,9 @@ import {
   Tooltip,
   CircularProgress,
   Alert,
-  Snackbar,
   Checkbox,
-  FormControlLabel,
   Tabs,
   Tab,
-  Divider,
   Grid,
   Paper
 } from '@mui/material';
@@ -36,13 +26,13 @@ import {
   Edit as EditIcon, 
   Delete as DeleteIcon,
   Search as SearchIcon,
-  FilterList as FilterIcon,
+
   CheckCircle as CheckCircleIcon,
   Schedule as ScheduleIcon,
   HourglassEmpty as PendingIcon,
   Person as PersonIcon,
   Assignment as AssignmentIcon,
-  DateRange as DateRangeIcon,
+
   BarChart as BarChartIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material';
@@ -50,24 +40,25 @@ import { taskService } from '../../services/taskService';
 import { toast } from 'react-toastify';
 import './TaskManagement.css';
 import { useSelector } from 'react-redux';
+import { CreateTaskDialog } from './components/CreateTaskDialog';
+import { EditTaskDialog } from './components/EditTaskDialog';
+import { BulkActionDialog } from './components/BulkActionDialog';
 
 const TaskManagement = () => {
   // Estado para el usuario actual
   const { user, token } = useSelector((state) => state.auth);
   const isAdmin = user && user.role === 'Admin';
-  // Añadir este estado para los trabajadores
-  const [allWorkers, setAllWorkers] = useState([]);
   // Estados para tareas
   const [tasks, setTasks] = useState([]); // Inicializado como arreglo vacío
   const [error, setError] = useState(null);
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedTasks, setSelectedTasks] = useState([]);
-  const [allProjects, setAllProjects] = useState([]);
-  // Estados para diálogos
-  const [open, setOpen] = useState(false);
-  const [bulkActionOpen, setBulkActionOpen] = useState(false);
-  const [statsOpen, setStatsOpen] = useState(false);
+  
+  // Estados de control para las variantes de diálogos
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isBulkOpen, setIsBulkOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   
   // Estados para filtros
@@ -83,89 +74,17 @@ const TaskManagement = () => {
   // Estado para estadísticas
   const [taskStats, setTaskStats] = useState(null);
   
-  // Estado para formulario
-  const [formData, setFormData] = useState({
-    projectId: '',
-    workerId: '',
-    description: '',
-    status: 'Pending'
-  });
-  
-  // Estado para acciones en masa
-  const [bulkAction, setBulkAction] = useState({
-    action: 'status',
-    status: 'Completed',
-    workerId: ''
-  });
-
   // Estado para pestañas
   const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
     loadTasks();
-    fetchAllProjects(); // Fetch projects on component mount
-    fetchAllWorkers(); 
   }, []);
 
   useEffect(() => {
     filterTasks();
   }, [tasks, searchTerm, statusFilter, projectFilter, workerFilter]);
-  const fetchAllProjects = async () => {
-    try {
-      // Using the correct endpoint for projects
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/projects`, getHeaders());
-      
-      if (response.data.success && Array.isArray(response.data.projects)) {
-        setAllProjects(response.data.projects, "esto es response");
-      } else {
-        console.error('Invalid response format for projects:', response.data);
-        setAllProjects([]);
-      }
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-      setAllProjects([]);
-    }
-  };
-  // Helper function to get headers with token
-const getHeaders = () => {
-  const accessToken = token || localStorage.getItem('accessToken');
-  return {
-    headers: {
-      'accessToken': accessToken
-    }
-  };
-};
-// Add this function to fetch all workers
-const fetchAllWorkers = async () => {
-  try {
-    // Intentar obtener el token de Redux, y si no está disponible, del localStorage
-    const accessToken = token || localStorage.getItem('accessToken');
-    
-    if (!accessToken) {
-      console.error('No hay token disponible');
-      return;
-    }
-    
-    const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/users/workers`,
-      {
-        headers: {
-          'accessToken': accessToken
-        }
-      }
-    );
-    
-    if (response.data.success && Array.isArray(response.data.workers)) {
-      setAllWorkers(response.data.workers);
-    } else {
-      console.error('Invalid response format for workers:', response.data);
-      setAllWorkers([]);
-    }
-  } catch (error) {
-    console.error('Error fetching workers:', error);
-    setAllWorkers([]);
-  }
-};
+
   const loadTasks = async () => {
     setLoading(true);
     setError(null);
@@ -289,143 +208,34 @@ const fetchAllWorkers = async () => {
     setFilteredTasks(result);
   };
 
-// Modify handleOpen to fetch projects when opening the dialog
-const handleOpen = (task = null) => {
-  fetchAllWorkers(); // Fetch all workers when opening the dialog
-  fetchAllProjects(); // Fetch all projects when opening the dialog
+  const openCreateDialog = () => setIsCreateOpen(true);
   
-  if (task) {
+  const openEditDialog = (task) => {
     setSelectedTask(task);
-    setFormData({
-      projectId: task.projectId,
-      workerId: task.workerId,
-      description: task.description,
-      status: task.status
-    });
-  } else {
-    setSelectedTask(null);
-    setFormData({
-      projectId: '',
-      workerId: '',
-      description: '',
-      status: 'Pending'
-    });
-  }
-  setOpen(true);
-};
-
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedTask(null);
+    setIsEditOpen(true);
   };
-// In the handleSubmit function, replace the existing code with this:
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
   
-  try {
-    console.log('Processing task with data:', formData);
-    
-    let response;
-    if (selectedTask) {
-      // For updates, make sure we include the task ID
-      const taskId = selectedTask.id || selectedTask.taskId;
-      console.log('Updating task:', taskId, 'with data:', formData);
-      
-      // Use the createOrUpdateTask method which handles both cases
-      response = await taskService.createOrUpdateTask({
-        ...formData,
-        id: taskId, // Include the ID in the data
-        taskId: taskId // Include both ID formats to be safe
-      });
-    } else {
-      // For new tasks, just pass the form data
-      console.log('Creating new task with data:', formData);
-      response = await taskService.createTask(formData);
+  const openBulkActionDialog = () => {
+    if (selectedTasks.length === 0) {
+      toast.warning('Seleccione al menos una tarea');
+      return;
     }
-    
-    console.log('Task processed successfully:', response);
-    
-    // Reset form and close dialog
-    setFormData({
-      projectId: '',
-      workerId: '',
-      description: '',
-      status: 'Pending'
-    });
-    setOpen(false);
-    setSelectedTask(null);
-    
-    // Refresh task list
-    loadTasks();
-    
-    // Show success message
-    toast.success(selectedTask ? 'Tarea actualizada con éxito' : 'Tarea creada con éxito');
-  } catch (error) {
-    console.error('Error al procesar la tarea:', error);
-    console.error('Error details:', error.response?.data || error.message);
-    toast.error(`Error: ${error.response?.data?.message || error.message}`);
-  } finally {
-    setLoading(false);
-  }
-};
+    setIsBulkOpen(true);
+  };
 
   const handleDelete = async (id) => {
     if (window.confirm('¿Está seguro de eliminar esta tarea?')) {
       setLoading(true);
       try {
-        console.log('Deleting task:', id);
-        const response = await taskService.deleteTask(id);
-        console.log('Delete task response:', response);
+        await taskService.deleteTask(id);
         toast.success('Tarea eliminada exitosamente');
-        loadTasks(); // Recargar tareas
+        loadTasks();
       } catch (error) {
         console.error('Error al eliminar la tarea:', error);
-        console.error('Error details:', error.response?.data || error.message);
         toast.error('Error al eliminar la tarea');
       } finally {
         setLoading(false);
       }
-    }
-  };
-
-  const handleBulkActionOpen = () => {
-    if (selectedTasks.length === 0) {
-      toast.warning('Seleccione al menos una tarea');
-      return;
-    }
-    fetchAllWorkers();
-    fetchAllProjects();
-    setBulkActionOpen(true);
-  };
-
-  const handleBulkActionClose = () => {
-    setBulkActionOpen(false);
-  };
-
-  const handleBulkActionSubmit = async () => {
-    setLoading(true);
-    try {
-      if (bulkAction.action === 'status') {
-        console.log('Bulk updating task status:', bulkAction.status, 'for tasks:', selectedTasks);
-        const response = await taskService.bulkUpdateTaskStatus(selectedTasks, bulkAction.status);
-        console.log('Bulk update status response:', response);
-        toast.success(`Estado actualizado para ${selectedTasks.length} tareas`);
-      } else if (bulkAction.action === 'assign') {
-        console.log('Bulk assigning tasks to worker:', bulkAction.workerId, 'for tasks:', selectedTasks);
-        const response = await taskService.bulkAssignTasks(selectedTasks, bulkAction.workerId);
-        console.log('Bulk assign response:', response);
-        toast.success(`${selectedTasks.length} tareas asignadas al trabajador ${bulkAction.workerId}`);
-      }
-      handleBulkActionClose();
-      setSelectedTasks([]);
-      loadTasks(); // Recargar tareas
-    } catch (error) {
-      console.error('Error al procesar acción en masa:', error);
-      console.error('Error details:', error.response?.data || error.message);
-      toast.error('Error al procesar la acción en masa');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -537,7 +347,7 @@ const handleSubmit = async (e) => {
               {selectedTasks.length > 0 && isAdmin && (
                 <Button
                   variant="outlined"
-                  onClick={handleBulkActionOpen}
+                  onClick={openBulkActionDialog}
                   startIcon={<AssignmentIcon />}
                   sx={{ mr: 2 }}
                 >
@@ -547,7 +357,7 @@ const handleSubmit = async (e) => {
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
-                onClick={() => handleOpen()}
+                onClick={openCreateDialog}
                 sx={{ 
                   background: 'linear-gradient(45deg, #2c3e50 30%,rgb(0, 0, 0) 90%)',
                   boxShadow: '0 3px 5px 2px rgba(52, 152, 219, .3)'
@@ -675,7 +485,7 @@ const handleSubmit = async (e) => {
       <Tooltip title="Editar">
         <IconButton 
           size="small" 
-          onClick={() => handleOpen(task)}
+          onClick={() => openEditDialog(task)}
           sx={{ 
             backgroundColor: 'rgba(255, 255, 255, 0.8)',
             '&:hover': { backgroundColor: 'rgba(255, 255, 255, 1)' }
@@ -938,201 +748,35 @@ const handleSubmit = async (e) => {
         </div>
       )}
 
-      {/* Diálogo para crear/editar tarea */}
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          {selectedTask ? 'Editar Tarea' : 'Nueva Tarea'}
-        </DialogTitle>
-        <form onSubmit={handleSubmit}>
-          <DialogContent>
-          <FormControl fullWidth margin="normal" required>
-  <InputLabel>Proyecto</InputLabel>
-  <Select
-    value={formData.projectId}
-    onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
-    label="Proyecto"
-  >
-    {allProjects.length > 0 ? (
-      allProjects.map(project => (
-        <MenuItem key={project.projectId} value={project.projectId}>
-          {project.projectName}
-        </MenuItem>
-      ))
-    ) : (
-      // Fallback to filtered tasks if allProjects is empty
-      filteredTasks
-        .reduce((uniqueProjects, task) => {
-          if (task.projectId && !uniqueProjects.some(p => p.id === task.projectId)) {
-            uniqueProjects.push({
-              id: task.projectId,
-              name: task.projectName || `Proyecto #${task.projectId}`
-            });
-          }
-          return uniqueProjects;
-        }, [])
-        .map(project => (
-          <MenuItem key={project.id} value={project.id}>
-            {project.name}
-          </MenuItem>
-        ))
-    )}
-  </Select>
-</FormControl>
-            <FormControl fullWidth margin="normal" required>
-  <InputLabel>Trabajador</InputLabel>
-  <Select
-    value={formData.workerId}
-    onChange={(e) => setFormData({ ...formData, workerId: e.target.value })}
-    label="Trabajador"
-  >
-    {allWorkers.length > 0 ? (
-      allWorkers.map(worker => (
-        <MenuItem key={worker.userId} value={worker.userId}>
-          {worker.name} ({worker.email})
-        </MenuItem>
-      ))
-    ) : (
-      // Fallback to filtered tasks if allWorkers is empty
-      filteredTasks
-        .reduce((uniqueWorkers, task) => {
-          if (task.workerId && !uniqueWorkers.some(w => w.id === task.workerId)) {
-            uniqueWorkers.push({
-              id: task.workerId,
-              name: task.workerName || `Trabajador #${task.workerId}`
-            });
-          }
-          return uniqueWorkers;
-        }, [])
-        .map(worker => (
-          <MenuItem key={worker.id} value={worker.id}>
-            {worker.name}
-          </MenuItem>
-        ))
-    )}
-  </Select>
-</FormControl>
-            <TextField
-              fullWidth
-              label="Descripción"
-              multiline
-              rows={4}
-              margin="normal"
-              required
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            />
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Estado</InputLabel>
-              <Select
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                label="Estado"
-              >
-                <MenuItem value="Pending">Pendiente</MenuItem>
-                <MenuItem value="In Progress">En Progreso</MenuItem>
-                <MenuItem value="Completed">Completada</MenuItem>
-              </Select>
-            </FormControl>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose} color="inherit">
-              Cancelar
-            </Button>
-            <Button 
-              type="submit" 
-              variant="contained" 
-              color="primary"
-              disabled={loading}
-            >
-              {loading ? <CircularProgress size={24} /> : selectedTask ? 'Actualizar' : 'Crear'}
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
+      {/* Componentes de Diálogos Refactorizados */}
+      <CreateTaskDialog
+        open={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        onSuccess={loadTasks}
+        token={token}
+        fallbackTasks={filteredTasks}
+      />
 
-      {/* Diálogo para acciones en masa */}
-      <Dialog open={bulkActionOpen} onClose={handleBulkActionClose} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          Acciones en Masa ({selectedTasks.length} tareas seleccionadas)
-        </DialogTitle>
-        <DialogContent>
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Acción</InputLabel>
-            <Select
-              value={bulkAction.action}
-              onChange={(e) => setBulkAction({ ...bulkAction, action: e.target.value })}
-              label="Acción"
-            >
-              <MenuItem value="status">Cambiar Estado</MenuItem>
-              <MenuItem value="assign">Asignar a Trabajador</MenuItem>
-            </Select>
-          </FormControl>
+      <EditTaskDialog
+        open={isEditOpen}
+        task={selectedTask}
+        onClose={() => setIsEditOpen(false)}
+        onSuccess={loadTasks}
+        token={token}
+        fallbackTasks={filteredTasks}
+      />
 
-          {bulkAction.action === 'status' && (
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Nuevo Estado</InputLabel>
-              <Select
-                value={bulkAction.status}
-                onChange={(e) => setBulkAction({ ...bulkAction, status: e.target.value })}
-                label="Nuevo Estado"
-              >
-                <MenuItem value="Pending">Pendiente</MenuItem>
-                <MenuItem value="In Progress">En Progreso</MenuItem>
-                <MenuItem value="Completed">Completada</MenuItem>
-              </Select>
-            </FormControl>
-          )}
-
-          {bulkAction.action === 'assign' && (
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Trabajador</InputLabel>
-              <Select
-                value={bulkAction.workerId}
-                onChange={(e) => setBulkAction({ ...bulkAction, workerId: e.target.value })}
-                label="Trabajador"
-              >
-                {allWorkers.length > 0 ? (
-                  allWorkers.map(worker => (
-                    <MenuItem key={worker.userId} value={worker.userId}>
-                      {worker.name} ({worker.email})
-                    </MenuItem>
-                  ))
-                ) : (
-                  // Fallback to filtered tasks if allWorkers is empty
-                  filteredTasks
-                    .reduce((uniqueWorkers, task) => {
-                      if (task.workerId && !uniqueWorkers.some(w => w.id === task.workerId)) {
-                        uniqueWorkers.push({
-                          id: task.workerId,
-                          name: task.workerName || `Trabajador #${task.workerId}`
-                        });
-                      }
-                      return uniqueWorkers;
-                    }, [])
-                    .map(worker => (
-                      <MenuItem key={worker.id} value={worker.id}>
-                        {worker.name}
-                      </MenuItem>
-                    ))
-                )}
-              </Select>
-            </FormControl>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleBulkActionClose} color="inherit">
-            Cancelar
-          </Button>
-          <Button 
-            onClick={handleBulkActionSubmit} 
-            
-            color="white"
-            disabled={loading || (bulkAction.action === 'assign' && !bulkAction.workerId)}
-          >
-            {loading ? <CircularProgress size={24} /> : 'Aplicar'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <BulkActionDialog
+        open={isBulkOpen}
+        selectedTasks={selectedTasks}
+        onClose={() => setIsBulkOpen(false)}
+        onSuccess={() => {
+          setSelectedTasks([]);
+          loadTasks();
+        }}
+        token={token}
+        fallbackTasks={filteredTasks}
+      />
     </div>
   );
 };
