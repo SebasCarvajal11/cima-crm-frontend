@@ -39,7 +39,7 @@ export const ProjectProvider = ({ children }) => {
       if (accessToken) {
         //console.log('Token siendo enviado:', accessToken);
         config.headers['Authorization'] = `Bearer ${accessToken}`;
-        config.headers['accessToken'] = accessToken;
+        config.headers['accesstoken'] = accessToken;
       } else {
         console.warn('No hay token disponible para la petición');
       }
