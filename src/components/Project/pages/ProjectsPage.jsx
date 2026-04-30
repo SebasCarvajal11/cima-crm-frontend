@@ -14,7 +14,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import { ProjectContext } from '../../../context/ProjectContext';
 import ProjectList from '../components/ProjectList';
-import ProjectForm from '../components/ProjectForm';
+import { CreateProjectDialog, EditProjectDialog } from '../components/ProjectForm';
 import ProjectStats from '../components/ProjectStats';
 
 const ProjectsPage = () => {
@@ -153,7 +153,7 @@ const ProjectsPage = () => {
             </Grid>
           </Grid>
 
-          <ProjectForm
+          <CreateProjectDialog
             open={openForm}
             onClose={() => {
               setOpenForm(false);
@@ -162,7 +162,7 @@ const ProjectsPage = () => {
             onSubmit={handleCreateProject}
           />
 
-          <ProjectForm
+          <EditProjectDialog
             open={openEditForm}
             onClose={() => {
               setOpenEditForm(false);
