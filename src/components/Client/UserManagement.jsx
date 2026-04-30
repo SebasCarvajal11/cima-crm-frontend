@@ -48,6 +48,9 @@ import { IoGridOutline, IoListOutline } from 'react-icons/io5';
 import Slide from '@mui/material/Slide';
 import UsersInterface from './UsersInterface';
 import { stringToColor, adjustColor, getInitials, getPlanColor } from '../../utils/colorUtils';
+import { CreateClientDialog } from './components/CreateClientDialog';
+import { EditClientDialog } from './components/EditClientDialog';
+import { DeleteClientDialog } from './components/DeleteClientDialog';
 // TabPanel component to handle tab content
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -213,57 +216,36 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Estados para el diálogo (crear/editar/eliminar)
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState('create');
+  // Estados para los diálogos variantes
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-
-  // Estado del formulario (para crear/editar)
-  // Update the default plan value in the initial state
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    role: '',
-    address: '',
-    phone: '',
-    contactInfo: '',
-    additionalInfo: '',
-    plan: 'Oro' // Changed from 'Básico' to 'Oro'
-  });
-
-  // Estado para el loading del envío del formulario
-  const [formLoading, setFormLoading] = useState(false);
 
   // Paginación
   const [page, setPage] = useState(1);
   const rowsPerPage = 5;
 
-  // Obtener todos los usuarios desde la API cuando se monte el componente
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        // Changing the endpoint from /developer/clients to /clients
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/clients`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'accesstoken': token
-          }
-        });
-        
-        console.log('Datos de clientes recibidos:', response.data);
-        // Make sure we're accessing the correct property in the response
-        setUsers(response.data.clients || []);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error al cargar clientes:', err);
-        setError('Error al cargar clientes');
-        toast.error('Error al cargar clientes', { position: 'top-center' });
-        setLoading(false);
-      }
-    };
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/clients`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'accesstoken': token
+        }
+      });
+      setUsers(response.data.clients || []);
+    } catch (err) {
+      console.error('Error al cargar clientes:', err);
+      setError('Error al cargar clientes');
+      toast.error('Error al cargar clientes', { position: 'top-center' });
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (token) {
       fetchUsers();
     }
@@ -274,212 +256,20 @@ const UserManagement = () => {
   };
 
   // Función para abrir el diálogo según la acción
-  // Update the openDialog function to use 'Oro' as default
-  const openDialog = (mode, user = null) => {
-    setDialogMode(mode);
+  const openCreateDialog = () => setIsCreateOpen(true);
+  
+  const openEditDialog = (user) => {
     setSelectedUser(user);
-    if (mode === 'edit' && user) {
-      setFormData({ 
-        ...user,
-        // Asegurarse de que todos los campos necesarios estén presentes
-        contactInfo: user.contactInfo || '',
-        additionalInfo: user.additionalInfo || '',
-        plan: user.plan || 'Oro' // Changed from 'Básico' to 'Oro'
-      });
-    } else if (mode === 'create') {
-      setFormData({ 
-        name: '', 
-        email: '', 
-        password: '', 
-        role: 'Client', // Por defecto, creamos clientes
-        address: '', 
-        phone: '',
-        contactInfo: '',
-        additionalInfo: '',
-        plan: 'Oro' // Changed from 'Básico' to 'Oro'
-      });
-    }
-    setDialogOpen(true);
-  };
-
-  const closeDialog = () => {
-    setDialogOpen(false);
-    setSelectedUser(null);
-    setFormLoading(false);
-  };
-
-  // Manejo del envío del formulario para crear/editar
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-  
-    // Validación mínima: nombre y email obligatorios
-    if (!formData.name || !formData.email) {
-      toast.error('Nombre y Email son obligatorios', { position: 'top-center' });
-      return;
-    }
-
-    // Validar que la contraseña esté presente para creación
-    if (dialogMode === 'create' && !formData.password) {
-      toast.error('La contraseña es obligatoria para crear un cliente', { position: 'top-center' });
-      return;
-    }
-    
-    // Validar que la contraseña tenga al menos 6 caracteres
-    if (dialogMode === 'create' && formData.password.length < 6) {
-      toast.error('La contraseña debe tener al menos 6 caracteres', { position: 'top-center' });
-      return;
-    }
-  
-    if (formLoading) return;
-    setFormLoading(true);
-    
-    try {
-      if (dialogMode === 'create') {
-        // Crear nuevo cliente - usando un objeto directo en lugar de JSON.stringify
-        const clientData = {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: 'Client'
-        };
-
-        // Solo agregar campos opcionales si tienen valor
-        if (formData.contactInfo || formData.phone) {
-          clientData.contactInfo = formData.contactInfo || formData.phone;
-        }
-        if (formData.address) {
-          clientData.address = formData.address;
-        }
-        if (formData.additionalInfo) {
-          clientData.additionalInfo = formData.additionalInfo;
-        }
-        if (formData.plan) {
-          clientData.plan = formData.plan;
-        }
-
-        console.log('Datos a enviar:', clientData);
-        
-        // Usar axios directamente sin config
-        const response = await axios({
-          method: 'post',
-          url: `${import.meta.env.VITE_API_URL}/clients/register`,
-          headers: { 
-            'Content-Type': 'application/json',
-            'accesstoken': token
-          },
-          data: clientData
-        });
-        
-        console.log('Cliente creado:', response.data);
-        toast.success('Cliente creado exitosamente', { position: 'top-center' });
-        
-        // Actualizar la lista de usuarios y refrescar la lista
-        setUsers(prevUsers => [...prevUsers, response.data.client || response.data]);
-        closeDialog();
-        
-        // Refrescar la lista de clientes después de crear uno nuevo
-        const refreshResponse = await axios.get(`${import.meta.env.VITE_API_URL}/clients`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'accesstoken': token
-          }
-        });
-        setUsers(refreshResponse.data.clients || []);
-      } else if (dialogMode === 'edit') {
-        // Determina el ID del cliente a actualizar
-        const clientId = selectedUser.clientId;
-        
-        if (!clientId) {
-          console.error('Cliente sin clientId para editar:', selectedUser);
-          toast.error('El cliente seleccionado no tiene un ID definido', { position: 'top-center' });
-          setFormLoading(false);
-          return;
-        }
-        
-        // Datos para actualizar cliente
-        const updateData = {
-          contactInfo: formData.contactInfo || formData.phone,
-          address: formData.address,
-          additionalInfo: formData.additionalInfo,
-          plan: formData.plan
-        };
-
-        // Actualizar cliente existente con el endpoint correcto usando clientId
-        await axios.put(
-          `${import.meta.env.VITE_API_URL}/clients/${clientId}`,
-          updateData,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'accesstoken': token
-            }
-          }
-        );
-
-        // Actualizar el estado local usando clientId
-        const updatedUsers = users.map(user => {
-          if (user.clientId === clientId) {
-            return { ...user, ...updateData };
-          }
-          return user;
-        });
-        
-        setUsers(updatedUsers);
-        toast.success('Cliente actualizado exitosamente', { position: 'top-center' });
-        closeDialog();
-      }
-    } catch (err) {
-      console.error('Error en la operación:', err);
-      toast.error(`Error: ${err.response?.data?.message || 'Ocurrió un problema'}`, { position: 'top-center' });
-    } finally {
-      setFormLoading(false);
-    }
+    setIsEditOpen(true);
   };
   
-  const handleDelete = async () => {
-    if (!selectedUser) {
-      toast.error('No se ha seleccionado ningún cliente para eliminar', { position: 'top-center' });
-      return;
-    }
-  
-    // Log the entire user object to see its structure
-    console.log('Selected user for deletion:', selectedUser);
-    
-    // Use clientId for deletion, not userId
-    const clientId = selectedUser.clientId;
-    
-    if (!clientId) {
-      console.error('Cliente sin clientId:', selectedUser);
-      toast.error('El cliente seleccionado no tiene un ID definido', { position: 'top-center' });
-      return;
-    }
-  
-    await deleteClient(clientId);
+  const openDeleteDialog = (user) => {
+    setSelectedUser(user);
+    setIsDeleteOpen(true);
   };
-  
-  // Helper function to handle the actual deletion
-  const deleteClient = async (clientId) => {
-    try {
-      console.log('Attempting to delete client with ID:', clientId);
-      
-      // Eliminar cliente con el endpoint correcto usando clientId
-      await axios.delete(`${import.meta.env.VITE_API_URL}/clients/${clientId}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'accesstoken': token
-        }
-      });
-  
-      // Actualizar estado local - use clientId for matching
-      const updatedUsers = users.filter(user => user.clientId !== clientId);
-      
-      setUsers(updatedUsers);
-      toast.success('Cliente eliminado correctamente', { position: 'top-center' });
-      closeDialog();
-    } catch (error) {
-      console.error('Error al eliminar cliente:', error);
-      toast.error(`Error al eliminar cliente: ${error.response?.data?.message || error.message}`, { position: 'top-center' });
-    }
+
+  const handleDeleteSuccess = (deletedId) => {
+    setUsers(users.filter(user => user.clientId !== deletedId));
   };
   
   // Manejo inmediato del cambio de rol en la tabla
@@ -580,7 +370,7 @@ const UserManagement = () => {
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
-                onClick={() => openDialog('create')}
+                onClick={openCreateDialog}
                 sx={{
                   background: 'linear-gradient(135deg, #8e3031 0%, #592d2d 100%)',
                   color: 'white',
@@ -648,13 +438,13 @@ const UserManagement = () => {
                     <TableCell>{user.phone || user.contactInfo}</TableCell>
                     <TableCell align="right">
                       <IconButton
-                        onClick={() => openDialog('edit', user)}
+                        onClick={() => openEditDialog(user)}
                         sx={{ color: '#592d2d' }}
                       >
                         <EditIcon />
                       </IconButton>
                       <IconButton
-                        onClick={() => openDialog('delete', user)}
+                        onClick={() => openDeleteDialog(user)}
                         sx={{ color: '#f1416c' }}
                       >
                         <DeleteIcon />
@@ -703,175 +493,29 @@ const UserManagement = () => {
         <UsersInterface token={token} />
       </TabPanel>
 
-      {/* Your existing dialogs */}
-      <Dialog
-        open={dialogOpen && (dialogMode === 'create' || dialogMode === 'edit')}
-        onClose={closeDialog}
-        fullWidth
-        maxWidth="sm"
-        PaperProps={{
-          sx: {
-            borderRadius: '16px',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-            '& .MuiDialogTitle-root': {
-              background: '#8e3031',
-              color: 'white',
-              padding: '20px 24px'
-            }
-          }
-        }}
-      >
-        <DialogTitle>
-          {dialogMode === 'create' ? 'Crear Nuevo Cliente' : 'Editar Cliente'}
-          <IconButton
-            aria-label="close"
-            onClick={closeDialog}
-            sx={{
-              position: 'absolute',
-              right: 16,
-              top: 16,
-              color: 'white',
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent sx={{ padding: '24px' }}>
-          <Box component="form" onSubmit={handleFormSubmit} sx={{ mt: 2 }}>
-            <TextField
-              fullWidth
-              label="Nombre"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              margin="normal"
-              disabled={dialogMode === 'edit'}
-              required
-            />
-            <TextField
-              fullWidth
-              label="Email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              margin="normal"
-              disabled={dialogMode === 'edit'}
-              required
-            />
-            {dialogMode === 'create' && (
-              <TextField
-                fullWidth
-                label="Contraseña"
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                margin="normal"
-                required
-              />
-            )}
-            <TextField
-              fullWidth
-              label="Dirección"
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              margin="normal"
-            />
-            <TextField
-              fullWidth
-              label="Teléfono"
-              value={formData.phone || formData.contactInfo}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value, contactInfo: e.target.value })}
-              margin="normal"
-            />
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Plan</InputLabel>
-              <Select
-                value={formData.plan || 'Oro'}
-                onChange={(e) => setFormData({ ...formData, plan: e.target.value })}
-                label="Plan"
-              >
-                <MenuItem value="Oro">Oro</MenuItem>
-                <MenuItem value="Esmeralda">Esmeralda</MenuItem>
-                <MenuItem value="Premium">Premium</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              fullWidth
-              label="Información Adicional"
-              value={formData.additionalInfo}
-              onChange={(e) => setFormData({ ...formData, additionalInfo: e.target.value })}
-              margin="normal"
-              multiline
-              rows={3}
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ padding: '16px 24px' }}>
-          <Button onClick={closeDialog} sx={{ color: '#7e8299' }}>
-            Cancelar
-          </Button>
-          <ActionButton 
-            variant="create" 
-            onClick={handleFormSubmit}
-            disabled={formLoading}
-          >
-            {formLoading ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              dialogMode === 'create' ? 'Crear Cliente' : 'Guardar Cambios'
-            )}
-          </ActionButton>
-        </DialogActions>
-      </Dialog>
-
-      {/* Delete dialog */}
-      <Dialog 
-        open={dialogOpen && dialogMode === 'delete'} 
-        onClose={closeDialog}
-        PaperProps={{
-          sx: {
-            borderRadius: '16px',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-            '& .MuiDialogTitle-root': {
-              background: '#f1416c',
-              color: 'white',
-              padding: '20px 24px'
-            }
-          }
-        }}
-      >
-        <DialogTitle sx={{ background: '#f1416c', color: 'white' }}>
-          Confirmar Eliminación
-          <IconButton
-            aria-label="close"
-            onClick={closeDialog}
-            sx={{
-              position: 'absolute',
-              right: 16,
-              top: 16,
-              color: 'white',
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent sx={{ padding: '24px', paddingTop: '24px' }}>
-          <Typography variant="body1">
-            ¿Estás seguro de que deseas eliminar al cliente <strong>{selectedUser?.name}</strong>?
-            Esta acción no se puede deshacer.
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{ padding: '16px 24px' }}>
-          <Button onClick={closeDialog} sx={{ color: '#7e8299' }}>
-            Cancelar
-          </Button>
-          <ActionButton 
-            variant="delete" 
-            onClick={handleDelete}
-          >
-            Eliminar Cliente
-          </ActionButton>
-        </DialogActions>
-      </Dialog>
+      {/* Explicit Variant Dialogs */}
+      <CreateClientDialog
+        open={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        onSuccess={fetchUsers}
+        token={token}
+      />
+      
+      <EditClientDialog
+        open={isEditOpen}
+        user={selectedUser}
+        onClose={() => setIsEditOpen(false)}
+        onSuccess={fetchUsers}
+        token={token}
+      />
+      
+      <DeleteClientDialog
+        open={isDeleteOpen}
+        user={selectedUser}
+        onClose={() => setIsDeleteOpen(false)}
+        onSuccess={handleDeleteSuccess}
+        token={token}
+      />
     </StyledBox>
   );
 };
