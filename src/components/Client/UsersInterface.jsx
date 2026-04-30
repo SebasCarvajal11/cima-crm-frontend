@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
   Box, 
@@ -13,28 +13,22 @@ import {
   IconButton,
   TextField,
   Pagination,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   CircularProgress
 } from '@mui/material';
 import { 
   Add as AddIcon, 
   Edit as EditIcon, 
   Delete as DeleteIcon,
-  Close as CloseIcon,
   Search as SearchIcon,
   FilterList as FilterListIcon
 } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import styled from '@emotion/styled';
 import { alpha } from '@mui/material/styles';
-import { stringToColor, adjustColor, getInitials, getPlanColor } from '../../utils/colorUtils';
+import { stringToColor, adjustColor, getInitials } from '../../utils/colorUtils';
+import { CreateUserDialog } from './components/CreateUserDialog';
+import { EditUserDialog } from './components/EditUserDialog';
+import { DeleteUserDialog } from './components/DeleteUserDialog';
 // Reuse styled components from UserManagement
 const EnhancedTableContainer = styled(Box)(({ theme }) => ({
   background: '#ffffff',
@@ -125,25 +119,6 @@ const StatusChip = styled(Box)(({ status }) => ({
   }),
 }));
 
-// Update the ActionButton component colors
-const ActionButton = styled(Button)(({ variant }) => ({
-  background: variant === 'create' 
-    ? 'linear-gradient(45deg, #8e3031 30%, #592d2d 90%)'
-    : 'linear-gradient(45deg, #e74c3c 30%, #c0392b 90%)',
-  boxShadow: variant === 'create'
-    ? '0 3px 5px 2px rgba(142, 48, 49, .3)'
-    : '0 3px 5px 2px rgba(231, 76, 60, .3)',
-  borderRadius: '8px',
-  padding: '10px 25px',
-  color: 'white',
-  textTransform: 'none',
-  fontWeight: 600,
-  '&:hover': {
-    background: variant === 'create'
-      ? 'linear-gradient(45deg, #592d2d 30%, #3d1e1e 90%)'
-      : 'linear-gradient(45deg, #c0392b 30%, #a93226 90%)',
-  }
-}));
 
 const UsersInterface = ({ token }) => {
   // Estado para los usuarios del staff (Worker y Admin)
@@ -151,23 +126,11 @@ const UsersInterface = ({ token }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Estados para el diálogo (crear/editar/eliminar)
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState('create');
+  // Estados de control para las variantes de diálogos
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  
-  // Estado del formulario
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    role: 'Worker',
-    department: '',
-    position: ''
-  });
-  
-  // Estado para el loading del envío del formulario
-  const [formLoading, setFormLoading] = useState(false);
   
   // Paginación
   const [page, setPage] = useState(1);
@@ -205,194 +168,41 @@ const UsersInterface = ({ token }) => {
     setPage(value);
   };
   
-  // Función para abrir el diálogo según la acción
-  const openDialog = (mode, user = null) => {
-    setDialogMode(mode);
+  // Openers explícitos para cada variante de diálogo
+  const openCreateDialog = () => setIsCreateOpen(true);
+  
+  const openEditDialog = (user) => {
     setSelectedUser(user);
-    if (mode === 'edit' && user) {
-      setFormData({ 
-        ...user,
-        department: user.department || '',
-        position: user.position || ''
-      });
-    } else if (mode === 'create') {
-      setFormData({ 
-        name: '', 
-        email: '', 
-        password: '', 
-        role: 'Worker',
-        department: '',
-        position: ''
-      });
-    }
-    setDialogOpen(true);
+    setIsEditOpen(true);
   };
 
-  const closeDialog = () => {
-    setDialogOpen(false);
-    setSelectedUser(null);
-    setFormLoading(false);
+  const openDeleteDialog = (user) => {
+    setSelectedUser(user);
+    setIsDeleteOpen(true);
   };
-  
-  // Manejo del envío del formulario para crear/editar
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-  
-    // Validación mínima: nombre, email y rol obligatorios
-    if (!formData.name || !formData.email || !formData.role) {
-      toast.error('Nombre, Email y Rol son obligatorios', { position: 'top-center' });
-      return;
-    }
-    
-    // Validación adicional para contraseña en modo creación
-    if (dialogMode === 'create' && !formData.password) {
-      toast.error('La contraseña es obligatoria para crear un usuario', { position: 'top-center' });
-      return;
-    }
-  
-    if (formLoading) return;
-    setFormLoading(true);
-  
-    try {
-      if (dialogMode === 'create') {
-        // Crear nuevo usuario del staff
-        const userData = {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: formData.role
-        };
 
-        console.log('Creando usuario con datos:', userData);
+  // Callbacks de éxito para actualizar estado local
+  const handleCreateSuccess = (newUser) => {
+    const userWithId = {
+      ...newUser,
+      userId: newUser.userId || newUser.id || Date.now().toString()
+    };
+    setStaffUsers(prevUsers => [...prevUsers, userWithId]);
+  };
 
-        // Configuración para la petición
-        const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/users/register`,
-          userData,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'accesstoken': token
-            }
-          }
-        );
-
-        console.log('Usuario creado:', response.data);
-        
-        // Check the structure of the response and extract the user data
-        const newUser = response.data.user || response.data;
-        
-        // Make sure the user object has an id property that can be used as userId
-        const userWithId = {
-          ...newUser,
-          userId: newUser.userId || newUser.id || Date.now().toString() // Fallback to timestamp if no ID
-        };
-        
-        // Actualizar la lista de usuarios
-        setStaffUsers(prevUsers => [...prevUsers, userWithId]);
-        toast.success('Usuario creado exitosamente', { position: 'top-center' });
-        closeDialog();
-      } else if (dialogMode === 'edit') {
-        // Código existente para editar...
-        // Determine the ID of the user to update
-        const userId = selectedUser.userId || selectedUser.id;
-        
-        if (!userId) {
-          console.error('Usuario sin ID para editar:', selectedUser);
-          toast.error('El usuario seleccionado no tiene un ID definido', { position: 'top-center' });
-          setFormLoading(false);
-          return;
-        }
-        
-        try {
-          // Prepare data for user update
-          const updateData = {
-            name: formData.name,
-            email: formData.email,
-            role: formData.role
-          };
-          
-          // If password is provided, include it in the update
-          if (formData.password && formData.password.trim() !== '') {
-            updateData.password = formData.password;
-          }
-          
-          console.log('Updating user with data:', updateData);
-          
-          // Update user using the correct endpoint
-          const response = await axios.put(
-            `${import.meta.env.VITE_API_URL}/users/${userId}`,
-            updateData,
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                'accesstoken': token
-              }
-            }
-          );
-          
-          console.log('User updated successfully:', response.data);
-          
-          // Update the local state
-          const updatedUsers = staffUsers.map(user => {
-            if ((user.userId || user.id) === userId) {
-              return { ...user, ...updateData };
-            }
-            return user;
-          });
-          
-          setStaffUsers(updatedUsers);
-          toast.success('Usuario actualizado exitosamente', { position: 'top-center' });
-          closeDialog();
-        } catch (error) {
-          console.error('Error updating user:', error);
-          toast.error(`Error al actualizar usuario: ${error.response?.data?.message || error.message}`, { position: 'top-center' });
-          setFormLoading(false);
-        }
+  const handleEditSuccess = (userId, updateData) => {
+    const updatedUsers = staffUsers.map(user => {
+      if ((user.userId || user.id) === userId) {
+        return { ...user, ...updateData };
       }
-    } catch (err) {
-      console.error('Error en la operación:', err);
-      toast.error(`Error: ${err.response?.data?.message || 'Ocurrió un problema'}`, { position: 'top-center' });
-    } finally {
-      setFormLoading(false);
-    }
+      return user;
+    });
+    setStaffUsers(updatedUsers);
   };
-  
-  const handleDelete = async () => {
-    if (!selectedUser) {
-      toast.error('No se ha seleccionado ningún usuario para eliminar', { position: 'top-center' });
-      return;
-    }
-    
-    const userId = selectedUser.userId || selectedUser.id;
-    
-    if (!userId) {
-      console.error('Usuario sin ID:', selectedUser);
-      toast.error('El usuario seleccionado no tiene un ID definido', { position: 'top-center' });
-      return;
-    }
-  
-    try {
-      console.log('Attempting to delete user with ID:', userId);
-      
-      // Eliminar usuario
-      await axios.delete(`${import.meta.env.VITE_API_URL}/users/${userId}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'accesstoken': token
-        }
-      });
-  
-      // Actualizar estado local
-      const updatedUsers = staffUsers.filter(user => (user.userId || user.id) !== userId);
-      
-      setStaffUsers(updatedUsers);
-      toast.success('Usuario eliminado correctamente', { position: 'top-center' });
-      closeDialog();
-    } catch (error) {
-      console.error('Error al eliminar usuario:', error);
-      toast.error(`Error al eliminar usuario: ${error.response?.data?.message || error.message}`, { position: 'top-center' });
-    }
+
+  const handleDeleteSuccess = (userId) => {
+    const updatedUsers = staffUsers.filter(user => (user.userId || user.id) !== userId);
+    setStaffUsers(updatedUsers);
   };
   
   const currentUsers = staffUsers.slice((page - 1) * rowsPerPage, page * rowsPerPage);
@@ -443,7 +253,7 @@ const UsersInterface = ({ token }) => {
           <Button
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={() => openDialog('create')}
+            onClick={openCreateDialog}
             sx={{
               background: 'linear-gradient(135deg,rgb(0, 0, 0) 0%,rgb(0, 0, 0) 100%)',
               color: 'white',
@@ -510,13 +320,13 @@ const UsersInterface = ({ token }) => {
                   </TableCell>
                   <TableCell align="right">
                     <IconButton
-                      onClick={() => openDialog('edit', user)}
+                      onClick={() => openEditDialog(user)}
                       sx={{ color: '#592d2d' }}
                     >
                       <EditIcon />
                     </IconButton>
                     <IconButton
-                      onClick={() => openDialog('delete', user)}
+                      onClick={() => openDeleteDialog(user)}
                       sx={{ color: '#f1416c' }}
                     >
                       <DeleteIcon />
@@ -558,175 +368,27 @@ const UsersInterface = ({ token }) => {
           />
         </Box>
   
-        {/* Create/Edit Dialog */}
-        <Dialog
-          open={dialogOpen && (dialogMode === 'create' || dialogMode === 'edit')}
-          onClose={closeDialog}
-          fullWidth
-          maxWidth="sm"
-          PaperProps={{
-            sx: {
-              borderRadius: '16px',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-              '& .MuiDialogTitle-root': {
-                background: '#8e3031',
-                color: 'white',
-                padding: '20px 24px'
-              }
-            }
-          }}
-        >
-          <DialogTitle>
-            {dialogMode === 'create' ? 'Crear Nuevo Usuario' : 'Editar Usuario'}
-            <IconButton
-              aria-label="close"
-              onClick={closeDialog}
-              sx={{
-                position: 'absolute',
-                right: 16,
-                top: 16,
-                color: 'white',
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent sx={{ padding: '24px' }}>
-            <Box component="form" onSubmit={handleFormSubmit} sx={{ mt: 2 }}>
-              <TextField
-                fullWidth
-                label="Nombre"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                margin="normal"
-                required
-              />
-              <TextField
-                fullWidth
-                label="Email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                margin="normal"
-                required
-              />
-              {dialogMode === 'create' ? (
-                <TextField
-                  fullWidth
-                  label="Contraseña"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  margin="normal"
-                  required
-                />
-              ) : (
-                <TextField
-                  fullWidth
-                  label="Nueva Contraseña (opcional)"
-                  type="password"
-                  value={formData.password || ''}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  margin="normal"
-                  helperText="Deja en blanco para mantener la contraseña actual"
-                />
-              )}
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Rol</InputLabel>
-                <Select
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  label="Rol"
-                >
-                  <MenuItem value="Admin">Administrador</MenuItem>
-                  <MenuItem value="Worker">Trabajador</MenuItem>
-                </Select>
-              </FormControl>
-              
-              {/* Display creation and update dates if editing */}
-              {dialogMode === 'edit' && formData.createdAt && (
-                <TextField
-                  fullWidth
-                  label="Fecha de creación"
-                  value={new Date(formData.createdAt).toLocaleDateString('es-ES')}
-                  margin="normal"
-                  disabled
-                />
-              )}
-              
-              {dialogMode === 'edit' && formData.updatedAt && (
-                <TextField
-                  fullWidth
-                  label="Última actualización"
-                  value={new Date(formData.updatedAt).toLocaleDateString('es-ES')}
-                  margin="normal"
-                  disabled
-                />
-              )}
-            </Box>
-          </DialogContent>
-          <DialogActions sx={{ padding: '16px 24px' }}>
-            <Button onClick={closeDialog} sx={{ color: '#7e8299' }}>
-              Cancelar
-            </Button>
-            <ActionButton 
-              variant="create" 
-              onClick={handleFormSubmit}
-              disabled={formLoading}
-            >
-              {formLoading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                dialogMode === 'create' ? 'Crear Usuario' : 'Guardar Cambios'
-              )}
-            </ActionButton>
-          </DialogActions>
-        </Dialog>
-  
-        {/* Delete dialog */}
-        <Dialog 
-          open={dialogOpen && dialogMode === 'delete'} 
-          onClose={closeDialog}
-          PaperProps={{
-            sx: {
-              borderRadius: '16px',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-            }
-          }}
-        >
-          <DialogTitle sx={{ background: '#f1416c', color: 'white' }}>
-            Confirmar Eliminación
-            <IconButton
-              aria-label="close"
-              onClick={closeDialog}
-              sx={{
-                position: 'absolute',
-                right: 16,
-                top: 16,
-                color: 'white',
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent sx={{ padding: '24px', paddingTop: '24px' }}>
-            <Typography variant="body1">
-              ¿Estás seguro de que deseas eliminar al usuario <strong>{selectedUser?.name}</strong>?
-              Esta acción no se puede deshacer.
-            </Typography>
-          </DialogContent>
-          <DialogActions sx={{ padding: '16px 24px' }}>
-            <Button onClick={closeDialog} sx={{ color: '#7e8299' }}>
-              Cancelar
-            </Button>
-            <ActionButton 
-              variant="delete" 
-              onClick={handleDelete}
-            >
-              Eliminar Usuario
-            </ActionButton>
-          </DialogActions>
-        </Dialog>
+        {/* Variantes explícitas de diálogos */}
+        <CreateUserDialog
+          open={isCreateOpen}
+          onClose={() => setIsCreateOpen(false)}
+          onSuccess={handleCreateSuccess}
+          token={token}
+        />
+        <EditUserDialog
+          open={isEditOpen}
+          user={selectedUser}
+          onClose={() => { setIsEditOpen(false); setSelectedUser(null); }}
+          onSuccess={handleEditSuccess}
+          token={token}
+        />
+        <DeleteUserDialog
+          open={isDeleteOpen}
+          user={selectedUser}
+          onClose={() => { setIsDeleteOpen(false); setSelectedUser(null); }}
+          onSuccess={handleDeleteSuccess}
+          token={token}
+        />
       </EnhancedTableContainer>
     );
   };

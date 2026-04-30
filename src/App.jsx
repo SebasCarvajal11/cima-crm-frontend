@@ -10,7 +10,6 @@ const EditClient = lazy(() => import('./components/Client/EditClient'));
 const UserManagement = lazy(() => import('./components/Client/UserManagement'));
 const RoleManagement = lazy(() => import('./components/Roles/RoleManagement')); // Nueva gestión de roles
 const Dashboard = lazy(() => import('./components/Dashboard/Dashboard')); // Importa el Dashboard aquí
-const CreateUser = lazy(() => import('./components/Client/CreateUser'));
 
 const LoadingFallback = () => <div style={{ display: 'flex', justifyContent: 'center', padding: '50px' }}>Cargando...</div>;
 const App = () => {
@@ -33,16 +32,10 @@ const App = () => {
           }
         />
 
-
-        {/* Ruta protegida para crear un cliente */}
+        {/* Ruta legacy redirigida a UserManagement */}
         <Route
           path="/create-users-register"
-          element={
-            <ProtectedRoute roles={['Admin']}>
-              {/*<CreateClient />*/}
-              <CreateUser />
-            </ProtectedRoute>
-          }
+          element={<Navigate to="/clients" replace />}
         />
 
         {/* Ruta protegida para editar un cliente */}
