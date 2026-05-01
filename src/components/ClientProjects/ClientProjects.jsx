@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import {
@@ -25,34 +24,31 @@ import {
   DialogActions,
   IconButton,
   Paper,
+  Divider,
 } from '@mui/material';
 import {
   Assignment as ProjectIcon,
-  Timeline as TimelineIcon,
   CalendarToday as CalendarIcon,
   Description as DescriptionIcon,
   Close as CloseIcon,
   Email as EmailIcon,
   Phone as PhoneIcon,
-  Task as TaskIcon,
   Contacts as ContactsIcon,
   Person as PersonIcon,
   Update as UpdateIcon,
   Schedule as ScheduleIcon,
 } from '@mui/icons-material';
+import { motion, AnimatePresence } from 'framer-motion';
+import logger from '../../utils/logger';
 
-// Add these imports at the top
-import { useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
-
-// Create theme outside the component
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#8e3031',
-      dark: '#592d2d',
-    },
-  },
-});
+const getStatusColor = (status) => {
+  switch (status?.toLowerCase()) {
+    case 'completed': return 'success';
+    case 'in progress': return 'info';
+    case 'pending': return 'warning';
+    default: return 'default';
+  }
+};
 
 const ClientProjects = () => {
   const [projects, setProjects] = useState([]);
@@ -62,498 +58,320 @@ const ClientProjects = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const { accessToken } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/projects/my-projects`,
-          {
-            headers: { 'accesstoken': accessToken }
-          }
-        );
-        setProjects(response.data.projects);
-        setLoading(false);
-      } catch (err) {
-        setError('Error al cargar los proyectos: ' + (err.response?.data?.message || err.message));
-        setLoading(false);
-      }
-    };
-
-    fetchProjects();
+  const fetchProjects = useCallback(async () => {
+    if (!accessToken) return;
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/projects/my-projects`,
+        {
+          headers: { 'accesstoken': accessToken }
+        }
+      );
+      setProjects(response.data.projects || []);
+      setError(null);
+    } catch (err) {
+      logger.error('Error fetching client projects:', err);
+      setError('Error al cargar los proyectos: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setLoading(false);
+    }
   }, [accessToken]);
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Completed': return 'success';
-      case 'In Progress': return 'info';
-      case 'Pending': return 'warning';
-      default: return 'default';
-    }
-  };
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
 
   const handleViewDetails = (project) => {
     setSelectedProject(project);
     setOpenDialog(true);
   };
 
-  const ProjectDetailsDialog = () => {
-    const theme = useTheme();
-    if (!selectedProject) return null;
-
-    return (
-      <Dialog 
-        open={openDialog} 
-        onClose={() => setOpenDialog(false)}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: 2,
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-          }
-        }}
-      >
-        <DialogTitle 
-          sx={{ 
-            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-            color: 'white',
-            p: 3,
-            display: 'flex', 
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <ProjectIcon sx={{ fontSize: 32 }} />
-            <Box>
-              <Typography variant="h5" component="span" sx={{ fontWeight: 600 }}>
-              {selectedProject.projectName}
-              </Typography>
-              <Typography variant="subtitle2" sx={{ mt: 0.5, opacity: 0.9 }}>
-            
-              </Typography>
-            </Box>
-          </Box>
-          <IconButton 
-            onClick={() => setOpenDialog(false)} 
-            sx={{ 
-              color: 'white',
-              '&:hover': { 
-                background: 'rgba(255, 255, 255, 0.1)' 
-              } 
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-
-        <DialogContent sx={{ p: 4 }}>
-          <Grid container spacing={4}>
-            <Grid item xs={12}>
-              <Paper sx={{ p: 3, bgcolor: 'background.default', borderRadius: 2 }}>
-                <Typography variant="h6" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <DescriptionIcon /> Descripción del Proyecto
-                </Typography>
-                <Typography variant="body1">
-                  {selectedProject.description || 'Sin descripción disponible'}
-                </Typography> 
-              </Paper>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Paper sx={{ p: 3, bgcolor: 'background.default', borderRadius: 2 }}>
-                <Typography variant="h6" color="primary" gutterBottom sx={{ mb: 3 }}>
-                  Estado y Progreso
-                </Typography>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6}>
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" gutterBottom>
-                        Estado Actual
-                      </Typography>
-                      <Chip
-                        label={selectedProject.status}
-                        color={getStatusColor(selectedProject.status)}
-                        sx={{ fontWeight: 500, px: 2 }}
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Box>
-                      <Typography variant="subtitle2" gutterBottom>
-                        Progreso General
-                      </Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <LinearProgress 
-                          variant="determinate" 
-                          value={selectedProject.progress || 0}
-                          sx={{
-                            height: 8,
-                            borderRadius: 4,
-                            mb: 1,
-                            bgcolor: 'rgba(142, 48, 49, 0.1)',
-                            '& .MuiLinearProgress-bar': {
-                              bgcolor: '#8e3031'
-                            }
-                          }}
-                        />
-                        <Typography variant="h6" sx={{ minWidth: 45 }}>
-                          {selectedProject.progress || 0}%
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Paper>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Paper sx={{ p: 3, bgcolor: 'background.default', borderRadius: 2 }}>
-                <Typography variant="h6" color="primary" gutterBottom sx={{ mb: 3 }}>
-                  Estadísticas de Tareas
-                </Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={6} sm={3}>
-                    <Box sx={{ 
-                      p: 2, 
-                      textAlign: 'center', 
-                      borderRadius: 2,
-                      border: '1px solid',
-                      borderColor: 'divider'
-                    }}>
-                      <Typography variant="h4" sx={{ mb: 1 }}>
-                        {selectedProject.taskStats.total}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Total de Tareas
-                      </Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={6} sm={3}>
-                    <Box sx={{ 
-                      p: 2, 
-                      textAlign: 'center', 
-                      borderRadius: 2,
-                      background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
-                      color: 'white'
-                    }}>
-                      <Typography variant="h4" sx={{ mb: 1 }}>
-                        {selectedProject.taskStats.completed}
-                      </Typography>
-                      <Typography variant="body2">
-                        Completadas
-                      </Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={6} sm={3}>
-                    <Box sx={{ 
-                      p: 2, 
-                      textAlign: 'center', 
-                      borderRadius: 2,
-                      background: 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)',
-                      color: 'white'
-                    }}>
-                      <Typography variant="h4" sx={{ mb: 1 }}>
-                        {selectedProject.taskStats.inProgress}
-                      </Typography>
-                      <Typography variant="body2">
-                        En Progreso
-                      </Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={6} sm={3}>
-                    <Box sx={{ 
-                      p: 2, 
-                      textAlign: 'center', 
-                      borderRadius: 2,
-                      background: 'linear-gradient(135deg, #FFC107 0%, #FFA000 100%)',
-                      color: 'white'
-                    }}>
-                      <Typography variant="h4" sx={{ mb: 1 }}>
-                        {selectedProject.taskStats.pending}
-                      </Typography>
-                      <Typography variant="body2">
-                        Pendientes
-                      </Typography>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Paper>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Paper sx={{ p: 3, bgcolor: 'background.default', borderRadius: 2, height: '100%' }}>
-                <Typography variant="h6" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <ContactsIcon /> Información de Contacto
-                </Typography>
-                <List>
-                  <ListItem>
-                    <ListItemIcon>
-                      <PersonIcon color="primary" />
-                    </ListItemIcon>
-                    <ListItemText 
-                      primary="Cliente"
-                      secondary={selectedProject.client.name}
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemIcon>
-                      <EmailIcon color="primary" />
-                    </ListItemIcon>
-                    <ListItemText 
-                      primary="Email"
-                      secondary={selectedProject.client.email}
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemIcon>
-                      <PhoneIcon color="primary" />
-                    </ListItemIcon>
-                    <ListItemText 
-                      primary="Teléfono"
-                      secondary={selectedProject.client.contactInfo}
-                    />
-                  </ListItem>
-                </List>
-              </Paper>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Paper sx={{ p: 3, bgcolor: 'background.default', borderRadius: 2, height: '100%' }}>
-                <Typography variant="h6" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <ScheduleIcon /> Fechas Importantes
-                </Typography>
-                <List>
-                  <ListItem>
-                    <ListItemIcon>
-                      <CalendarIcon color="primary" />
-                    </ListItemIcon>
-                    <ListItemText 
-                      primary="Fecha de Creación"
-                      secondary={new Date(selectedProject.createdAt).toLocaleDateString('es-ES', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemIcon>
-                      <UpdateIcon color="primary" />
-                    </ListItemIcon>
-                    <ListItemText 
-                      primary="Última Actualización"
-                      secondary={new Date(selectedProject.updatedAt).toLocaleDateString('es-ES', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    />
-                  </ListItem>
-                </List>
-              </Paper>
-            </Grid>
-          </Grid>
-        </DialogContent>
-
-        <DialogActions sx={{ p: 3, bgcolor: 'background.default' }}>
-          <Button 
-            onClick={() => setOpenDialog(false)}
-            variant="outlined"
-            startIcon={<CloseIcon />}
-          >
-            Cerrar
-          </Button>
-        </DialogActions>
-      </Dialog>
-    );
-  };
-
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <LinearProgress />
+      <Container maxWidth="lg" className="mt-12 flex justify-center">
+        <CircularProgress />
       </Container>
     );
   }
 
-  // Wrap the return statement with ThemeProvider using the defined theme
   return (
-    <ThemeProvider theme={theme}>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" component="h1" gutterBottom sx={{ 
-            fontWeight: 700,
-            background: 'linear-gradient(45deg, #8e3031 30%, #8e3031 90%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
-          }}>
+    <Container maxWidth="lg" className="py-8">
+      <Box className="mb-8">
+        <Typography variant="h4" className="font-bold mb-2 flex items-center gap-3">
+          <ProjectIcon fontSize="large" className="text-brand-primary" />
+          <span className="bg-gradient-to-r from-brand-primary to-brand-primary-light bg-clip-text text-transparent">
             Mis Proyectos
-          </Typography>
-          <Typography variant="subtitle1" color="#000000">
-            Gestiona y visualiza el progreso de tus proyectos
-          </Typography>
-        </Box>
+          </span>
+        </Typography>
+        <Typography variant="subtitle1" className="text-gray-600 font-medium">
+          Gestiona y visualiza el progreso de tus proyectos activos
+        </Typography>
+      </Box>
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 4 }}>
-            {error}
-          </Alert>
-        )}
+      {error && (
+        <Alert severity="error" className="mb-8 rounded-xl shadow-sm">
+          {error}
+        </Alert>
+      )}
 
-        <Grid container spacing={3}>
-          {projects.map((project) => (
+      <Grid container spacing={4}>
+        <AnimatePresence>
+          {projects.map((project, index) => (
             <Grid item xs={12} sm={6} md={4} key={project.projectId}>
-              <Fade in={true} timeout={300}>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+              >
                 <Card 
-                  elevation={3} 
-                  sx={{ 
-                    height: '100%', 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                    '&:hover': {
-                      transform: 'translateY(-5px)',
-                      boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
-                    },
-                    borderRadius: '12px',
-                    overflow: 'hidden',
-                    border: '1px solid #ebedf3'
-                  }}
+                  className="h-full rounded-2xl border border-gray-100 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col group"
                 >
-                  {/* Project status indicator */}
                   <Box 
-                    sx={{ 
-                      height: '8px', 
-                      bgcolor: project.status === 'Completed' 
-                        ? '#10b981' 
-                        : project.status === 'In Progress' 
-                          ? '#8e3031' 
-                          : '#f59e0b' 
-                    }} 
+                    className={`h-2 transition-colors duration-300 ${
+                      project.status === 'Completed' ? 'bg-green-500' : 
+                      project.status === 'In Progress' ? 'bg-brand-primary' : 'bg-yellow-500'
+                    }`}
                   />
                   
-                  {/* Card content */}
-                  <CardContent sx={{ flexGrow: 1, p: 3 }}>
-                    {/* Project title */}
-                    <Typography 
-                      variant="h5" 
-                      component="h2" 
-                      gutterBottom 
-                      sx={{ 
-                        fontWeight: 600,
-                        color: '#3f4254',
-                        mb: 2,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1
-                      }}
-                    >
-                      <ProjectIcon fontSize="small" sx={{ color: '#8e3031' }} />
-                      {project.projectName || project.name}
-                    </Typography>
-                    
-                    {/* Project status chip */}
+                  <CardContent className="flex-grow p-6">
+                    <Box className="flex justify-between items-start mb-4">
+                      <Typography variant="h6" className="font-bold text-gray-800 group-hover:text-brand-primary transition-colors">
+                        {project.projectName}
+                      </Typography>
+                    </Box>
+
                     <Chip 
                       label={project.status} 
                       size="small" 
-                      sx={{ 
-                        mb: 2,
-                        bgcolor: project.status === 'Completed' 
-                          ? 'rgba(16, 185, 129, 0.1)' 
-                          : project.status === 'In Progress' 
-                            ? 'rgba(142, 48, 49, 0.1)' 
-                            : 'rgba(245, 158, 11, 0.1)',
-                        color: project.status === 'Completed' 
-                          ? '#10b981' 
-                          : project.status === 'In Progress' 
-                            ? '#8e3031' 
-                            : '#f59e0b',
-                        fontWeight: 500,
-                        borderRadius: '6px'
-                      }}
+                      color={getStatusColor(project.status)}
+                      className="mb-4 font-semibold rounded-md"
                     />
                     
-                    {/* Project description preview */}
-                    {project.description && (
-                      <Typography 
-                        variant="body2" 
-                        color="text.secondary"
-                        sx={{ 
-                          mb: 2,
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis'
-                        }}
-                      >
-                        {project.description}
-                      </Typography>
-                    )}
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary"
+                      className="mb-6 line-clamp-3 min-h-[3rem]"
+                    >
+                      {project.description || 'Sin descripción disponible'}
+                    </Typography>
                     
-                    {/* Project progress */}
-                    <Box sx={{ mt: 2, mb: 1 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                        <Typography variant="caption" color="text.secondary">Progreso</Typography>
-                        <Typography variant="caption" fontWeight="medium">{project.progress || 0}%</Typography>
+                    <Box className="mt-auto">
+                      <Box className="flex justify-between items-end mb-2">
+                        <Typography variant="caption" className="text-gray-500 font-medium">Progreso</Typography>
+                        <Typography variant="caption" className="text-brand-primary font-bold">{project.progress || 0}%</Typography>
                       </Box>
                       <LinearProgress 
                         variant="determinate" 
                         value={project.progress || 0}
+                        className="h-2 rounded-full bg-gray-100"
                         sx={{
-                          height: 6,
-                          borderRadius: 3,
-                          bgcolor: 'rgba(142, 48, 49, 0.1)',
                           '& .MuiLinearProgress-bar': {
-                            bgcolor: '#8e3031'
+                            borderRadius: 5,
+                            bgcolor: 'var(--color-brand-primary)'
                           }
                         }}
                       />
                     </Box>
                   </CardContent>
                   
-                  {/* Card actions */}
-                  <CardActions sx={{ p: 2, pt: 0 }}>
+                  <CardActions className="p-6 pt-0">
                     <Button 
-                      size="small" 
+                      fullWidth
+                      variant="outlined"
                       onClick={() => handleViewDetails(project)}
-                      sx={{
-                        color: '#8e3031',
-                        '&:hover': {
-                          bgcolor: 'rgba(142, 48, 49, 0.1)'
-                        }
-                      }}
+                      className="rounded-xl border-gray-200 text-gray-700 hover:border-brand-primary hover:text-brand-primary normal-case font-semibold"
                     >
                       Ver Detalles
                     </Button>
                   </CardActions>
                 </Card>
-              </Fade>
+              </motion.div>
             </Grid>
           ))}
+        </AnimatePresence>
 
-          {projects.length === 0 && !error && (
-            <Grid item xs={12}>
-              <Box sx={{ textAlign: 'center', py: 8 }}>
-                <ProjectIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
-                <Typography variant="h6" color="text.secondary">
-                  No hay proyectos disponibles
-                </Typography>
-                <Typography variant="body2" color="text.disabled">
-                  Los proyectos aparecerán aquí cuando sean creados
-                </Typography>
+        {projects.length === 0 && !error && (
+          <Grid item xs={12}>
+            <Box className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300">
+              <ProjectIcon className="text-7xl text-gray-200 mb-4" />
+              <Typography variant="h6" className="text-gray-400 font-medium">
+                Aún no tienes proyectos asignados
+              </Typography>
+            </Box>
+          </Grid>
+        )}
+      </Grid>
+
+      {/* Details Dialog */}
+      <Dialog 
+        open={openDialog} 
+        onClose={() => setOpenDialog(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{ className: "rounded-3xl shadow-2xl overflow-hidden" }}
+      >
+        {selectedProject && (
+          <>
+            <DialogTitle className="p-0">
+              <Box className="bg-gradient-to-r from-brand-primary to-brand-primary-light p-8 text-white relative">
+                <Box className="flex items-center gap-4">
+                  <Box className="p-3 bg-white/20 backdrop-blur-md rounded-2xl">
+                    <ProjectIcon fontSize="large" />
+                  </Box>
+                  <Box>
+                    <Typography variant="h5" className="font-bold leading-tight">
+                      {selectedProject.projectName}
+                    </Typography>
+                    <Typography variant="body2" className="opacity-80">
+                      ID: {selectedProject.projectId}
+                    </Typography>
+                  </Box>
+                </Box>
+                <IconButton 
+                  onClick={() => setOpenDialog(false)} 
+                  className="absolute top-6 right-6 text-white hover:bg-white/20"
+                >
+                  <CloseIcon />
+                </IconButton>
               </Box>
-            </Grid>
-          )}
-        </Grid>
-        <ProjectDetailsDialog />
-      </Container>
-    </ThemeProvider>
+            </DialogTitle>
+
+            <DialogContent className="p-8">
+              <Grid container spacing={4}>
+                <Grid item xs={12}>
+                  <Box className="p-6 bg-gray-50 rounded-2xl">
+                    <Typography variant="subtitle1" className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                      <DescriptionIcon className="text-brand-primary" /> 
+                      Descripción del Proyecto
+                    </Typography>
+                    <Typography variant="body1" className="text-gray-600 leading-relaxed">
+                      {selectedProject.description || 'Sin descripción disponible'}
+                    </Typography> 
+                  </Box>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography variant="subtitle1" className="font-bold text-gray-800 mb-4">
+                    Estado y Progreso Actual
+                  </Typography>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} sm={6}>
+                      <Box className="p-4 border border-gray-100 rounded-2xl">
+                        <Typography variant="caption" className="text-gray-400 uppercase font-bold block mb-2">Estado</Typography>
+                        <Chip
+                          label={selectedProject.status}
+                          color={getStatusColor(selectedProject.status)}
+                          className="font-bold px-4"
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Box className="p-4 border border-gray-100 rounded-2xl h-full flex flex-col justify-center">
+                        <Box className="flex justify-between mb-2">
+                          <Typography variant="caption" className="text-gray-400 uppercase font-bold">Progreso General</Typography>
+                          <Typography variant="body2" className="font-bold text-brand-primary">{selectedProject.progress || 0}%</Typography>
+                        </Box>
+                        <LinearProgress 
+                          variant="determinate" 
+                          value={selectedProject.progress || 0}
+                          className="h-2 rounded-full bg-gray-100"
+                          sx={{ '& .MuiLinearProgress-bar': { bgcolor: 'var(--color-brand-primary)' } }}
+                        />
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </Grid>
+
+                {selectedProject.taskStats && (
+                  <Grid item xs={12}>
+                    <Typography variant="subtitle1" className="font-bold text-gray-800 mb-4">
+                      Estadísticas de Tareas
+                    </Typography>
+                    <Grid container spacing={2}>
+                      {[
+                        { label: 'Total', count: selectedProject.taskStats.total, color: 'bg-gray-100 text-gray-600' },
+                        { label: 'Completadas', count: selectedProject.taskStats.completed, color: 'bg-green-50 text-green-600' },
+                        { label: 'En Progreso', count: selectedProject.taskStats.inProgress, color: 'bg-blue-50 text-blue-600' },
+                        { label: 'Pendientes', count: selectedProject.taskStats.pending, color: 'bg-yellow-50 text-yellow-600' }
+                      ].map((stat) => (
+                        <Grid item xs={6} sm={3} key={stat.label}>
+                          <Box className={`p-4 text-center rounded-2xl ${stat.color}`}>
+                            <Typography variant="h4" className="font-bold mb-1">{stat.count}</Typography>
+                            <Typography variant="caption" className="font-bold uppercase opacity-80">{stat.label}</Typography>
+                          </Box>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Grid>
+                )}
+
+                <Grid item xs={12} md={6}>
+                  <Box className="p-6 border border-gray-100 rounded-2xl h-full">
+                    <Typography variant="subtitle1" className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                      <ContactsIcon className="text-brand-primary" /> Información de Contacto
+                    </Typography>
+                    <List dense className="p-0">
+                      <ListItem className="px-0">
+                        <ListItemIcon className="min-w-[40px]"><PersonIcon color="primary" /></ListItemIcon>
+                        <ListItemText primary="Responsable" secondary={selectedProject.client?.name || '-'} />
+                      </ListItem>
+                      <ListItem className="px-0">
+                        <ListItemIcon className="min-w-[40px]"><EmailIcon color="primary" /></ListItemIcon>
+                        <ListItemText primary="Email" secondary={selectedProject.client?.email || '-'} />
+                      </ListItem>
+                      <ListItem className="px-0">
+                        <ListItemIcon className="min-w-[40px]"><PhoneIcon color="primary" /></ListItemIcon>
+                        <ListItemText primary="Teléfono" secondary={selectedProject.client?.contactInfo || '-'} />
+                      </ListItem>
+                    </List>
+                  </Box>
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <Box className="p-6 border border-gray-100 rounded-2xl h-full">
+                    <Typography variant="subtitle1" className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                      <ScheduleIcon className="text-brand-primary" /> Fechas del Proyecto
+                    </Typography>
+                    <List dense className="p-0">
+                      <ListItem className="px-0">
+                        <ListItemIcon className="min-w-[40px]"><CalendarIcon color="primary" /></ListItemIcon>
+                        <ListItemText 
+                          primary="Fecha de Creación" 
+                          secondary={new Date(selectedProject.createdAt).toLocaleDateString('es-ES', { 
+                            year: 'numeric', month: 'long', day: 'numeric' 
+                          })} 
+                        />
+                      </ListItem>
+                      <ListItem className="px-0">
+                        <ListItemIcon className="min-w-[40px]"><UpdateIcon color="primary" /></ListItemIcon>
+                        <ListItemText 
+                          primary="Última Actualización" 
+                          secondary={new Date(selectedProject.updatedAt).toLocaleDateString('es-ES', { 
+                            year: 'numeric', month: 'long', day: 'numeric' 
+                          })} 
+                        />
+                      </ListItem>
+                    </List>
+                  </Box>
+                </Grid>
+              </Grid>
+            </DialogContent>
+
+            <Divider />
+            <DialogActions className="p-6 bg-gray-50">
+              <Button 
+                onClick={() => setOpenDialog(false)}
+                variant="contained"
+                className="bg-black hover:bg-gray-800 px-8 py-2.5 rounded-xl normal-case font-bold shadow-lg"
+              >
+                Cerrar Detalles
+              </Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
+    </Container>
   );
 };
 
