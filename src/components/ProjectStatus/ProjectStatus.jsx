@@ -75,8 +75,8 @@ const ProjectStatus = ({ userRole }) => {
 
   const handleViewDetails = async (projectId) => {
     try {
-      logger.debug('Project ID:', projectId); // Verificar el ID
-      logger.debug('Access Token:', localStorage.getItem('accessToken')); // Verificar el token
+      logger.debug('Project ID:', projectId);
+      logger.debug('Access Token:', localStorage.getItem('accessToken'));
 
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/projects/${projectId}/progress`, {
         headers: {
@@ -85,7 +85,7 @@ const ProjectStatus = ({ userRole }) => {
       });
       
       if (response.data.success) {
-        logger.debug('API Response:', response.data); // Ver la respuesta completa
+        logger.debug('API Response:', response.data);
         setProjectDetails(response.data);
         setOpenDialog(true);
       }
@@ -93,6 +93,12 @@ const ProjectStatus = ({ userRole }) => {
       logger.error('Error al cargar detalles del proyecto:', err);
     }
   };
+
+  const filteredProjects = useMemo(() => {
+    return projects.filter(project =>
+      project.projectName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [projects, searchTerm]);
 
   if (loading) {
     return (
@@ -110,15 +116,9 @@ const ProjectStatus = ({ userRole }) => {
     );
   }
 
-  const filteredProjects = useMemo(() => {
-    return projects.filter(project =>
-      project.projectName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [projects, searchTerm]);
-
   return (
     <Box className="w-full bg-white rounded-xl shadow-[0_8px_20px_rgba(0,0,0,0.05)] text-brand-primary font-sans" sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom sx={{ mb: 4, color:"#8e3031" }}>
+      <Typography variant="h4" gutterBottom sx={{ mb: 4, color: "#8e3031" }}>
         Estado de Proyectos
       </Typography>
 

@@ -91,7 +91,7 @@ const ExcelManagerContainer = () => {
 };
 
 // Componente principal envuelto en el Provider
-const ExcelImport = ({ projectId = 42 }) => {
+const ExcelImport = ({ projectId = '' }) => {
   return (
     <ExcelProvider initialProjectId={projectId}>
       <ExcelManagerContainer />
