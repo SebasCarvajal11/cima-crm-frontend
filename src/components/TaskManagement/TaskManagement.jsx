@@ -38,11 +38,12 @@ import {
 } from '@mui/icons-material';
 import { taskService } from '../../services/taskService';
 import { toast } from 'react-toastify';
-import './TaskManagement.css';
+
 import { useSelector } from 'react-redux';
 import { CreateTaskDialog } from './components/CreateTaskDialog';
 import { EditTaskDialog } from './components/EditTaskDialog';
 import { BulkActionDialog } from './components/BulkActionDialog';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const TaskManagement = () => {
   // Estado para el usuario actual
@@ -312,12 +313,12 @@ const TaskManagement = () => {
   };
 
   return (
-    <div className="task-management-container">
+    <div className="p-4 md:p-8 bg-gradient-to-br from-gray-50 to-gray-200 min-h-screen">
       <Tabs 
             value={tabValue} 
             onChange={handleTabChange}
             variant="fullWidth"
-            className="task-tabs"
+            className="bg-white rounded-lg mb-6 shadow-sm"
             sx={{
               '& .MuiTab-root': {
                 color: '#592d2d',
@@ -339,11 +340,11 @@ const TaskManagement = () => {
 
       {tabValue === 0 && (
         <>
-          <div className="task-header">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-8 p-5 bg-white rounded-xl shadow-md gap-4">
             <Typography variant="h4" component="h1" sx={{ color: '#592d2d' }}>
               Gestión de Tareas
             </Typography>
-            <div className="task-header-actions">
+            <div className="flex items-center gap-2">
               {selectedTasks.length > 0 && isAdmin && (
                 <Button
                   variant="outlined"
@@ -368,7 +369,7 @@ const TaskManagement = () => {
             </div>
           </div>
 
-          <div className="task-filters">
+          <div className="flex flex-wrap gap-4 p-4 bg-white rounded-lg mb-6 shadow-sm items-center">
             <TextField
               placeholder="Buscar por descripción o nombre de proyecto..."
               variant="outlined"
@@ -436,26 +437,35 @@ const TaskManagement = () => {
           
 
           {loading ? (
-            <div className="loading-container">
+            <div className="flex justify-center p-10">
               <CircularProgress />
             </div>
           ) : error ? (
             <Alert severity="error" sx={{ my: 2 }}>{error}</Alert>
           ) : (
-            <div className="task-grid">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8 p-4">
+              <AnimatePresence>
               {filteredTasks.length > 0 ? (
-                filteredTasks.map((task) => (
-                  <div key={task.taskId || task.id} className="task-card">
+                filteredTasks.map((task, index) => (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                    key={task.taskId || task.id} 
+                    className="bg-white rounded-xl p-5 shadow-sm hover:shadow-xl transition-all duration-300 relative flex flex-col hover:-translate-y-1 focus-within:ring-2 focus-within:ring-brand-secondary outline-none"
+                    tabIndex={0}
+                  >
   {isAdmin && (
     <Checkbox
       checked={selectedTasks.includes(task.taskId || task.id)}
       onChange={() => handleTaskSelection(task.taskId || task.id)}
-      className="task-checkbox"
+      className="absolute top-2 left-2 z-10"
     />
   )}
 
   {/* Botón de eliminar posicionado en la esquina superior derecha */}
-  <div className="delete-icon">
+  <div className="absolute top-2 right-2 z-10">
     <Tooltip title="Eliminar">
       <IconButton 
         size="small" 
@@ -471,17 +481,17 @@ const TaskManagement = () => {
     </Tooltip>
   </div>
 
-  <div className="task-card-header">
+  <div className="flex justify-between items-start mb-4 w-full">
     <div>
-      <Typography className="task-project-name">
-        <AssignmentIcon className="task-project-icon" />
+      <Typography className="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+        <AssignmentIcon className="text-gray-500" />
         {task.projectName || `Proyecto #${task.projectId}`}
       </Typography>
-      <span className={`task-status-chip ${getStatusClass(task.status)}`}>
+      <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${getStatusClass(task.status)}`}>
         {getStatusIcon(task.status)} {task.status}
       </span>
     </div>
-    <div className="task-actions">
+    <div className="flex items-center gap-2 ml-auto relative z-10">
       <Tooltip title="Editar">
         <IconButton 
           size="small" 
@@ -498,11 +508,11 @@ const TaskManagement = () => {
     </div>
   </div>
   {/* Resto del contenido de la tarjeta */}
-  <Typography className="task-card-description">
+  <Typography className="flex-grow mb-4 text-gray-600 text-sm leading-relaxed">
     {task.description}
   </Typography>
-  <div className="task-card-footer">
-    <div className="task-worker-info">
+  <div className="flex justify-between items-center text-xs text-gray-500 border-t border-gray-100 pt-3">
+    <div className="flex items-center gap-2">
       <Avatar sx={{ width: 24, height: 24, bgcolor: '#000000' }}>
         {task.workerName ? task.workerName.charAt(0).toUpperCase() : <PersonIcon fontSize="small" />}
       </Avatar>
@@ -513,25 +523,31 @@ const TaskManagement = () => {
         </Typography>
       )}
     </div>
-    <div className="task-date">
+    <div className="text-gray-400 text-sm">
       {new Date(task.createdAt).toLocaleDateString()}
     </div>
   </div>
-</div>
-
+                  </motion.div>
                 ))
               ) : (
-                <Typography variant="body1" sx={{ gridColumn: '1 / -1', textAlign: 'center', py: 4 }}>
-                  No se encontraron tareas con los filtros aplicados.
-                </Typography>
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="col-span-full text-center py-8"
+                >
+                  <Typography variant="body1" sx={{ color: '#666' }}>
+                    No se encontraron tareas con los filtros aplicados.
+                  </Typography>
+                </motion.div>
               )}
+              </AnimatePresence>
             </div>
           )}
         </>
       )}
 {/* Sección de Estadísticas */}
       {tabValue === 1 && isAdmin && (
-        <div className="stats-container">
+        <div className="p-5 bg-white rounded-xl shadow-md">
           <Typography variant="h5" sx={{ mb: 4, display: 'flex', alignItems: 'center', color: '#2c3e50', fontWeight: 600 }}>
             <BarChartIcon sx={{ mr: 1 }} /> Estadísticas de Tareas
           </Typography>
@@ -551,8 +567,8 @@ const TaskManagement = () => {
                       boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
                     }
                   }}>
-                    <div className="stats-card-content">
-                      <div className="stats-card-icon total">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-center w-12 h-12 rounded-xl text-blue-500 bg-blue-100 mr-4">
                         <AssignmentIcon fontSize="large" />
                       </div>
                       <div>
@@ -574,8 +590,8 @@ const TaskManagement = () => {
                       boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
                     }
                   }}>
-                    <div className="stats-card-content">
-                      <div className="stats-card-icon completed">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-center w-12 h-12 rounded-xl text-green-600 bg-green-100 mr-4">
                         <CheckCircleIcon fontSize="large" />
                       </div>
                       <div>
@@ -597,8 +613,8 @@ const TaskManagement = () => {
                       boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
                     }
                   }}>
-                    <div className="stats-card-content">
-                      <div className="stats-card-icon in-progress">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-center w-12 h-12 rounded-xl text-blue-800 bg-blue-100 mr-4">
                         <ScheduleIcon fontSize="large" />
                       </div>
                       <div>
@@ -620,8 +636,8 @@ const TaskManagement = () => {
                       boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
                     }
                   }}>
-                    <div className="stats-card-content">
-                      <div className="stats-card-icon pending">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-center w-12 h-12 rounded-xl text-orange-500 bg-orange-100 mr-4">
                         <PendingIcon fontSize="large" />
                       </div>
                       <div>
@@ -637,7 +653,7 @@ const TaskManagement = () => {
               <Grid container spacing={3}>
                 {/* Distribución de tareas */}
                 <Grid item xs={12} md={6}>
-                  <Paper className="stats-detail-card" elevation={3} sx={{ 
+                  <Paper className="p-6 rounded-xl bg-white shadow-sm h-full" elevation={3} sx={{ 
                     p: 3, 
                     borderRadius: '12px',
                     height: '100%',
@@ -647,56 +663,56 @@ const TaskManagement = () => {
                       <BarChartIcon sx={{ mr: 1, color: '#3498db' }} /> Distribución de Tareas
                     </Typography>
                     
-                    <div className="stats-progress-container">
-                      <div className="stats-progress-item">
-                        <div className="stats-progress-label">
+                    <div className="flex flex-col gap-4">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex justify-between text-sm">
                           <Typography sx={{ display: 'flex', alignItems: 'center' }}>
-                            <span className="status-dot completed"></span>
+                            <span className="w-3 h-3 rounded-full mr-2 bg-green-500"></span>
                             Completadas
                           </Typography>
                           <Typography sx={{ fontWeight: 600 }}>
                             {Math.round((taskStats.stats?.completed / taskStats.stats?.total || 0) * 100)}%
                           </Typography>
                         </div>
-                        <div className="stats-progress-bar-container">
+                        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                           <div 
-                            className="stats-progress-bar completed" 
+                            className="h-full rounded-full transition-all duration-500 bg-green-500" 
                             style={{ width: `${(taskStats.stats?.completed / taskStats.stats?.total || 0) * 100}%` }}
                           ></div>
                         </div>
                       </div>
                       
-                      <div className="stats-progress-item">
-                        <div className="stats-progress-label">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex justify-between text-sm">
                           <Typography sx={{ display: 'flex', alignItems: 'center' }}>
-                            <span className="status-dot in-progress"></span>
+                            <span className="w-3 h-3 rounded-full mr-2 bg-blue-500"></span>
                             En Progreso
                           </Typography>
                           <Typography sx={{ fontWeight: 600 }}>
                             {Math.round((taskStats.stats?.inProgress / taskStats.stats?.total || 0) * 100)}%
                           </Typography>
                         </div>
-                        <div className="stats-progress-bar-container">
+                        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                           <div 
-                            className="stats-progress-bar in-progress" 
+                            className="h-full rounded-full transition-all duration-500 bg-blue-500" 
                             style={{ width: `${(taskStats.stats?.inProgress / taskStats.stats?.total || 0) * 100}%` }}
                           ></div>
                         </div>
                       </div>
                       
-                      <div className="stats-progress-item">
-                        <div className="stats-progress-label">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex justify-between text-sm">
                           <Typography sx={{ display: 'flex', alignItems: 'center' }}>
-                            <span className="status-dot pending"></span>
+                            <span className="w-3 h-3 rounded-full mr-2 bg-orange-400"></span>
                             Pendientes
                           </Typography>
                           <Typography sx={{ fontWeight: 600 }}>
                             {Math.round((taskStats.stats?.pending / taskStats.stats?.total || 0) * 100)}%
                           </Typography>
                         </div>
-                        <div className="stats-progress-bar-container">
+                        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                           <div 
-                            className="stats-progress-bar pending" 
+                            className="h-full rounded-full transition-all duration-500 bg-orange-400" 
                             style={{ width: `${(taskStats.stats?.pending / taskStats.stats?.total || 0) * 100}%` }}
                           ></div>
                         </div>
@@ -707,7 +723,7 @@ const TaskManagement = () => {
                 
                 {/* Resumen del proyecto */}
                 <Grid item xs={12} md={6}>
-                  <Paper className="stats-detail-card" elevation={3} sx={{ 
+                  <Paper className="p-6 rounded-xl bg-white shadow-sm h-full" elevation={3} sx={{ 
                     p: 3, 
                     borderRadius: '12px',
                     height: '100%',
@@ -717,12 +733,12 @@ const TaskManagement = () => {
                       <PersonIcon sx={{ mr: 1, color: '#9c27b0' }} /> Resumen de tareas
                     </Typography>
                     
-                    <div className="stats-info-grid">
-                    <div className="stats-info-item">
-                        <div className="stats-info-icon efficiency">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-5">
+                    <div className="flex items-center p-4 bg-gray-50 rounded-lg hover:-translate-y-1 hover:shadow-md transition-all duration-200">
+                        <div className="flex items-center justify-center w-12 h-12 rounded-xl mr-3 bg-green-100 text-green-600">
                           <CheckCircleIcon />
                         </div>
-                        <div className="stats-info-content">
+                        <div className="flex flex-col">
                           <Typography variant="h4" sx={{ fontWeight: 700 }}>
                             {taskStats.stats?.total ? Math.round((taskStats.stats?.completed / taskStats.stats?.total) * 100) : 0}%
                           </Typography>
@@ -741,7 +757,7 @@ const TaskManagement = () => {
               </Grid>
             </>
           ) : (
-            <div className="loading-container">
+            <div className="flex justify-center p-10">
               <CircularProgress />
             </div>
           )}

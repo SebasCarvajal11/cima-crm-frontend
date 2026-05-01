@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import './ProjectStatus.css';
 import { 
   CircularProgress, 
   Paper, 
@@ -117,7 +116,7 @@ const ProjectStatus = ({ userRole }) => {
   }, [projects, searchTerm]);
 
   return (
-    <Box className="project-status-container" sx={{ p: 3 }}>
+    <Box className="w-full bg-white rounded-xl shadow-[0_8px_20px_rgba(0,0,0,0.05)] text-brand-primary font-sans" sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom sx={{ mb: 4, color:"#8e3031" }}>
         Estado de Proyectos
       </Typography>
@@ -136,7 +135,20 @@ const ProjectStatus = ({ userRole }) => {
               </InputAdornment>
             ),
           }}
-          className="search-input"
+          sx={{
+            backgroundColor: '#fff',
+            borderRadius: '8px',
+            '& .MuiOutlinedInput-root': {
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                backgroundColor: 'rgba(89, 45, 45, 0.04)'
+              },
+              '&.Mui-focused': {
+                backgroundColor: '#fff',
+                boxShadow: '0 2px 8px rgba(89, 45, 45, 0.1)'
+              }
+            }
+          }}
         />
       </Box>
 
@@ -144,18 +156,18 @@ const ProjectStatus = ({ userRole }) => {
         <Table>
           <TableHead>
             <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-              <TableCell><strong>Nombre del Proyecto</strong></TableCell>
-              <TableCell><strong>Cliente</strong></TableCell>
-              <TableCell><strong>Descripción</strong></TableCell>
-              <TableCell><strong>Estado</strong></TableCell>
-              <TableCell><strong>Fecha de Creación</strong></TableCell>
-              <TableCell><strong>Última Actualización</strong></TableCell>
-              <TableCell><strong>Acciones</strong></TableCell>
+              <TableCell sx={{ fontWeight: 600, color: '#333' }}>Nombre del Proyecto</TableCell>
+              <TableCell sx={{ fontWeight: 600, color: '#333' }}>Cliente</TableCell>
+              <TableCell sx={{ fontWeight: 600, color: '#333' }}>Descripción</TableCell>
+              <TableCell sx={{ fontWeight: 600, color: '#333' }}>Estado</TableCell>
+              <TableCell sx={{ fontWeight: 600, color: '#333' }}>Fecha de Creación</TableCell>
+              <TableCell sx={{ fontWeight: 600, color: '#333' }}>Última Actualización</TableCell>
+              <TableCell sx={{ fontWeight: 600, color: '#333' }}>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredProjects.map((project) => (
-              <TableRow key={project.projectId} hover>
+              <TableRow key={project.projectId} hover sx={{ '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' } }}>
                 <TableCell>{project.projectName}</TableCell>
                 <TableCell>
                   <Box>
@@ -182,11 +194,17 @@ const ProjectStatus = ({ userRole }) => {
                 <TableCell>
                   <Tooltip title="Ver detalles">
                     <IconButton
-                      className="view-button"
                       onClick={() => {
                         console.log('Clicked project:', project);
-                        handleViewDetails(project.projectId)} // Cambiado de project.id a project.projectId
+                        handleViewDetails(project.projectId)}
                       }
+                      sx={{ 
+                        color: '#000000',
+                        '&:hover': {
+                          backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                          color: '#000000'
+                        }
+                      }}
                     >
                       <VisibilityIcon />
                     </IconButton>
@@ -240,9 +258,9 @@ const ProjectStatus = ({ userRole }) => {
                       value={projectDetails.progress}
                       text={`${projectDetails.progress}%`}
                       styles={buildStyles({
-                        textColor: '#1976d2',
-                        pathColor: '#2196f3',
-                        trailColor: '#e3f2fd',
+                        textColor: '#592d2d',
+                        pathColor: '#592d2d',
+                        trailColor: 'rgba(89, 45, 45, 0.1)',
                         textSize: '16px',
                         strokeLinecap: 'round'
                       })}

@@ -1,73 +1,39 @@
+@import "tailwindcss";
 
-/* Global styles for the entire app */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-heading: "Outfit", system-ui, sans-serif;
+  
+  /* Brand Colors extracted from AdminDashboard */
+  --color-brand-primary: #592d2d;
+  --color-brand-primary-light: #8e3031;
+  --color-brand-secondary: #1a237e;
+  --color-brand-secondary-light: #3949ab;
+  --color-background: #f4f6f9;
 }
 
-body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f4f6f9;
-  color: #333;
-  line-height: 1.6;
+/* Global resets for base HTML elements to complement Tailwind */
+@layer base {
+  body {
+    @apply font-sans bg-background text-gray-800 antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold tracking-tight text-gray-900;
+  }
 }
 
+/* 
+ * NOTA: Los siguientes estilos globales se han mantenido temporalmente 
+ * para no romper vistas no refactorizadas, pero se deben ir eliminando 
+ * conforme se migren los componentes a Tailwind utility classes.
+ */
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-h1, h2, h3, h4 {
-  color: #c7c1c1;
-}
-
-button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-input, select {
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  width: 100%;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-}
-
-table th, table td {
-  padding: 15px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
+  @apply max-w-7xl mx-auto p-5;
 }
 
 @media (max-width: 768px) {
   .container {
-    padding: 10px;
+    @apply p-2.5;
   }
-
-  table th, table td {
-    padding: 10px;
-  }
-
-  button {
-    width: 100%;
-    margin-bottom: 10px;
-  }
-}
-  
+}

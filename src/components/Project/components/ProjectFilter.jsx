@@ -26,14 +26,7 @@ const ProjectFilter = () => {
   };
 
   return (
-    <div
-      style={{
-        marginBottom: '20px',
-        display: 'flex',
-        gap: '10px',
-        alignItems: 'center',
-      }}
-    >
+    <div className="flex items-center gap-2.5 mb-5 flex-wrap">
       <TextField
         label="Buscar por nombre"
         value={searchTerm}
@@ -41,7 +34,7 @@ const ProjectFilter = () => {
         variant="outlined"
         size="small"
       />
-      <FormControl variant="outlined" size="small" style={{ minWidth: '150px' }}>
+      <FormControl variant="outlined" size="small" className="min-w-[150px]">
         <InputLabel>Estado</InputLabel>
         <Select
           value={statusFilter}

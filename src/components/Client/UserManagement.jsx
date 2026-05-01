@@ -62,7 +62,7 @@ function TabPanel(props) {
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
       {...other}
-      style={{ width: '100%' }}
+      className="w-full"
     >
       {value === index && (
         <Box sx={{ pt: 3 }}>
@@ -347,6 +347,7 @@ const UserManagement = () => {
       {/* Tab Panels */}
       <TabPanel value={tabValue} index={0}>
         {/* Clients Tab Content - Your existing client management UI */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <EnhancedTableContainer>
           <TableToolbar>
             <SearchBar>
@@ -486,11 +487,14 @@ const UserManagement = () => {
             />
           </Box>
         </EnhancedTableContainer>
+        </motion.div>
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
         {/* Users Tab Content - Import from UsersInterface component */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <UsersInterface token={token} />
+        </motion.div>
       </TabPanel>
 
       {/* Explicit Variant Dialogs */}

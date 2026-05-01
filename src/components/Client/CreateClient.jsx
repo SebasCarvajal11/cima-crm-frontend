@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { createClient } from '../../redux/slices/clientSlice';
-import './CreateClient.css'; // Importar los estilos
-import { ToastContainer, toast } from 'react-toastify'; // Importa react-toastify
-import 'react-toastify/dist/ReactToastify.css'; // Estilos de react-toastify
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CreateClient = () => {
   const [formData, setFormData] = useState({
@@ -27,13 +26,12 @@ const CreateClient = () => {
       return;
     }
     try{
-    dispatch(createClient(formData));
-    toast.success('Cliente creado con éxito', { position: "top-center" });
+      dispatch(createClient(formData));
+      toast.success('Cliente creado con éxito', { position: "top-center" });
     }
     catch(error){
       toast.error(error, { position: "top-center" });
     }
-    
     
     // Limpiar formulario
     setFormData({
@@ -45,55 +43,59 @@ const CreateClient = () => {
   };
 
   return (
-    <div className="create-client-container">
+    <div className="max-w-lg mx-auto my-10 p-6 bg-white rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.1)] font-sans">
       <ToastContainer />
-      <h1>Crear Usuario</h1>
-      <form onSubmit={handleSubmit} className="create-client-form">
-        <div className="form-group">
-          <label htmlFor="name">Nombre <span className="required">*</span></label>
+      <h1 className="text-center text-2xl font-bold mb-6 text-brand-primary">Crear Usuario</h1>
+      <form onSubmit={handleSubmit} className="flex flex-col">
+        <div className="mb-5">
+          <label htmlFor="name" className="block text-sm mb-1 text-gray-700 font-medium">Nombre <span className="text-red-500 font-bold">*</span></label>
           <input
             type="text"
             id="name"
             placeholder="Nombre del Cliente"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="w-full p-3 border border-gray-300 rounded-md text-base transition-colors focus:border-brand-secondary focus:outline-none focus:ring-1 focus:ring-brand-secondary"
           />
         </div>
         
-        <div className="form-group">
-          <label htmlFor="email">Correo</label>
+        <div className="mb-5">
+          <label htmlFor="email" className="block text-sm mb-1 text-gray-700 font-medium">Correo</label>
           <input
             type="text"
             id="email"
             placeholder="Correo Electronico"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            className="w-full p-3 border border-gray-300 rounded-md text-base transition-colors focus:border-brand-secondary focus:outline-none focus:ring-1 focus:ring-brand-secondary"
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="password">Contraseña</label>
+        <div className="mb-5">
+          <label htmlFor="password" className="block text-sm mb-1 text-gray-700 font-medium">Contraseña</label>
           <input
             type="text"
             id="password"
             placeholder="Contraseña"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            className="w-full p-3 border border-gray-300 rounded-md text-base transition-colors focus:border-brand-secondary focus:outline-none focus:ring-1 focus:ring-brand-secondary"
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="role">Rol <span className="required">*</span></label>
+        <div className="mb-5">
+          <label htmlFor="role" className="block text-sm mb-1 text-gray-700 font-medium">Rol <span className="text-red-500 font-bold">*</span></label>
           <input
-            type="role"
+            type="text"
             id="role"
             placeholder="Rol"
             value={formData.role}
             onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+            className="w-full p-3 border border-gray-300 rounded-md text-base transition-colors focus:border-brand-secondary focus:outline-none focus:ring-1 focus:ring-brand-secondary"
           />
         </div>
 
-        <button type="submit" className="btn-submit">Crear ssssCliente</button>
+        <button type="submit" className="w-full p-3 bg-brand-secondary border-none rounded-md text-white text-base font-bold cursor-pointer transition-colors hover:bg-brand-secondary-light mt-2">Crear Cliente</button>
       </form>
     </div>
   );
