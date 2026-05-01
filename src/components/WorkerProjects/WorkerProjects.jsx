@@ -168,11 +168,11 @@ const WorkerProjects = () => {
 
   const renderProjectCard = (project) => (
     <StyledCard>
-      <CardContent sx={{ flexGrow: 1, p: 3 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <CardContent className="flex-grow p-6">
+        <Box className="flex justify-between items-start mb-4">
+          <Box className="flex items-center gap-2">
             <ProjectIcon color="primary" />
-            <Typography variant="h6" component="h2">
+            <Typography variant="h6" component="h2" className="font-semibold">
               {project.projectName}
             </Typography>
           </Box>
@@ -183,22 +183,21 @@ const WorkerProjects = () => {
           />
         </Box>
 
-        <Divider sx={{ my: 2 }} />
+        <Divider className="my-4" />
 
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 60 }}>
-          <DescriptionIcon sx={{ fontSize: 16, mr: 1, verticalAlign: 'text-bottom' }} />
+        <Typography variant="body2" color="text.secondary" className="mb-4 min-h-[60px]">
+          <DescriptionIcon className="text-base mr-2 align-text-bottom" />
           {project.description || 'Sin descripción disponible'}
         </Typography>
 
         <ProjectMetadata>
-         
           <Typography variant="body2">
-           
+            {/* Metadata placeholder */}
           </Typography>
         </ProjectMetadata>
       </CardContent>
 
-      <CardActions sx={{ p: 2, pt: 0, gap: 1 }}>
+      <CardActions className="p-4 pt-0 gap-2">
         <Button
           fullWidth
           variant="outlined"
@@ -211,25 +210,27 @@ const WorkerProjects = () => {
     </StyledCard>
   );
 
-    const fetchProjects = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/projects/worker/projects`,
-          {
-            headers: { 'accesstoken': accessToken }
-          }
-        );
-        setProjects(response.data.projects || []);
-        setLoading(false);
-      } catch (err) {
-        setError('Error al cargar los proyectos: ' + (err.response?.data?.message || err.message));
-        setLoading(false);
-      }
-    };
+  const fetchProjects = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/projects/worker/projects`,
+        {
+          headers: { 'accesstoken': accessToken }
+        }
+      );
+      setProjects(response.data.projects || []);
+      setLoading(false);
+    } catch (err) {
+      setError('Error al cargar los proyectos: ' + (err.response?.data?.message || err.message));
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    if (accessToken) {
+      fetchProjects();
+    }
+  }, [accessToken]);
 
   const handleStatusChange = async (projectId, newStatus) => {
     try {
@@ -249,35 +250,22 @@ const WorkerProjects = () => {
     navigate(`/project-status/${projectId}`);
   };
 
-  if (loading) {
-    return (
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <LinearProgress />
-      </Container>
-    );
-  }
-
   const fetchProjectTasks = async (projectId) => {
     try {
       logger.debug('Fetching tasks for project:', projectId);
-      if (!projectId) {
-        logger.debug('No projectId provided');
-        return;
-      }
+      if (!projectId) return;
+
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/projects/${projectId}/worker/tasks`, // Updated endpoint
+        `${import.meta.env.VITE_API_URL}/projects/${projectId}/worker/tasks`,
         {
           headers: { 'accesstoken': accessToken }
         }
       );
-      logger.debug('Tasks API Response:', response.data);
       setTasks(response.data.tasks || []);
-      logger.debug('Tasks set in state:', response.data.tasks);
       setSelectedProjectTasks(projectId);
       setTasksModalOpen(true);
     } catch (err) {
       logger.error('Error fetching tasks:', err);
-      logger.debug('Error response:', err.response);
       setError('Error al cargar las tareas: ' + (err.response?.data?.message || err.message));
     }
   };
@@ -285,15 +273,12 @@ const WorkerProjects = () => {
   const handleCloseTasksModal = () => {
     setTasksModalOpen(false);
     setSelectedProjectTasks(null);
-    setTasks([]); // Clear tasks when closing modal
+    setTasks([]);
   };
 
   const handleUpdateTaskStatus = async () => {
     try {
-      // Use taskService instead of direct axios call
       await taskService.updateTaskStatus(selectedTask.taskId, newTaskStatus);
-      
-      // Refresh tasks after update
       await fetchProjectTasks(selectedProjectTasks);
       setTaskUpdateDialog(false);
       setSelectedTask(null);
@@ -303,13 +288,20 @@ const WorkerProjects = () => {
     }
   };
 
-  // Modify the table row in the TaskModal to include an update button
+  if (loading) {
+    return (
+      <Container maxWidth="lg" className="mt-8">
+        <LinearProgress />
+      </Container>
+    );
+  }
+
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ mb: 4 }}>
+    <Container maxWidth="lg" className="py-8">
+      <Box className="mb-8">
         <Typography variant="h4" component="h1" gutterBottom sx={{ 
           fontWeight: 700,
-          background: 'linear-gradient(45deg, #8e3031 30%, #592d2d 90%)', // Changed to burgundy gradient
+          background: 'linear-gradient(45deg, #8e3031 30%, #592d2d 90%)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent'
         }}>
@@ -321,7 +313,7 @@ const WorkerProjects = () => {
       </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 4 }}>
+        <Alert severity="error" className="mb-8">
           {error}
         </Alert>
       )}
@@ -337,24 +329,22 @@ const WorkerProjects = () => {
       </Grid>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        {/* ... Dialog content ... */}
+        {/* Dialog content for project status change if needed */}
       </Dialog>
 
       <StyledModal open={tasksModalOpen} onClose={handleCloseTasksModal}>
-        <Paper sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
+        <Paper className="flex flex-col h-[90vh]">
           <ModalHeader>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <TaskIcon sx={{ fontSize: 28 }} />
-              <Typography variant="h5" component="h2" sx={{ fontWeight: 600 }}>
+            <Box className="flex items-center gap-4">
+              <TaskIcon className="text-3xl" />
+              <Typography variant="h5" component="h2" className="font-semibold">
                 Tareas del Proyecto
               </Typography>
             </Box>
           </ModalHeader>
 
-          <Box sx={{ p: 3, flexGrow: 1, overflow: 'auto' }}>
-            <TableContainer sx={{ 
-              borderRadius: 1,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+          <Box className="p-6 flex-grow overflow-auto">
+            <TableContainer className="rounded shadow-sm" sx={{ 
               '& .MuiTable-root': {
                 borderCollapse: 'separate',
                 borderSpacing: '0 8px',
@@ -363,25 +353,18 @@ const WorkerProjects = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600, color: 'primary.main' }}>Descripción</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: 'primary.main' }}>Estado</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: 'primary.main' }}>Fecha de Creación</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: 'primary.main' }}>Última Actualización</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: 'primary.main' }}>Acciones</TableCell>
+                    <TableCell className="font-semibold text-brand-primary">Descripción</TableCell>
+                    <TableCell className="font-semibold text-brand-primary">Estado</TableCell>
+                    <TableCell className="font-semibold text-brand-primary">Fecha de Creación</TableCell>
+                    <TableCell className="font-semibold text-brand-primary">Última Actualización</TableCell>
+                    <TableCell className="font-semibold text-brand-primary">Acciones</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {tasks.map((task) => (
                     <TableRow 
                       key={task.taskId || task._id}
-                      sx={{
-                        transition: 'all 0.2s',
-                        '&:hover': {
-                          backgroundColor: 'rgba(0, 0, 0, 0.02)',
-                          transform: 'translateY(-2px)',
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                        },
-                      }}
+                      className="transition-all duration-200 hover:bg-black/5 hover:-translate-y-0.5 hover:shadow-md"
                     >
                       <TableCell>{task.description}</TableCell>
                       <TableCell>
@@ -405,12 +388,7 @@ const WorkerProjects = () => {
                               setNewTaskStatus(task.status);
                               setTaskUpdateDialog(true);
                             }}
-                            sx={{
-                              boxShadow: 'none',
-                              '&:hover': {
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                              },
-                            }}
+                            className="shadow-none hover:shadow-lg"
                           >
                             Actualizar
                           </Button>
@@ -423,14 +401,8 @@ const WorkerProjects = () => {
             </TableContainer>
             
             {tasks.length === 0 && (
-              <Box sx={{ 
-                py: 8, 
-                display: 'flex', 
-                flexDirection: 'column', 
-                alignItems: 'center',
-                gap: 2 
-              }}>
-                <TaskIcon sx={{ fontSize: 48, color: 'text.disabled' }} />
+              <Box className="py-16 flex flex-col items-center gap-4">
+                <TaskIcon className="text-5xl text-gray-400" />
                 <Typography variant="h6" color="text.secondary">
                   No hay tareas asignadas para este proyecto
                 </Typography>
@@ -438,25 +410,13 @@ const WorkerProjects = () => {
             )}
           </Box>
 
-          <Box sx={{ 
-            p: 2, 
-            borderTop: 1, 
-            borderColor: 'divider',
-            backgroundColor: 'background.default',
-            display: 'flex',
-            justifyContent: 'flex-end' 
-          }}>
+          <Box className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end">
             <Button
               onClick={handleCloseTasksModal}
               variant="contained"
               color="primary"
               startIcon={<CloseIcon />}
-              sx={{
-                boxShadow: 'none',
-                '&:hover': {
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                },
-              }}
+              className="shadow-none hover:shadow-lg"
             >
               Cerrar
             </Button>
@@ -468,8 +428,8 @@ const WorkerProjects = () => {
         <DialogTitle>
           Actualizar Estado de Tarea
         </DialogTitle>
-        <DialogContent sx={{ minWidth: 300 }}>
-          <FormControl fullWidth sx={{ mt: 2 }}>
+        <DialogContent className="min-w-[300px]">
+          <FormControl fullWidth className="mt-4">
             <InputLabel>Estado</InputLabel>
             <Select
               value={newTaskStatus}

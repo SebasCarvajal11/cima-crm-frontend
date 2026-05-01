@@ -1,0 +1,46 @@
+import React from 'react';
+import { Typography, Button } from '@mui/material';
+import { Add as AddIcon, Assignment as AssignmentIcon } from '@mui/icons-material';
+import { useTask } from '../../../context/TaskContext';
+
+const TaskManagementHeader = () => {
+  const { 
+    selectedTasks, 
+    isAdmin, 
+    setIsBulkOpen, 
+    setIsCreateOpen 
+  } = useTask();
+
+  return (
+    <div className="flex flex-col md:flex-row justify-between items-center mb-8 p-5 bg-white rounded-xl shadow-md gap-4">
+      <Typography variant="h4" component="h1" sx={{ color: '#592d2d' }}>
+        Gestión de Tareas
+      </Typography>
+      <div className="flex items-center gap-2">
+        {selectedTasks.length > 0 && isAdmin && (
+          <Button
+            variant="outlined"
+            onClick={() => setIsBulkOpen(true)}
+            startIcon={<AssignmentIcon />}
+            sx={{ mr: 2 }}
+          >
+            Acciones en Masa ({selectedTasks.length})
+          </Button>
+        )}
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => setIsCreateOpen(true)}
+          sx={{
+            background: 'linear-gradient(45deg, #2c3e50 30%,rgb(0, 0, 0) 90%)',
+            boxShadow: '0 3px 5px 2px rgba(52, 152, 219, .3)',
+          }}
+        >
+          Nueva Tarea
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default TaskManagementHeader;

@@ -5,7 +5,6 @@ import {
   Table, 
   TableBody, 
   TableCell, 
-  TableHead, 
   TableRow, 
   Typography, 
   Avatar, 
@@ -23,56 +22,26 @@ import {
   FilterList as FilterListIcon
 } from '@mui/icons-material';
 import { toast } from 'react-toastify';
-import styled from '@emotion/styled';
-import { alpha } from '@mui/material/styles';
 import { stringToColor, adjustColor, getInitials } from '../../utils/colorUtils';
 import { CreateUserDialog } from './components/CreateUserDialog';
 import { EditUserDialog } from './components/EditUserDialog';
 import { DeleteUserDialog } from './components/DeleteUserDialog';
 import logger from '../../utils/logger';
-import { EnhancedTableContainer, TableToolbar, SearchBar, StatusChip } from './components/SharedStyles';
-// Reuse styled components from SharedStyles
-const StyledTableHead = styled(TableHead)(({ theme }) => ({
-  '& .MuiTableCell-head': {
-    background: '#8e3031',
-    color: '#ffffff',
-    fontWeight: 600,
-    fontSize: '0.95rem',
-    padding: '16px 24px',
-    borderBottom: '1px solid #ebedf3',
-    whiteSpace: 'nowrap',
-  },
-}));
-
-// Add the StyledTableRow component
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:hover': {
-    backgroundColor: alpha('#f3f6f9', 0.7),
-  },
-  '& .MuiTableCell-root': {
-    padding: '16px 24px',
-    borderBottom: '1px solid #ebedf3',
-    color: '#464E5F',
-  },
-}));
+import { EnhancedTableContainer, TableToolbar, SearchBar, StatusChip, StyledTableHead, StyledTableRow } from './components/SharedStyles';
 
 const UsersInterface = ({ token }) => {
-  // Estado para los usuarios del staff (Worker y Admin)
   const [staffUsers, setStaffUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Estados de control para las variantes de diálogos
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   
-  // Paginación
   const [page, setPage] = useState(1);
   const rowsPerPage = 5;
   
-  // Obtener todos los usuarios del staff cuando se monte el componente
   useEffect(() => {
     const fetchStaffUsers = async () => {
       try {
@@ -104,7 +73,6 @@ const UsersInterface = ({ token }) => {
     setPage(value);
   };
   
-  // Openers explícitos para cada variante de diálogo
   const openCreateDialog = () => setIsCreateOpen(true);
   
   const openEditDialog = (user) => {
@@ -117,7 +85,6 @@ const UsersInterface = ({ token }) => {
     setIsDeleteOpen(true);
   };
 
-  // Callbacks de éxito para actualizar estado local
   const handleCreateSuccess = (newUser) => {
     const userWithId = {
       ...newUser,
@@ -304,7 +271,6 @@ const UsersInterface = ({ token }) => {
           />
         </Box>
   
-        {/* Variantes explícitas de diálogos */}
         <CreateUserDialog
           open={isCreateOpen}
           onClose={() => setIsCreateOpen(false)}

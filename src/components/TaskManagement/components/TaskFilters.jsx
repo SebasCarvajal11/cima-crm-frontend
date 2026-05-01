@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   TextField,
   MenuItem,
@@ -8,17 +9,20 @@ import {
   InputAdornment,
 } from '@mui/material';
 import { Search as SearchIcon, Refresh as RefreshIcon } from '@mui/icons-material';
+import { useTask } from '../../../context/TaskContext';
 
-const TaskFilters = ({
-  searchTerm,
-  setSearchTerm,
-  statusFilter,
-  setStatusFilter,
-  projectFilter,
-  setProjectFilter,
-  filteredTasks,
-  onRefresh,
-}) => {
+const TaskFilters = () => {
+  const {
+    searchTerm,
+    setSearchTerm,
+    statusFilter,
+    setStatusFilter,
+    projectFilter,
+    setProjectFilter,
+    filteredTasks,
+    loadTasks: onRefresh,
+  } = useTask();
+
   const uniqueProjects = filteredTasks.reduce((unique, task) => {
     if (task.projectId && !unique.some(p => p.id === task.projectId)) {
       unique.push({

@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   Typography,
   Grid,
@@ -12,6 +13,7 @@ import {
   BarChart as BarChartIcon,
   Person as PersonIcon,
 } from '@mui/icons-material';
+import { useTask } from '../../../context/TaskContext';
 
 const StatCard = ({ icon, value, label, gradient, iconColor }) => (
   <Grid item xs={12} sm={6} md={3}>
@@ -65,7 +67,9 @@ const ProgressBar = ({ label, colorClass, percentage }) => (
   </div>
 );
 
-const TaskStats = ({ taskStats }) => {
+const TaskStats = () => {
+  const { taskStats } = useTask();
+
   if (!taskStats) {
     return (
       <div className="flex justify-center p-10">

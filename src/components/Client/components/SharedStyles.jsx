@@ -1,4 +1,4 @@
-import { Box, TableContainer } from '@mui/material';
+import { Box, TableContainer, TableHead, TableRow } from '@mui/material';
 import styled from '@emotion/styled';
 import { alpha } from '@mui/material/styles';
 
@@ -63,4 +63,28 @@ export const StatusChip = styled(Box)(({ status }) => ({
     background: alpha('#f1416c', 0.1),
     color: '#f1416c',
   }),
+}));
+
+export const StyledTableHead = styled(TableHead)(({ theme }) => ({
+  '& .MuiTableCell-head': {
+    background: '#8e3031',
+    color: '#ffffff',
+    fontWeight: 600,
+    fontSize: '0.95rem',
+    padding: '16px 24px',
+    borderBottom: '1px solid #ebedf3',
+    whiteSpace: 'nowrap',
+  },
+}));
+
+export const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  transition: 'all 0.2s',
+  '&:hover': {
+    backgroundColor: alpha('#f3f6f9', 0.7),
+  },
+  '& .MuiTableCell-root': {
+    padding: '16px 24px',
+    borderBottom: '1px solid #ebedf3',
+    color: '#3f4254',
+  },
 }));

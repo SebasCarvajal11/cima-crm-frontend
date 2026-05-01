@@ -14,37 +14,31 @@ import {
 } from '@mui/icons-material';
 import logger from '../../../utils/logger';
 
-const StatCard = ({ title, value, icon, color }) => (
+const StatCard = ({ title, value, icon, borderColor, barColor }) => (
   <Paper
     elevation={2}
-    sx={{
-      p: 2,
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      bgcolor: 'background.paper',
-      border: '2px solid',
-      borderColor: `${color}.main`,
-      color: '#592d2d'  // Updated text color
-    }}
+    className={`p-4 h-full flex flex-col bg-white border-2 ${borderColor} rounded-lg transition-transform hover:-translate-y-1 hover:shadow-md`}
   >
-    <Box display="flex" alignItems="center" mb={1}>
-      {icon}
-      <Typography variant="h6" component="div" ml={1} sx={{ color: '#000000' }}>
+    <Box className="flex items-center mb-2">
+      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-50 mr-2 text-gray-600">
+        {icon}
+      </div>
+      <Typography variant="h6" component="div" className="text-gray-900 font-semibold">
         {title}
       </Typography>
     </Box>
-    <Typography variant="h4" component="div" sx={{ color: '#000000' }}>
+    <Typography variant="h3" component="div" className="text-gray-900 font-bold mb-4">
       {value}
     </Typography>
     <LinearProgress
       variant="determinate"
       value={100}
       sx={{
-        mt: 2,
-        bgcolor: `${color}.lighter`,
+        height: 6,
+        borderRadius: 3,
+        bgcolor: 'rgba(0,0,0,0.05)',
         '& .MuiLinearProgress-bar': {
-          bgcolor: `${color}.main`
+          bgcolor: barColor
         }
       }}
     />
@@ -52,7 +46,7 @@ const StatCard = ({ title, value, icon, color }) => (
 );
 
 const ProjectStats = ({ stats }) => {
-  logger.debug(stats )
+  logger.debug('Project stats:', stats);
   const {
     total = 0,
     completed = 0,
@@ -66,32 +60,36 @@ const ProjectStats = ({ stats }) => {
         <StatCard
           title="Total Proyectos"
           value={total}
-          icon={<AssignmentIcon fontSize="large" />}
-          color="primary"
+          icon={<AssignmentIcon />}
+          borderColor="border-brand-primary/20"
+          barColor="var(--color-brand-primary)"
         />
       </Grid>
       <Grid item xs={12} sm={6} md={3}>
         <StatCard
           title="Completados"
           value={completed}
-          icon={<CheckCircleIcon fontSize="large" />}
-          color="success"
+          icon={<CheckCircleIcon />}
+          borderColor="border-green-500/20"
+          barColor="#10b981" // Tailwind green-500
         />
       </Grid>
       <Grid item xs={12} sm={6} md={3}>
         <StatCard
           title="Pendientes"
           value={pending}
-          icon={<PendingIcon fontSize="large" />}
-          color="warning"
+          icon={<PendingIcon />}
+          borderColor="border-orange-500/20"
+          barColor="#f59e0b" // Tailwind orange-500
         />
       </Grid>
       <Grid item xs={12} sm={6} md={3}>
         <StatCard
           title="En Progreso"
           value={inProgress}
-          icon={<TimelineIcon fontSize="large" />}
-          color="info"
+          icon={<TimelineIcon />}
+          borderColor="border-blue-500/20"
+          barColor="#3b82f6" // Tailwind blue-500
         />
       </Grid>
     </Grid>

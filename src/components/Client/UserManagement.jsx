@@ -52,7 +52,8 @@ import { CreateClientDialog } from './components/CreateClientDialog';
 import { EditClientDialog } from './components/EditClientDialog';
 import { DeleteClientDialog } from './components/DeleteClientDialog';
 import logger from '../../utils/logger';
-import { EnhancedTableContainer, TableToolbar, SearchBar, StatusChip } from './components/SharedStyles';
+import { EnhancedTableContainer, TableToolbar, SearchBar, StatusChip, StyledTableHead, StyledTableRow } from './components/SharedStyles';
+
 // TabPanel component to handle tab content
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -100,27 +101,6 @@ const PageHeader = styled(Box)(({ theme }) => ({
   }
 }));
 
-const StyledTableHead = styled(TableHead)(({ theme }) => ({
-  '& .MuiTableCell-head': {
-    background: '#f3f6f9',
-    color: '#592d2d',
-    fontWeight: 600,
-    fontSize: '0.95rem',
-    padding: '16px 24px',
-    borderBottom: '1px solid #ebedf3',
-    whiteSpace: 'nowrap',
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-
-  '& .MuiTableCell-root': {
-    padding: '16px 24px',
-    borderBottom: '1px solid #ebedf3',
-    color: '#7e8299',
-  },
-}));
-
 // Update ActionButton colors to match the maroon/burgundy theme
 const ActionButton = styled(Button)(({ variant }) => ({
   background: variant === 'create' 
@@ -134,35 +114,28 @@ const ActionButton = styled(Button)(({ variant }) => ({
   color: 'white',
   textTransform: 'none',
   fontWeight: 600,
-
 }));
 
 const UserManagement = () => {
   // Add tab state
   const [tabValue, setTabValue] = useState(0);
   
-  // Fix the handleTabChange function definition
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
   
-  // Extraer el token desde Redux (asegúrate de que el path sea el correcto)
   const token = useSelector((state) => state.auth.accessToken);
-  // Extrae el token y el userId desde Redux
   const userId = useSelector((state) =>  state.auth.user.userId);
 
-  // Estado de usuarios (se obtendrán de la API)
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Estados para los diálogos variantes
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  // Paginación
   const [page, setPage] = useState(1);
   const rowsPerPage = 5;
 
@@ -195,7 +168,6 @@ const UserManagement = () => {
     setPage(value);
   };
 
-  // Función para abrir el diálogo según la acción
   const openCreateDialog = () => setIsCreateOpen(true);
   
   const openEditDialog = (user) => {
@@ -212,7 +184,6 @@ const UserManagement = () => {
     setUsers(users.filter(user => user.clientId !== deletedId));
   };
   
-  // Manejo inmediato del cambio de rol en la tabla
   const handleRoleChange = (userId, newRole) => {
     const updatedUsers = users.map((u) =>
       u.id === userId ? { ...u, role: newRole } : u
@@ -240,7 +211,6 @@ const UserManagement = () => {
         </Typography>
       </PageHeader>
 
-      {/* Tabs */}
       <Box sx={{ 
         width: '100%', 
         bgcolor: 'background.paper',
@@ -265,9 +235,6 @@ const UserManagement = () => {
                 color: '#8e3031',
                 fontWeight: 600,
               },
-  
-
-   
             },
           }}
         >
@@ -284,9 +251,7 @@ const UserManagement = () => {
         </Tabs>
       </Box>
 
-      {/* Tab Panels */}
       <TabPanel value={tabValue} index={0}>
-        {/* Clients Tab Content - Your existing client management UI */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <EnhancedTableContainer>
           <TableToolbar>
@@ -315,7 +280,6 @@ const UserManagement = () => {
                 sx={{
                   background: 'linear-gradient(135deg, #8e3031 0%, #592d2d 100%)',
                   color: 'white',
-        
                 }}
               >
                 Nuevo Cliente
@@ -323,7 +287,6 @@ const UserManagement = () => {
             </Box>
           </TableToolbar>
 
-          {/* Rest of your client table code... */}
           <Table>
             <StyledTableHead>
               <TableRow>
@@ -431,13 +394,11 @@ const UserManagement = () => {
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
-        {/* Users Tab Content - Import from UsersInterface component */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <UsersInterface token={token} />
         </motion.div>
       </TabPanel>
 
-      {/* Explicit Variant Dialogs */}
       <CreateClientDialog
         open={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
@@ -463,7 +424,5 @@ const UserManagement = () => {
     </StyledBox>
   );
 };
-
-  
 
 export default UserManagement;
