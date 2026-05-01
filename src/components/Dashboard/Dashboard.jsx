@@ -80,23 +80,23 @@ const Dashboard = () => {
 
         <section className="p-4 md:p-8 flex-grow overflow-y-auto bg-gray-100">
           <Suspense fallback={<div className="flex justify-center items-center h-full p-8 text-gray-500 font-medium">Cargando panel...</div>}>
-            {activeView === 'adminDashboard' && user.role === 'Admin' && <AdminDashboard />}
-            {activeView === 'excelImport' && <ExcelImport />}
-            {activeView === 'excelExport' && <ExcelExport />}
-            {(activeView === 'projectStatus' || activeView.startsWith('project-status/')) && (
+            {activeView === 'adminDashboard' && user.role === 'Admin' ? <AdminDashboard /> : null}
+            {activeView === 'excelImport' ? <ExcelImport /> : null}
+            {activeView === 'excelExport' ? <ExcelExport /> : null}
+            {(activeView === 'projectStatus' || activeView.startsWith('project-status/')) ? (
               <ProjectStatus 
                 userRole={user.role} 
                 projectId={activeView.startsWith('project-status/') ? activeView.split('/')[1] : null}
               />
-            )}
-            {activeView === 'customerSupport' && <CustomerSupport />}
-            {activeView === 'clientProjects' && user.role === 'Client' && (
+            ) : null}
+            {activeView === 'customerSupport' ? <CustomerSupport /> : null}
+            {activeView === 'clientProjects' && user.role === 'Client' ? (
               <ClientProjects onChangeView={changeView} />
-            )}
-            {activeView === 'faqClient' && user.role === 'Client' && <FaqClient />}
-            {activeView === 'workerProjects' && user.role === 'Worker' && <WorkerProjects />}
-            {activeView === 'workerTasks' && user.role === 'Worker' && <WorkerTasks />}
-            {activeView === 'faqAdmin' && user.role === 'Admin' && <FaqAdmin />}
+            ) : null}
+            {activeView === 'faqClient' && user.role === 'Client' ? <FaqClient /> : null}
+            {activeView === 'workerProjects' && user.role === 'Worker' ? <WorkerProjects /> : null}
+            {activeView === 'workerTasks' && user.role === 'Worker' ? <WorkerTasks /> : null}
+            {activeView === 'faqAdmin' && user.role === 'Admin' ? <FaqAdmin /> : null}
           </Suspense>
         </section>
       </main>

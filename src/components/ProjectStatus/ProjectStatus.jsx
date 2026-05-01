@@ -27,6 +27,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import logger from '../../utils/logger';
 
 const ProjectStatus = ({ userRole }) => {
   const [projects, setProjects] = useState([]);
@@ -74,8 +75,8 @@ const ProjectStatus = ({ userRole }) => {
 
   const handleViewDetails = async (projectId) => {
     try {
-      console.log('Project ID:', projectId); // Verificar el ID
-      console.log('Access Token:', localStorage.getItem('accessToken')); // Verificar el token
+      logger.debug('Project ID:', projectId); // Verificar el ID
+      logger.debug('Access Token:', localStorage.getItem('accessToken')); // Verificar el token
 
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/projects/${projectId}/progress`, {
         headers: {
@@ -84,12 +85,12 @@ const ProjectStatus = ({ userRole }) => {
       });
       
       if (response.data.success) {
-        console.log('API Response:', response.data); // Ver la respuesta completa
+        logger.debug('API Response:', response.data); // Ver la respuesta completa
         setProjectDetails(response.data);
         setOpenDialog(true);
       }
     } catch (err) {
-      console.error('Error al cargar detalles del proyecto:', err);
+      logger.error('Error al cargar detalles del proyecto:', err);
     }
   };
 
@@ -195,7 +196,7 @@ const ProjectStatus = ({ userRole }) => {
                   <Tooltip title="Ver detalles">
                     <IconButton
                       onClick={() => {
-                        console.log('Clicked project:', project);
+                        logger.debug('Clicked project:', project);
                         handleViewDetails(project.projectId)}
                       }
                       sx={{ 

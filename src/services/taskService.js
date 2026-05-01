@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { store } from '../redux/store';
+import logger from '../utils/logger';
 
 const API_URL = `${import.meta.env.VITE_API_URL}/tasks`;
 
 // Helper function to get the authentication token from Redux store
 const getAuthToken = () => {
   const state = store.getState();
-  return state.auth?.token || localStorage.getItem('accessToken');
+  return state.auth?.accessToken || localStorage.getItem('accessToken');
 };
 
 // Helper to create headers with authentication token
@@ -19,9 +20,9 @@ const getHeaders = () => ({
 
 export const taskService = {
   async createTask(task) {
-    console.log('API Request - Create Task:', task);
+    logger.debug('API Request - Create Task:', task);
     const response = await axios.post(API_URL, task, getHeaders());
-    console.log('API Response - Create Task:', response.data);
+    logger.debug('API Response - Create Task:', response.data);
     return response.data;
   },
 
@@ -29,66 +30,66 @@ export const taskService = {
     // If task has an ID, update it; otherwise, create a new task
     if (task.id || task.taskId) {
       const taskId = task.id || task.taskId;
-      console.log('Updating existing task:', taskId);
+      logger.debug('Updating existing task:', taskId);
       return this.updateTask(taskId, task);
     } else {
-      console.log('Creating new task as no ID was provided');
+      logger.debug('Creating new task as no ID was provided');
       return this.createTask(task);
     }
   },
 
   async updateTaskStatus(taskId, status) {
     if (!taskId) {
-      console.error('Error: taskId is undefined or null');
+      logger.error('Error: taskId is undefined or null');
       throw new Error('Task ID is required');
     }
     
-    console.log('API Request - Update Task Status:', taskId, status);
+    logger.debug('API Request - Update Task Status:', taskId, status);
     const response = await axios.put(
       `${API_URL}/${taskId}/status`, 
       { status }, 
       getHeaders()
     );
-    console.log('API Response - Update Task Status:', response.data);
+    logger.debug('API Response - Update Task Status:', response.data);
     return response.data;
   },
 
   async updateTask(id, task) {
     if (!id) {
-      console.error('Error: Task ID is undefined or null', task);
+      logger.error('Error: Task ID is undefined or null', task);
       throw new Error('Task ID is required');
     }
     
-    console.log('API Request - Update Task:', id, task);
+    logger.debug('API Request - Update Task:', id, task);
     const response = await axios.put(`${API_URL}/${id}`, task, getHeaders());
-    console.log('API Response - Update Task:', response.data);
+    logger.debug('API Response - Update Task:', response.data);
     return response.data;
   },
 
   async getTaskById(id) {
-    console.log('API Request - Get Task by ID:', id);
+    logger.debug('API Request - Get Task by ID:', id);
     const response = await axios.get(`${API_URL}/${id}`, getHeaders());
-    console.log('API Response - Get Task by ID:', response.data);
+    logger.debug('API Response - Get Task by ID:', response.data);
     return response.data;
   },
 
   async deleteTask(id) {
-    console.log('API Request - Delete Task:', id);
+    logger.debug('API Request - Delete Task:', id);
     const response = await axios.delete(`${API_URL}/${id}`, getHeaders());
-    console.log('API Response - Delete Task:', response.data);
+    logger.debug('API Response - Delete Task:', response.data);
     return response.data;
   },
 
   async listTasks(filters = {}) {
-    console.log('API Request - List Tasks with filters:', filters);
+    logger.debug('API Request - List Tasks with filters:', filters);
     const params = new URLSearchParams(filters);
     const response = await axios.get(`${API_URL}?${params}`, getHeaders());
-    console.log('API Response - List Tasks:', response.data);
+    logger.debug('API Response - List Tasks:', response.data);
     return response.data;
   },
 
   async getTasksWithProjectDetails(filters = {}) {
-    console.log('API Request - Get Tasks with Project Details, filters:', filters);
+    logger.debug('API Request - Get Tasks with Project Details, filters:', filters);
     try {
       const cleanFilters = Object.fromEntries(
         Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
@@ -97,12 +98,12 @@ export const taskService = {
         params: cleanFilters,
         ...getHeaders()
       });
-      console.log('API Response - Get Tasks with Project Details:', response.data);
+      logger.debug('API Response - Get Tasks with Project Details:', response.data);
       return response.data;
     } catch (error) {
-      console.error('API Error - Get Tasks with Project Details:', error);
+      logger.error('API Error - Get Tasks with Project Details:', error);
       if (error.response?.status === 404) {
-        console.warn('Detailed endpoint not found, falling back to regular endpoint');
+        logger.warn('Detailed endpoint not found, falling back to regular endpoint');
         const tasks = await this.listTasks(filters);
         return tasks.map(task => ({ ...task, project: { name: 'Unknown Project' } }));
       }
@@ -111,7 +112,7 @@ export const taskService = {
   },
 
   async getDetailedTasks(filters = {}) {
-    console.log('API Request - Get Detailed Tasks, filters:', filters);
+    logger.debug('API Request - Get Detailed Tasks, filters:', filters);
     try {
       const cleanFilters = Object.fromEntries(
         Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
@@ -123,13 +124,13 @@ export const taskService = {
         ...getHeaders()
       });
       
-      console.log('API Response - Get Detailed Tasks:', response.data);
+      logger.debug('API Response - Get Detailed Tasks:', response.data);
       return response.data;
     } catch (error) {
-      console.error('API Error - Get Detailed Tasks:', error);
+      logger.error('API Error - Get Detailed Tasks:', error);
       // Si falla el endpoint detallado, usa el endpoint regular
       if (error.response?.status === 404) {
-        console.warn('Endpoint detallado no encontrado, usando endpoint regular');
+        logger.warn('Endpoint detallado no encontrado, usando endpoint regular');
         return this.listTasks(filters);
       }
       throw error;
@@ -166,25 +167,12 @@ export const taskService = {
   },
   
   async bulkUpdateTaskStatus(taskIds, status) {
-    try {
-      const response = await axios.post(
-        `${API_URL}/admin/bulk-update-status`,
-        { taskIds, status },
-        getHeaders()
-      );
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-  
-  async getAllDetailedTasks() {
-    try {
-      const response = await axios.get(`${API_URL}/all/detailed`, getHeaders());
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await axios.post(
+      `${API_URL}/admin/bulk-update-status`,
+      { taskIds, status },
+      getHeaders()
+    );
+    return response.data;
   },
   
   async bulkAssignTasks(taskIds, workerId) {
@@ -204,11 +192,6 @@ export const taskService = {
   
   async getDetailedTaskById(id) {
     const response = await axios.get(`${API_URL}/detailed/${id}`, getHeaders());
-    return response.data;
-  },
-  
-  async getAllDetailedTasks() {
-    const response = await axios.get(`${API_URL}/all/detailed`, getHeaders());
     return response.data;
   },
   

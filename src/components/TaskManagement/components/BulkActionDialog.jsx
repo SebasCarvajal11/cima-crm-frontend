@@ -7,6 +7,7 @@ import {
   Button, CircularProgress
 } from '@mui/material';
 import { taskService } from '../../../services/taskService';
+import logger from '../../../utils/logger';
 
 export const BulkActionDialog = ({ open, selectedTasks, onClose, onSuccess, token, fallbackTasks }) => {
   const [bulkAction, setBulkAction] = useState({
@@ -36,7 +37,7 @@ export const BulkActionDialog = ({ open, selectedTasks, onClose, onSuccess, toke
         setAllWorkers(workRes.data.workers);
       }
     } catch (error) {
-      console.error('Error fetching workers:', error);
+      logger.error('Error fetching workers:', error);
     }
   };
 
@@ -53,7 +54,7 @@ export const BulkActionDialog = ({ open, selectedTasks, onClose, onSuccess, toke
       onSuccess();
       onClose();
     } catch (error) {
-      console.error('Error al procesar acción en masa:', error);
+      logger.error('Error al procesar acción en masa:', error);
       toast.error('Error al procesar la acción en masa');
     } finally {
       setLoading(false);

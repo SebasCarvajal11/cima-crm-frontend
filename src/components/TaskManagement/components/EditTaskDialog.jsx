@@ -7,6 +7,7 @@ import {
   Button, CircularProgress
 } from '@mui/material';
 import { taskService } from '../../../services/taskService';
+import logger from '../../../utils/logger';
 
 export const EditTaskDialog = ({ open, task, onClose, onSuccess, token, fallbackTasks }) => {
   const [formData, setFormData] = useState({
@@ -47,7 +48,7 @@ export const EditTaskDialog = ({ open, task, onClose, onSuccess, token, fallback
         setAllWorkers(workRes.data.workers);
       }
     } catch (error) {
-      console.error('Error fetching options:', error);
+      logger.error('Error fetching options:', error);
     }
   };
 
@@ -65,7 +66,7 @@ export const EditTaskDialog = ({ open, task, onClose, onSuccess, token, fallback
       onSuccess();
       onClose();
     } catch (error) {
-      console.error('Error al actualizar tarea:', error);
+      logger.error('Error al actualizar tarea:', error);
       toast.error(`Error: ${error.response?.data?.message || error.message}`);
     } finally {
       setLoading(false);

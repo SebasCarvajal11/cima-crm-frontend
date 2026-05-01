@@ -21,6 +21,7 @@ import {
   CheckCircle as CheckCircleIcon,
   HourglassEmpty as PendingIcon
 } from '@mui/icons-material';
+import logger from '../../utils/logger';
 
 const FaqAdmin = () => {
   // State variables
@@ -72,7 +73,7 @@ const FaqAdmin = () => {
       setError(null);
     } catch (err) {
       setError('Error al cargar las preguntas frecuentes. Por favor, intenta de nuevo.');
-      console.error('Error fetching FAQs:', err);
+      logger.error('Error fetching FAQs:', err);
     } finally {
       setLoading(false);
     }
@@ -111,7 +112,7 @@ const FaqAdmin = () => {
         setFilteredFaqs(searchResults || []);
       } catch (err) {
         showNotification('Error al buscar preguntas', 'error');
-        console.error('Error searching FAQs:', err);
+        logger.error('Error searching FAQs:', err);
       } finally {
         setLoading(false);
       }
@@ -136,7 +137,7 @@ const FaqAdmin = () => {
         showNotification('Pregunta añadida correctamente', 'success');
       } catch (err) {
         showNotification('Error al añadir la pregunta', 'error');
-        console.error('Error adding FAQ:', err);
+        logger.error('Error adding FAQ:', err);
       } finally {
         setLoading(false);
       }
@@ -156,7 +157,7 @@ const FaqAdmin = () => {
       showNotification('Pregunta eliminada correctamente', 'success');
     } catch (err) {
       showNotification('Error al eliminar la pregunta', 'error');
-      console.error('Error deleting FAQ:', err);
+      logger.error('Error deleting FAQ:', err);
     } finally {
       setLoading(false);
       setDeleteDialogOpen(false);
@@ -172,10 +173,10 @@ const FaqAdmin = () => {
 
   // Function to start editing a FAQ
   const handleEditFaq = (faq) => {
-    console.log('Attempting to edit FAQ:', JSON.stringify(faq));
+    logger.debug('Attempting to edit FAQ:', JSON.stringify(faq));
     
     if (!faq) {
-      console.error('Cannot edit FAQ: Missing FAQ object');
+      logger.error('Cannot edit FAQ: Missing FAQ object');
       showNotification('Error: No se puede editar esta pregunta (objeto no encontrado)', 'error');
       return;
     }
@@ -184,12 +185,12 @@ const FaqAdmin = () => {
     const faqId = faq.faqId || faq._id;
     
     if (!faqId) {
-      console.error('Cannot edit FAQ: Missing FAQ ID', faq);
+      logger.error('Cannot edit FAQ: Missing FAQ ID', faq);
       showNotification('Error: No se puede editar esta pregunta (ID no encontrado)', 'error');
       return;
     }
     
-    console.log('Starting edit for FAQ with ID:', faqId);
+    logger.debug('Starting edit for FAQ with ID:', faqId);
     setEditFaq(faqId);
     setEditQuestion(faq.question || '');
     setEditAnswer(faq.answer || '');
@@ -197,10 +198,10 @@ const FaqAdmin = () => {
 
   // Function to save edited FAQ
   const handleSaveFaq = async (id) => {
-    console.log('Attempting to save FAQ with ID:', id);
+    logger.debug('Attempting to save FAQ with ID:', id);
     
     if (!id) {
-      console.error('Cannot save FAQ: Missing FAQ ID');
+      logger.error('Cannot save FAQ: Missing FAQ ID');
       showNotification('Error: ID de pregunta no válido', 'error');
       return;
     }
@@ -214,11 +215,11 @@ const FaqAdmin = () => {
           answer: editAnswer
         };
         
-        console.log(`Saving FAQ with ID: ${id}`, updatedFaqData);
+        logger.debug(`Saving FAQ with ID: ${id}`, updatedFaqData);
         
         const updatedFaq = await faqService.updateFaq(id, updatedFaqData);
         
-        console.log('Updated FAQ received:', updatedFaq);
+        logger.debug('Updated FAQ received:', updatedFaq);
         
         // Update the faqs state with the updated FAQ
         setFaqs(prevFaqs => 
@@ -234,7 +235,7 @@ const FaqAdmin = () => {
         
         showNotification('Pregunta actualizada correctamente', 'success');
       } catch (err) {
-        console.error('Error in handleSaveFaq:', err);
+        logger.error('Error in handleSaveFaq:', err);
         showNotification(`Error al actualizar la pregunta: ${err.message}`, 'error');
       } finally {
         setLoading(false);
@@ -481,7 +482,7 @@ const FaqAdmin = () => {
                         color="primary"
                         startIcon={<EditIcon />}
                         onClick={() => {
-                          console.log('Edit button clicked for FAQ:', filteredFaqs.find(f => f._id === faq._id));
+                          logger.debug('Edit button clicked for FAQ:', filteredFaqs.find(f => f._id === faq._id));
                           handleEditFaq(faq);
                         }}
                         size="small"

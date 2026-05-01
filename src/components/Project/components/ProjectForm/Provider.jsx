@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ProjectFormContext } from './context';
+import logger from '../../../../utils/logger';
 
 export function ProjectFormProvider({ children, initialData, onSubmit, open }) {
   const [formData, setFormData] = useState(
@@ -43,7 +44,7 @@ export function ProjectFormProvider({ children, initialData, onSubmit, open }) {
         }
       } catch (err) {
         if (isMounted) {
-          console.error('Error al cargar clientes:', err);
+          logger.error('Error al cargar clientes:', err);
           setError('No se pudieron cargar los clientes. Por favor, inténtelo de nuevo.');
         }
       } finally {

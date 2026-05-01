@@ -25,6 +25,7 @@
   import EditIcon from '@mui/icons-material/Edit';
   import DeleteIcon from '@mui/icons-material/Delete';
   import StatusChip from '../StatusChip';
+import logger from '../../../utils/logger';
 
   const ProjectList = ({ projects = [], loading, onEdit, onDelete }) => {
     const [page, setPage] = React.useState(0);
@@ -63,7 +64,7 @@
     };
 
     const handleEdit = (project) => {
-      //console.log.log('Enviando proyecto a editar:', project);
+      //logger.debug.log('Enviando proyecto a editar:', project);
       
       // Crear una copia del proyecto con id si no existe
       const projectToEdit = {
@@ -71,10 +72,10 @@
         id: project.id || project.projectId // Usar projectId como fallback
       };
       
-      //console.log.log('Proyecto normalizado para editar:', projectToEdit);
+      //logger.debug.log('Proyecto normalizado para editar:', projectToEdit);
       
       if (!projectToEdit.id) {
-        console.error('Proyecto inválido para editar, sin ID:', project);
+        logger.error('Proyecto inválido para editar, sin ID:', project);
         return;
       }
       
@@ -86,12 +87,12 @@
         // Usar projectId si id no está disponible
         const idToDelete = project.id || project.projectId;
         if (!idToDelete) {
-          console.error('No se puede eliminar proyecto sin ID:', project);
+          logger.error('No se puede eliminar proyecto sin ID:', project);
           return;
         }
         await onDelete(idToDelete);
       } catch (error) {
-        console.error('Error al eliminar el proyecto:', error);
+        logger.error('Error al eliminar el proyecto:', error);
       }
     };
 

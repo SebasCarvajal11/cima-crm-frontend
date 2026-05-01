@@ -16,6 +16,7 @@ import { ProjectContext } from '../../../context/ProjectContext';
 import ProjectList from '../components/ProjectList';
 import { CreateProjectDialog, EditProjectDialog } from '../components/ProjectForm';
 import ProjectStats from '../components/ProjectStats';
+import logger from '../../../utils/logger';
 
 const ProjectsPage = () => {
   const projectContext = useContext(ProjectContext);
@@ -62,7 +63,7 @@ const ProjectsPage = () => {
       fetchProjects(); // Recargar la lista después de crear
       setOpenForm(false);
     } catch (error) {
-      console.error('Error al crear proyecto:', error);
+      logger.error('Error al crear proyecto:', error);
     }
   };
 
@@ -78,7 +79,7 @@ const ProjectsPage = () => {
         return;
       }
 
-      //console.log.log('Actualizando proyecto:', selectedProject.id, formData);
+      //logger.debug.log('Actualizando proyecto:', selectedProject.id, formData);
 
       // Formatear los datos según lo requiere el backend
       const projectData = {
@@ -92,7 +93,7 @@ const ProjectsPage = () => {
       setOpenEditForm(false);
       showNotification('Proyecto actualizado exitosamente', 'success');
     } catch (error) {
-      console.error('Error en la actualización:', error);
+      logger.error('Error en la actualización:', error);
       showNotification('Error al actualizar el proyecto', 'error');
     }
   };
@@ -102,7 +103,7 @@ const ProjectsPage = () => {
       try {
         await deleteProject(id);
       } catch (error) {
-        console.error('Error deleting project:', error);
+        logger.error('Error deleting project:', error);
       }
     }
   };

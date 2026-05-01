@@ -1,8 +1,9 @@
 // src/context/ProjectContext.js
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useMemo } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import qs from 'qs';
+import logger from '../utils/logger';
 
 export const ProjectContext = createContext();
 
@@ -24,58 +25,54 @@ export const ProjectProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState({ open: false, message: '', type: 'info' });
 
-  // Configuración de axios con interceptores
-  const axiosInstance = axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  });
-
-  // Interceptor para añadir el token en cada petición
-  axiosInstance.interceptors.request.use(
-    (config) => {
-      // Verificar que el token existe y tiene el formato correcto
-      if (accessToken) {
-        //console.log('Token siendo enviado:', accessToken);
-        config.headers['Authorization'] = `Bearer ${accessToken}`;
-        config.headers['accesstoken'] = accessToken;
-      } else {
-        console.warn('No hay token disponible para la petición');
+  // Configuración de axios con interceptores (memoizado para evitar re-creación en cada render)
+  const axiosInstance = useMemo(() => {
+    const instance = axios.create({
+      baseURL: API_BASE_URL,
+      headers: {
+        'Content-Type': 'application/json',
       }
-      // ¡Log de la configuración final
-      
-      return config;
-    },
-    (error) => {
-      console.error('Error en interceptor de request:', error);
-      return Promise.reject(error);
-    }
-  );
+    });
 
-  // Interceptor para manejar respuestas
-  axiosInstance.interceptors.response.use(
-    (response) => {
-      
-      return response;
-    },
-    (error) => {
-      
-      if (error.response?.status === 401) {
-        showNotification('Error de autenticación. Verificando sesión...', 'error');
+    // Interceptor para añadir el token en cada petición
+    instance.interceptors.request.use(
+      (config) => {
+        if (accessToken) {
+          config.headers['Authorization'] = `Bearer ${accessToken}`;
+          config.headers['accesstoken'] = accessToken;
+        } else {
+          logger.warn('No hay token disponible para la petición');
+        }
+        return config;
+      },
+      (error) => {
+        logger.error('Error en interceptor de request:', error);
+        return Promise.reject(error);
       }
-      return Promise.reject(error);
-    }
-  );
+    );
+
+    // Interceptor para manejar respuestas
+    instance.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          showNotification('Error de autenticación. Verificando sesión...', 'error');
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return instance;
+  }, [accessToken]);
 
   // GET /stats con verificación de token
   const fetchProjectStats = async () => {
     if (!accessToken) {
-      console.warn('Intentando obtener stats sin token');
+      logger.warn('Intentando obtener stats sin token');
       return;
     }
     try {
-      ////console.log.log('Obteniendo estadísticas con token:', accessToken);
+      ////logger.debug.log('Obteniendo estadísticas con token:', accessToken);
       const response = await axiosInstance.get('/stats');
       if (response.data.success) {
         setProjectStats(response.data.stats);
@@ -88,7 +85,7 @@ export const ProjectProvider = ({ children }) => {
   // GET / con verificación de token
   const fetchProjects = async (filters = {}) => {
     if (!accessToken) {
-      console.warn('Intentando obtener proyectos sin token');
+      logger.warn('Intentando obtener proyectos sin token');
       return;
     }
     setLoading(true);
@@ -113,16 +110,16 @@ export const ProjectProvider = ({ children }) => {
   // Función auxiliar para manejar errores
   const handleError = (error, defaultMessage) => {
     const errorMessage = error.response?.data?.message || defaultMessage;
-    console.error(defaultMessage, error);
+    logger.error(defaultMessage, error);
     setError(errorMessage);
     setNotification({ open: true, message: errorMessage, type: 'error' });
   };
 
   // Efecto para cargar datos iniciales
   useEffect(() => {
-    //////console.log.log('Estado de autenticación:', { auth, accessToken });
+    //////logger.debug.log('Estado de autenticación:', { auth, accessToken });
     if (accessToken) {
-      //////console.log.log('Iniciando carga de datos con token:', accessToken);
+      //////logger.debug.log('Iniciando carga de datos con token:', accessToken);
       fetchProjects();
       fetchProjectStats();
     }
@@ -164,8 +161,7 @@ export const ProjectProvider = ({ children }) => {
       const response = await axiosInstance.post('/', dataToSubmit);
       
       if (response.data.success) {
-        await fetchProjects();
-        await fetchProjectStats();
+        await Promise.all([fetchProjects(), fetchProjectStats()]);
         showNotification(response.data.message, 'success');
       }
       return response.data.project;
@@ -191,8 +187,7 @@ export const ProjectProvider = ({ children }) => {
     try {
       const response = await axiosInstance.patch(`/${id}/status`, { status });
       if (response.data.success) {
-        await fetchProjects();
-        await fetchProjectStats();
+        await Promise.all([fetchProjects(), fetchProjectStats()]);
         showNotification(response.data.message, 'success');
       }
       return response.data.project;
@@ -207,8 +202,7 @@ export const ProjectProvider = ({ children }) => {
     try {
       const response = await axiosInstance.delete(`/${id}`);
       if (response.data.success) {
-        await fetchProjects();
-        await fetchProjectStats();
+        await Promise.all([fetchProjects(), fetchProjectStats()]);
         showNotification(response.data.message, 'success');
       }
     } catch (error) {
@@ -235,11 +229,11 @@ export const ProjectProvider = ({ children }) => {
         baseURL: `${import.meta.env.VITE_API_URL}/projects`
       });
       
-      //console.log.log('Respuesta de clientes:', response.data);
+      //logger.debug.log('Respuesta de clientes:', response.data);
       
       // Verificar la estructura de la respuesta
       if (!response.data || !response.data.clients) {
-        console.error('Formato de respuesta inesperado:', response.data);
+        logger.error('Formato de respuesta inesperado:', response.data);
         return [];
       }
       
@@ -280,17 +274,16 @@ export const ProjectProvider = ({ children }) => {
         }
       });
 
-      //console.log.log('Respuesta de actualización:', response.data);
+      //logger.debug.log('Respuesta de actualización:', response.data);
 
       if (response.data.success) {
-        await fetchProjects(); // Recargar la lista completa
-        await fetchProjectStats(); // Actualizar estadísticas
+        await Promise.all([fetchProjects(), fetchProjectStats()]);
         showNotification(response.data.message || 'Proyecto actualizado exitosamente', 'success');
       }
 
       return response.data.project;
     } catch (error) {
-      console.error('Error al actualizar el proyecto:', error.response?.data || error.message);
+      logger.error('Error al actualizar el proyecto:', error.response?.data || error.message);
       handleError(error, 'Error al actualizar el proyecto');
       throw error;
     }

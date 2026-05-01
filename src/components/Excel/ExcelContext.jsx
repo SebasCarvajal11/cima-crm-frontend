@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import logger from '../../utils/logger';
 
 // 1. Crear el contexto (State Interface)
 const ExcelContext = createContext();
@@ -32,7 +33,7 @@ export const ExcelProvider = ({ children, initialProjectId }) => {
       );
       setProjects(response.data.projects || []);
     } catch (err) {
-      console.error('Projects fetch error:', err);
+      logger.error('Projects fetch error:', err);
       setError('Error al cargar los proyectos');
       setProjects([]);
     }

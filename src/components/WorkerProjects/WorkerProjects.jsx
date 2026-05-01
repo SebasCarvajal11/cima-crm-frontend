@@ -47,6 +47,7 @@ import {
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { taskService } from '../../services/taskService';
+import logger from '../../utils/logger';
 
 // Update the StyledCard component to use the burgundy color
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -258,9 +259,9 @@ const WorkerProjects = () => {
 
   const fetchProjectTasks = async (projectId) => {
     try {
-      console.log('Fetching tasks for project:', projectId);
+      logger.debug('Fetching tasks for project:', projectId);
       if (!projectId) {
-        console.log('No projectId provided');
+        logger.debug('No projectId provided');
         return;
       }
       const response = await axios.get(
@@ -269,14 +270,14 @@ const WorkerProjects = () => {
           headers: { 'accesstoken': accessToken }
         }
       );
-      console.log('Tasks API Response:', response.data);
+      logger.debug('Tasks API Response:', response.data);
       setTasks(response.data.tasks || []);
-      console.log('Tasks set in state:', response.data.tasks);
+      logger.debug('Tasks set in state:', response.data.tasks);
       setSelectedProjectTasks(projectId);
       setTasksModalOpen(true);
     } catch (err) {
-      console.error('Error fetching tasks:', err);
-      console.log('Error response:', err.response);
+      logger.error('Error fetching tasks:', err);
+      logger.debug('Error response:', err.response);
       setError('Error al cargar las tareas: ' + (err.response?.data?.message || err.message));
     }
   };

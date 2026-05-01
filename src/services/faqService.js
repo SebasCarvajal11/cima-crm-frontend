@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { store } from '../redux/store';
+import logger from '../utils/logger';
 
 const API_URL = `${import.meta.env.VITE_API_URL}/faqs`;
 
@@ -21,12 +22,12 @@ export const faqService = {
   // Get all FAQs
   async getAllFaqs() {
     try {
-      console.log('Fetching all FAQs');
+      logger.debug('Fetching all FAQs');
       const response = await axios.get(`${API_URL}/all`);
-      console.log('FAQs fetched successfully:', response.data);
+      logger.debug('FAQs fetched successfully:', response.data);
       return response.data.faqs;
     } catch (error) {
-      console.error('Error fetching FAQs:', error);
+      logger.error('Error fetching FAQs:', error);
       throw error;
     }
   },
@@ -34,12 +35,12 @@ export const faqService = {
   // Create a new FAQ
   async createFaq(faqData) {
     try {
-      console.log('Creating new FAQ:', faqData);
+      logger.debug('Creating new FAQ:', faqData);
       const response = await axios.post(API_URL, faqData, getHeaders());
-      console.log('FAQ created successfully:', response.data);
+      logger.debug('FAQ created successfully:', response.data);
       return response.data.faq;
     } catch (error) {
-      console.error('Error creating FAQ:', error);
+      logger.error('Error creating FAQ:', error);
       throw error;
     }
   },
@@ -47,11 +48,11 @@ export const faqService = {
   // Update an existing FAQ
   async updateFaq(id, faqData) {
     try {
-      console.log(`Updating FAQ with ID ${id}:`, faqData);
+      logger.debug(`Updating FAQ with ID ${id}:`, faqData);
       
       // Check if id is undefined, null, or empty string
       if (!id) {
-        console.error('Missing FAQ ID for update operation');
+        logger.error('Missing FAQ ID for update operation');
         throw new Error('FAQ ID is required for update');
       }
       
@@ -63,11 +64,11 @@ export const faqService = {
       
       const response = await axios.put(`${API_URL}/${formattedId}`, faqData, headers);
       
-      console.log('FAQ updated successfully:', response.data);
+      logger.debug('FAQ updated successfully:', response.data);
       
       return response.data.faq;
     } catch (error) {
-      console.error(`Error updating FAQ with ID ${id}:`, error);
+      logger.error(`Error updating FAQ with ID ${id}:`, error);
       throw error;
     }
   },
@@ -75,12 +76,12 @@ export const faqService = {
   // Delete a FAQ
   async deleteFaq(id) {
     try {
-      console.log(`Deleting FAQ with ID ${id}`);
+      logger.debug(`Deleting FAQ with ID ${id}`);
       await axios.delete(`${API_URL}/${id}`, getHeaders());
-      console.log('FAQ deleted successfully');
+      logger.debug('FAQ deleted successfully');
       return true;
     } catch (error) {
-      console.error(`Error deleting FAQ with ID ${id}:`, error);
+      logger.error(`Error deleting FAQ with ID ${id}:`, error);
       throw error;
     }
   },
@@ -88,12 +89,12 @@ export const faqService = {
   // Search FAQs by term
   async searchFaqs(searchTerm) {
     try {
-      console.log(`Searching FAQs with term: ${searchTerm}`);
+      logger.debug(`Searching FAQs with term: ${searchTerm}`);
       const response = await axios.get(`${API_URL}/search/${searchTerm}`);
-      console.log('Search results:', response.data);
+      logger.debug('Search results:', response.data);
       return response.data.faqs;
     } catch (error) {
-      console.error(`Error searching FAQs with term ${searchTerm}:`, error);
+      logger.error(`Error searching FAQs with term ${searchTerm}:`, error);
       throw error;
     }
   },
@@ -101,12 +102,12 @@ export const faqService = {
   // Get FAQ by ID
   async getFaqById(id) {
     try {
-      console.log(`Fetching FAQ with ID ${id}`);
+      logger.debug(`Fetching FAQ with ID ${id}`);
       const response = await axios.get(`${API_URL}/${id}`);
-      console.log('FAQ fetched successfully:', response.data);
+      logger.debug('FAQ fetched successfully:', response.data);
       return response.data.faq;
     } catch (error) {
-      console.error(`Error fetching FAQ with ID ${id}:`, error);
+      logger.error(`Error fetching FAQ with ID ${id}:`, error);
       throw error;
     }
   }

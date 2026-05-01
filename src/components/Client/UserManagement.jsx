@@ -51,6 +51,8 @@ import { stringToColor, adjustColor, getInitials, getPlanColor } from '../../uti
 import { CreateClientDialog } from './components/CreateClientDialog';
 import { EditClientDialog } from './components/EditClientDialog';
 import { DeleteClientDialog } from './components/DeleteClientDialog';
+import logger from '../../utils/logger';
+import { EnhancedTableContainer, TableToolbar, SearchBar, StatusChip } from './components/SharedStyles';
 // TabPanel component to handle tab content
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -98,46 +100,6 @@ const PageHeader = styled(Box)(({ theme }) => ({
   }
 }));
 
-const EnhancedTableContainer = styled(TableContainer)(({ theme }) => ({
-  background: '#ffffff',
-  borderRadius: '20px',
-  boxShadow: '0 0 50px 0 rgba(82, 63, 105, 0.15)',
-  overflow: 'hidden',
-  border: '1px solid #ebedf3',
-}));
-
-const TableToolbar = styled(Box)(({ theme }) => ({
-  padding: '20px 24px',
-  background: '#ffffff',
-  borderBottom: '1px solid #ebedf3',
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  gap: '16px',
-}));
-
-const SearchBar = styled('div')(({ theme }) => ({
-  position: 'relative',
-  flex: '1',
-  maxWidth: '400px',
-  '& .MuiInputBase-root': {
-    width: '100%',
-    background: alpha('#f3f6f9', 0.7),
-    borderRadius: '10px',
-
-  },
-  '& .MuiInputBase-input': {
-    padding: '12px 12px 12px 45px',
-  },
-  '& .MuiSvgIcon-root': {
-    position: 'absolute',
-    left: '12px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    color: '#b5b5c3',
-  },
-}));
-
 const StyledTableHead = styled(TableHead)(({ theme }) => ({
   '& .MuiTableCell-head': {
     background: '#f3f6f9',
@@ -157,28 +119,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     borderBottom: '1px solid #ebedf3',
     color: '#7e8299',
   },
-}));
-
-// Update StatusChip colors to match the maroon/burgundy theme
-const StatusChip = styled(Box)(({ status }) => ({
-  padding: '6px 12px',
-  borderRadius: '6px',
-  fontSize: '0.85rem',
-  fontWeight: 500,
-  display: 'inline-flex',
-  alignItems: 'center',
-  ...(status === 'Admin' && {
-    background: alpha('#8e3031', 0.1),
-    color: '#8e3031',
-  }),
-  ...(status === 'Worker' && {
-    background: alpha('#592d2d', 0.1),
-    color: '#592d2d',
-  }),
-  ...(status === 'Client' && {
-    background: alpha('#f1416c', 0.1),
-    color: '#f1416c',
-  }),
 }));
 
 // Update ActionButton colors to match the maroon/burgundy theme
@@ -237,7 +177,7 @@ const UserManagement = () => {
       });
       setUsers(response.data.clients || []);
     } catch (err) {
-      console.error('Error al cargar clientes:', err);
+      logger.error('Error al cargar clientes:', err);
       setError('Error al cargar clientes');
       toast.error('Error al cargar clientes', { position: 'top-center' });
     } finally {

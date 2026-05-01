@@ -11,7 +11,7 @@ const UserManagement = lazy(() => import('./components/Client/UserManagement'));
 const RoleManagement = lazy(() => import('./components/Roles/RoleManagement')); // Nueva gestión de roles
 const Dashboard = lazy(() => import('./components/Dashboard/Dashboard')); // Importa el Dashboard aquí
 
-const LoadingFallback = () => <div style={{ display: 'flex', justifyContent: 'center', padding: '50px' }}>Cargando...</div>;
+const LoadingFallback = () => <div className="flex justify-center p-12">Cargando...</div>;
 const App = () => {
   const { user } = useSelector((state) => state.auth);
 

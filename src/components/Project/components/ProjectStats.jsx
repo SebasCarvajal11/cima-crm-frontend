@@ -12,6 +12,7 @@ import {
   Pending as PendingIcon,
   Timeline as TimelineIcon
 } from '@mui/icons-material';
+import logger from '../../../utils/logger';
 
 const StatCard = ({ title, value, icon, color }) => (
   <Paper
@@ -51,7 +52,7 @@ const StatCard = ({ title, value, icon, color }) => (
 );
 
 const ProjectStats = ({ stats }) => {
-  console.log(stats )
+  logger.debug(stats )
   const {
     total = 0,
     completed = 0,
