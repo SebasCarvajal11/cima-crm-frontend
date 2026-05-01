@@ -56,3 +56,5 @@ coverage/
 # Archivos de la plataforma de agentes / AI
 .agents/
 CLAUDE.md
+MODULARIZATION_PLAN.md
+RULES.md

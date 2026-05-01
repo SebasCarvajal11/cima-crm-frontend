@@ -13,7 +13,7 @@ const TaskManagementHeader = () => {
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-center mb-8 p-5 bg-white rounded-xl shadow-md gap-4">
-      <Typography variant="h4" component="h1" sx={{ color: '#592d2d' }}>
+      <Typography variant="h4" component="h1" sx={{ color: 'var(--color-brand-primary)' }}>
         Gestión de Tareas
       </Typography>
       <div className="flex items-center gap-2">
@@ -32,7 +32,7 @@ const TaskManagementHeader = () => {
           startIcon={<AddIcon />}
           onClick={() => setIsCreateOpen(true)}
           sx={{
-            background: 'linear-gradient(45deg, #2c3e50 30%,rgb(0, 0, 0) 90%)',
+            background: 'linear-gradient(45deg, var(--color-brand-secondary) 30%, var(--color-brand-secondary-light) 90%)',
             boxShadow: '0 3px 5px 2px rgba(52, 152, 219, .3)',
           }}
         >

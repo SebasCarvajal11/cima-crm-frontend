@@ -2,33 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { fetchUsers, updateRole } from '../../redux/slices/roleSlice';
-import { 
-  CircularProgress, 
-  Alert, 
-  Pagination, 
-  Box, 
-  Typography, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableRow, 
-  Avatar, 
-  Select, 
-  MenuItem, 
-  FormControl,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button
+import {
+  CircularProgress,
+  Alert,
+  Pagination,
+  Box,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
 } from '@mui/material';
-import { 
-  Security as SecurityIcon,
-  Shield as ShieldIcon,
-} from '@mui/icons-material';
-import { stringToColor, getInitials } from '../../utils/colorUtils';
-import { EnhancedTableContainer, TableToolbar, StyledTableHead, StyledTableRow } from '../Client/components/SharedStyles';
+import { Security as SecurityIcon } from '@mui/icons-material';
+import { RoleTableRow } from './components/RoleTableRow';
+import { RoleChangeDialog } from './components/RoleChangeDialog';
+import { EnhancedTableContainer, TableToolbar, StyledTableHead } from '../Client/components/SharedStyles';
 import logger from '../../utils/logger';
 
 const RoleManagement = () => {
@@ -39,7 +27,6 @@ const RoleManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 5;
 
-  // Estado para el diálogo de confirmación
   const [confirmDialog, setConfirmDialog] = useState({
     open: false,
     userId: null,
@@ -55,7 +42,7 @@ const RoleManagement = () => {
 
   const handleRoleChangeClick = (user, newRole) => {
     if (user.role === newRole) return;
-    
+
     setConfirmDialog({
       open: true,
       userId: user.userId || user.id,
@@ -87,7 +74,7 @@ const RoleManagement = () => {
       <Box className="mb-8">
         <Typography variant="h4" className="font-bold text-gray-800 mb-2 flex items-center gap-3">
           <SecurityIcon fontSize="large" className="text-brand-primary" />
-          Gestión de Roles y Permisos
+          Gestin de Roles y Permisos
         </Typography>
         <Typography variant="body1" color="text.secondary">
           Asigna roles a los usuarios para controlar su nivel de acceso al sistema.
@@ -122,51 +109,13 @@ const RoleManagement = () => {
               </TableRow>
             </StyledTableHead>
             <TableBody>
-              {currentUsers.map((user) => {
-                const userId = user.userId || user.id;
-                const name = user.name || user.userName || 'Usuario';
-                
-                return (
-                  <StyledTableRow key={userId}>
-                    <TableCell>
-                      <Box className="flex items-center gap-3">
-                        <Avatar sx={{ bgcolor: stringToColor(name), width: 32, height: 32, fontSize: '0.875rem' }}>
-                          {getInitials(name)}
-                        </Avatar>
-                        <Typography className="font-medium text-gray-700">
-                          {name}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell className="text-gray-600">{user.email}</TableCell>
-                    <TableCell>
-                      <Box className="flex items-center gap-1">
-                        <ShieldIcon sx={{ fontSize: 16, color: user.role === 'Admin' ? '#8e3031' : '#666' }} />
-                        <Typography variant="body2" className={user.role === 'Admin' ? 'text-brand-primary font-bold' : ''}>
-                          {user.role}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell align="right">
-                      <FormControl size="small" sx={{ minWidth: 120 }}>
-                        <Select
-                          value={user.role}
-                          onChange={(e) => handleRoleChangeClick(user, e.target.value)}
-                          sx={{ 
-                            borderRadius: '8px',
-                            fontSize: '0.875rem',
-                            '& .MuiSelect-select': { py: 1 }
-                          }}
-                        >
-                          <MenuItem value="Admin">Admin</MenuItem>
-                          <MenuItem value="Worker">Worker</MenuItem>
-                          <MenuItem value="Client">Client</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </TableCell>
-                  </StyledTableRow>
-                );
-              })}
+              {currentUsers.map((user) => (
+                <RoleTableRow
+                  key={user.userId || user.id}
+                  user={user}
+                  onRoleChange={handleRoleChangeClick}
+                />
+              ))}
               {users.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={4} align="center" className="p-8 text-gray-500 italic">
@@ -191,37 +140,13 @@ const RoleManagement = () => {
         )}
       </EnhancedTableContainer>
 
-      {/* Diálogo de Confirmación */}
-      <Dialog
+      <RoleChangeDialog
         open={confirmDialog.open}
+        userName={confirmDialog.userName}
+        newRole={confirmDialog.newRole}
         onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
-        PaperProps={{ className: "rounded-2xl" }}
-      >
-        <DialogTitle className="font-bold text-gray-800">
-          ¿Confirmar cambio de rol?
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Estás a punto de cambiar el rol de <strong>{confirmDialog.userName}</strong> a <strong>{confirmDialog.newRole}</strong>. 
-            Este cambio afectará sus permisos de acceso inmediatamente.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions className="p-4">
-          <Button 
-            onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
-            className="text-gray-600"
-          >
-            Cancelar
-          </Button>
-          <Button 
-            onClick={handleConfirmRoleChange}
-            variant="contained"
-            className="bg-brand-primary hover:bg-brand-primary-light rounded-lg px-6"
-          >
-            Confirmar Cambio
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onConfirm={handleConfirmRoleChange}
+      />
     </Box>
   );
 };

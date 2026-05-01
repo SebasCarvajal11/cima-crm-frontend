@@ -1,8 +1,8 @@
-import { Box, TableContainer, TableHead, TableRow } from '@mui/material';
+import { TableContainer, TableHead, TableRow } from '@mui/material';
 import styled from '@emotion/styled';
 import { alpha } from '@mui/material/styles';
 
-export const EnhancedTableContainer = styled(TableContainer)(({ theme }) => ({
+export const EnhancedTableContainer = styled(TableContainer)(() => ({
   background: '#ffffff',
   borderRadius: '20px',
   boxShadow: '0 0 50px 0 rgba(82, 63, 105, 0.15)',
@@ -10,7 +10,7 @@ export const EnhancedTableContainer = styled(TableContainer)(({ theme }) => ({
   border: '1px solid #ebedf3',
 }));
 
-export const TableToolbar = styled(Box)(({ theme }) => ({
+export const TableToolbar = styled('div')(() => ({
   padding: '20px 24px',
   background: '#ffffff',
   borderBottom: '1px solid #ebedf3',
@@ -20,7 +20,7 @@ export const TableToolbar = styled(Box)(({ theme }) => ({
   gap: '16px',
 }));
 
-export const SearchBar = styled('div')(({ theme }) => ({
+export const SearchBar = styled('div')(() => ({
   position: 'relative',
   flex: '1',
   maxWidth: '400px',
@@ -44,30 +44,9 @@ export const SearchBar = styled('div')(({ theme }) => ({
   },
 }));
 
-export const StatusChip = styled(Box)(({ status }) => ({
-  padding: '6px 12px',
-  borderRadius: '6px',
-  fontSize: '0.85rem',
-  fontWeight: 500,
-  display: 'inline-flex',
-  alignItems: 'center',
-  ...(status === 'Admin' && {
-    background: alpha('#8e3031', 0.1),
-    color: '#8e3031',
-  }),
-  ...(status === 'Worker' && {
-    background: alpha('#592d2d', 0.1),
-    color: '#592d2d',
-  }),
-  ...(status === 'Client' && {
-    background: alpha('#f1416c', 0.1),
-    color: '#f1416c',
-  }),
-}));
-
-export const StyledTableHead = styled(TableHead)(({ theme }) => ({
+export const StyledTableHead = styled(TableHead)(() => ({
   '& .MuiTableCell-head': {
-    background: '#8e3031',
+    background: 'var(--color-brand-primary-light)',
     color: '#ffffff',
     fontWeight: 600,
     fontSize: '0.95rem',
@@ -77,7 +56,7 @@ export const StyledTableHead = styled(TableHead)(({ theme }) => ({
   },
 }));
 
-export const StyledTableRow = styled(TableRow)(({ theme }) => ({
+export const StyledTableRow = styled(TableRow)(() => ({
   transition: 'all 0.2s',
   '&:hover': {
     backgroundColor: alpha('#f3f6f9', 0.7),

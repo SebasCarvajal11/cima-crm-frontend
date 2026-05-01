@@ -25,6 +25,8 @@ CIMA CRM es una plataforma de gestion de relaciones con clientes para la empresa
 | Animaciones | Framer Motion | 12.5.x |
 | Notificaciones | react-toastify | 10.x |
 | Iconos | `@mui/icons-material`, `react-icons`, `lucide-react` | Varias |
+| Class Variants | `class-variance-authority` (CVA) | 0.7.x |
+| Class Merge | `clsx` + `tailwind-merge` (via `cn()`) | 2.x + 2.x |
 
 ### 1.2. Variables de Entorno
 
@@ -66,12 +68,15 @@ src/
                              #   renderizar sub-vistas con lazy loading segun el rol.
       AdminDashboard.jsx     # Vista Admin: cards de navegacion + selectedView para
                              #   renderizar ProjectsPage, UserManagement, TaskManagement.
-      ClientDashboard.jsx    # Vista Client: gestion de clientes (INCOMPLETO: usa datos ficticios)
-      WorkerDashboard.jsx    # Vista Worker: placeholder basico
+      ClientDashboard.jsx    # Vista Client: gestion de clientes con tarjetas. Refactorizado
+                             #   en sub-componentes. Usa ClientContext para estado y API.
+      ClientDashboardStats.jsx    # Tarjetas de estadisticas de clientes
+      ClientDashboardSearchBar.jsx # Barra de busqueda para clientes
+      ClientDashboardCard.jsx      # Tarjeta individual de cliente
 
     Client/
       UserManagement.jsx     # Gestion de clientes: tabla paginada + tabs (Clientes / Usuarios).
-                             #   Tiene su propio fetchUsers() con Axios directo.
+                             #   Usa ClientContext para estado y API.
       UsersInterface.jsx     # Tab "Usuarios" dentro de UserManagement: gestion de staff
                              #   (Admin/Worker). Fetch independiente a /users/staff.
       CreateClient.jsx       # Formulario legacy de creacion (NO se usa activamente)
@@ -86,6 +91,13 @@ src/
         EditUserDialog.jsx       # Variante explicita: editar usuario staff
         DeleteUserDialog.jsx     # Variante explicita: eliminar usuario staff
         DialogStyles.jsx         # Styled-components compartidos para dialogos
+        SharedStyles.jsx         # Styled-components compartidos para tablas (centralizados)
+        ClientTableToolbar.jsx   # Toolbar de tabla de clientes (busqueda + botones)
+        ClientTableRow.jsx       # Fila individual de tabla de clientes
+        ClientPagination.jsx     # Paginacion de tabla de clientes
+        UserTableToolbar.jsx     # Toolbar de tabla de usuarios staff
+        UserTableRow.jsx         # Fila individual de tabla de usuarios staff
+        UserPagination.jsx       # Paginacion de tabla de usuarios staff
 
     Project/
       StatusChip.jsx         # Chip de estado de proyecto reutilizable
@@ -99,45 +111,79 @@ src/
           context.jsx        #   createContext + useProjectFormContext hook
           Provider.jsx       #   ProjectFormProvider: estado del formulario, fetch de clientes
           CompoundUI.jsx     #   Sub-componentes: Dialog, Header, Content, Actions
+          StyledComponents.jsx # Styled Dialog, DialogTitle, FormSection
+          FormSections.jsx   #   ClientSection, DetailsSection, StatusSection
           CreateProjectDialog.jsx  # Variante explicita: crear proyecto
           EditProjectDialog.jsx    # Variante explicita: editar proyecto
           index.js           #   Re-exporta variantes
       pages/
         ProjectsPage.jsx    # Pagina orquestadora de proyectos (usa ProjectContext)
-      services/             # (directorio vacio o legacy)
 
     TaskManagement/
-      TaskManagement.jsx     # Componente monolitico (801 lineas): gestion completa de tareas,
-                             #   filtros, seleccion multiple, tabs con estadisticas.
-                             #   ** PENDIENTE DE REFACTORIZACION **
+      TaskManagement.jsx     # Componente refactorizado (120 lineas): shell con TaskProvider.
+                             #   Usa TaskContext para estado y API.
       components/
+        TaskFilters.jsx      # Filtros de busqueda y estado
+        TaskCard.jsx         # Tarjeta individual de tarea
+        TaskStats.jsx        # Estadisticas de tareas (admin)
+        TaskManagementHeader.jsx # Header con boton de crear
+        TaskManagementTabs.jsx   # Tabs de navegacion
         CreateTaskDialog.jsx # Variante explicita: crear tarea
         EditTaskDialog.jsx   # Variante explicita: editar tarea
         BulkActionDialog.jsx # Acciones masivas sobre tareas
 
     Roles/
-      RoleManagement.jsx     # Gestion de roles (INCOMPLETO: usa datos ficticios hardcoded,
-                             #   no conectado a API)
+      RoleManagement.jsx     # Gestion de roles. Usa Redux roleSlice para API.
+                             #   Refactorizado en sub-componentes.
+      components/
+        RoleTableRow.jsx     # Fila individual de tabla de roles
+        RoleChangeDialog.jsx # Dialogo de confirmacion para cambio de rol
 
     # Otros dominios:
-    Collab/                  # Colaboracion
     CustomerSupport/         # Soporte al cliente
     Excel/                   # Import/Export de Excel (xlsx)
-    FaqAdmin/                # CRUD de FAQs (admin)
+    FaqAdmin/                # CRUD de FAQs (admin). Usa FaqContext.
+      FaqAdmin.jsx           #   Shell con FaqProvider (106 lineas)
+      components/
+        FaqStats.jsx         #   Tarjetas de estadisticas
+        FaqFilters.jsx       #   Busqueda y filtros
+        FaqList.jsx          #   Lista de FAQs
+        FaqCard.jsx          #   Tarjeta individual (ver/editar)
+        FaqForm.jsx          #   Formulario de nueva FAQ
+        FaqDeleteDialog.jsx  #   Dialogo de confirmacion
     FaqClient/               # Vista de FAQs (cliente)
     Layout/                  # Componentes de layout compartido
-    Marketing/               # Marketing
     ProjectStatus/           # Estado detallado de un proyecto
-    Reports/                 # Reportes
-    TaskTable/               # Vista alternativa de tareas en tabla
+      ProjectStatus.jsx      #   Tabla de proyectos con busqueda (120 lineas)
+      components/
+        ProjectProgressDialog.jsx # Dialogo con CircularProgressbar y stats
     ClientProjects/          # Proyectos vistos por el cliente
+      ClientProjects.jsx     #   Orquestador con tarjetas y dialogo de detalles (104 lineas)
+      components/
+        ProjectCard.jsx      #   Tarjeta de proyecto con animacion
+        ProjectDetailsDialog.jsx # Dialogo detallado con contactos y fechas
     WorkerProjects/          # Proyectos vistos por el trabajador
+      WorkerProjects.jsx     #   Orquestador con tarjetas y modal de tareas (120 lineas)
+      components/
+        ProjectCard.jsx      #   Tarjeta de proyecto
+        TasksModal.jsx       #   Modal de tareas del proyecto
+        TaskUpdateDialog.jsx #   Dialogo para actualizar estado de tarea
+        StyledComponents.jsx #   Styled-components extraidos
     WorkerTasks/             # Tareas del trabajador
 
   context/
     ProjectContext.jsx       # Context + Provider para el dominio de Proyectos.
                              #   Maneja: lista de proyectos, filtros, stats, CRUD via Axios.
                              #   Expone: useProject() hook.
+    TaskContext.jsx          # Context + Provider para el dominio de Tareas.
+                             #   Maneja: lista de tareas, filtros, stats, CRUD via taskService.
+                             #   Expone: useTask() hook.
+    ClientContext.jsx        # Context + Provider para el dominio de Clientes.
+                             #   Maneja: lista de clientes, busqueda, paginacion, CRUD via clientService.
+                             #   Expone: useClient() hook.
+    FaqContext.jsx           # Context + Provider para el dominio de FAQs.
+                             #   Maneja: lista de FAQs, filtros, busqueda, CRUD via faqService.
+                             #   Expone: useFaq() hook.
 
   redux/
     store.js                 # configureStore con 3 reducers: auth, clients, roles
@@ -152,16 +198,32 @@ src/
     ProtectedRoute.jsx       # HOC que verifica autenticacion y rol antes de renderizar hijos.
 
   services/
+    api.js                   # Instancia Axios centralizada con interceptor de token.
+                             #   Usa: import api from '../services/api'
     taskService.js           # Modulo API para tareas: CRUD, filtros, stats, bulk actions.
                              #   Obtiene token de Redux store o localStorage.
+    clientService.js         # Modulo API para clientes: CRUD.
+    projectService.js        # Modulo API para proyectos: CRUD.
     faqService.js            # Modulo API para FAQs.
 
   styles/
     global.css               # Estilos globales residuales
 
   utils/
+    cn.js                    # Utilidad clsx + tailwind-merge para clases dinamicas
     colorUtils.js            # Utilidades: stringToColor, adjustColor, getInitials, getPlanColor
+    normalizeEntity.js       # Normalizacion de IDs inconsistentes del backend
 ```
+
+  hooks/
+    useNotification.js       # Hook centralizado para notificaciones toast (success, error, loading)
+
+  components/
+    ui/                      # Biblioteca de componentes UI atomicos
+      index.js               #   Re-exports publicos
+      Button.jsx             #   Boton con variantes CVA (primary, secondary, outline, ghost, danger)
+      StatusChip.jsx         #   Chip de estado universal con variantes por rol/estado
+      Layout.jsx             #   Primitivas de layout: Section, Container, GridStack, Grid
 
 ---
 
@@ -275,6 +337,10 @@ El proyecto usa **tres capas de estilos** en orden de preferencia:
 --color-brand-secondary: #1a237e;
 --color-brand-secondary-light: #3949ab;
 --color-background: #f4f6f9;
+--color-success: #10b981;
+--color-warning: #f59e0b;
+--color-error: #ef4444;
+--color-info: #3b82f6;
 --font-sans: "Inter", system-ui, sans-serif;
 --font-heading: "Outfit", system-ui, sans-serif;
 ```
@@ -337,6 +403,7 @@ Si modificas uno, verifica el otro.
 6. **NO mezcles fuentes de estado.** Si un dominio ya usa Context, no agregues Redux para el mismo dato. Si usa Redux, no dupliques con fetch local.
 7. **Usa fallbacks para IDs del backend.** Siempre `data.clientId || data.id`, `data.clientName || data.name`. Ver seccion 4.1.
 8. **Usa los design tokens existentes.** Colores brand como clases Tailwind (`text-brand-primary`, `bg-brand-secondary`) o variables CSS (`var(--color-brand-primary)`). No inventes colores nuevos.
+9. **Usa la instancia Axios centralizada.** Importa `api` desde `src/services/api.js` para todas las llamadas HTTP. El interceptor agrega el token automaticamente.
 
 ### 5.3. Al finalizar
 
@@ -357,10 +424,17 @@ Si modificas uno, verifica el otro.
 | **ProjectForm (Compound)** | Sistema de formularios modulares con Context + Provider + CompoundUI |
 | **UserManagement** | Gestion de clientes + tab de usuarios staff (Workers/Admins) |
 | **UsersInterface** | Sub-componente de UserManagement para el tab de staff |
-| **TaskManagement** | Gestion de tareas (monolitico, pendiente de refactorizacion) |
+| **TaskManagement** | Gestion de tareas (refactorizado: shell + TaskContext + sub-componentes) |
 | **ProtectedRoute** | HOC que verifica `user` y `roles` en Redux antes de renderizar |
+| **api.js** | Instancia Axios centralizada con interceptor de token automatico |
 | **taskService.js** | Modulo API centralizado para tareas (CRUD + admin endpoints) |
+| **useNotification** | Hook centralizado para notificaciones toast (success, error, loading) |
+| **cn()** | Utilidad clsx + tailwind-merge para combinar clases dinamicas |
+| **normalizeEntity** | Utilidad para normalizar IDs inconsistentes del backend |
 | **ProjectContext** | Context API que maneja el estado del dominio de proyectos |
+| **ClientContext** | Context API que maneja el estado del dominio de clientes |
+| **TaskContext** | Context API que maneja el estado del dominio de tareas |
+| **FaqContext** | Context API que maneja el estado del dominio de FAQs |
 
 ---
 

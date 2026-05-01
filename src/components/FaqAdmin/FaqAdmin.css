@@ -101,7 +101,6 @@
   line-height: 1.6;
 }
 
-/* Stats section */
 .faq-stats {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -161,7 +160,6 @@
   font-size: 0.9rem;
 }
 
-/* Filter buttons */
 .faq-filters {
   display: flex;
   gap: 10px;
@@ -190,7 +188,6 @@
   border-color: #3182ce;
 }
 
-/* Empty state */
 .faq-empty-state {
   text-align: center;
   padding: 40px 0;
@@ -218,7 +215,6 @@
   font-size: 0.9rem;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .faq-list {
     grid-template-columns: 1fr;

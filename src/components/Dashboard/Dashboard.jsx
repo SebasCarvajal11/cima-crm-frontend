@@ -2,8 +2,6 @@ import React, { useState, useCallback, Suspense, lazy } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom'; 
 
-const WorkerDashboard = lazy(() => import('./WorkerDashboard'));
-const ClientDashboard = lazy(() => import('./ClientDashboard'));
 const AdminDashboard = lazy(() => import('./AdminDashboard'));
 const ExcelImport = lazy(() => import('../Excel/ExcelImport'));
 const ExcelExport = lazy(() => import('../Excel/ExcelExport'));

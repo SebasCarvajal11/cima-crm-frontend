@@ -1,14 +1,15 @@
 import React, { createContext, useState, useEffect, useContext, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { taskService } from '../services/taskService';
-import { toast } from 'react-toastify';
 import logger from '../utils/logger';
+import { useNotification } from '../hooks/useNotification';
 
 const TaskContext = createContext();
 
 export const TaskProvider = ({ children }) => {
   const { user, accessToken } = useSelector((state) => state.auth);
   const isAdmin = user && user.role === 'Admin';
+  const notify = useNotification();
 
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState(null);
@@ -66,7 +67,7 @@ export const TaskProvider = ({ children }) => {
       setTaskStats(response);
     } catch (error) {
       logger.error('Error al cargar estadísticas:', error);
-      toast.error('No se pudieron cargar las estadísticas');
+      notify.error('No se pudieron cargar las estadísticas', error);
       setTaskStats({
         success: false,
         stats: {
@@ -123,11 +124,11 @@ export const TaskProvider = ({ children }) => {
       setLoading(true);
       try {
         await taskService.deleteTask(id);
-        toast.success('Tarea eliminada exitosamente');
+        notify.success('Tarea eliminada exitosamente');
         loadTasks();
       } catch (error) {
         logger.error('Error al eliminar la tarea:', error);
-        toast.error('Error al eliminar la tarea');
+        notify.error('Error al eliminar la tarea', error);
       } finally {
         setLoading(false);
       }

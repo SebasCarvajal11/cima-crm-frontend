@@ -10,6 +10,38 @@
   --color-brand-secondary: #1a237e;
   --color-brand-secondary-light: #3949ab;
   --color-background: #f4f6f9;
+  
+  /* State Colors */
+  --color-success: #10b981;
+  --color-success-light: #d1fae5;
+  --color-warning: #f59e0b;
+  --color-warning-light: #fef3c7;
+  --color-error: #ef4444;
+  --color-error-light: #fee2e2;
+  --color-info: #3b82f6;
+  --color-info-light: #dbeafe;
+}
+
+/* Custom utilities */
+@utility bg-brand-gradient {
+  background: linear-gradient(135deg, var(--color-brand-primary-light) 0%, var(--color-brand-primary) 100%);
+}
+
+@utility scrollbar-brand {
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-brand-primary-light);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--color-brand-primary);
+  }
 }
 
 /* Global resets for base HTML elements to complement Tailwind */

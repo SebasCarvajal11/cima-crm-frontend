@@ -77,7 +77,7 @@ const ExcelManagerContainer = () => {
                 gap: 2,
               }}
             >
-              <ProjectIcon sx={{ fontSize: 48, color: '#592d2d', opacity: 0.5 }} />
+              <ProjectIcon sx={{ fontSize: 48, color: 'var(--color-brand-primary)', opacity: 0.5 }} />
               <Typography variant="h6" color="text.secondary">
                 Seleccione un proyecto para gestionar sus documentos
               </Typography>

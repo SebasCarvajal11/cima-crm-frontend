@@ -1,47 +1,38 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { 
-  Box, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableRow, 
-  Typography, 
-  Avatar, 
-  Button, 
-  IconButton,
-  TextField,
-  Pagination,
+import {
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Typography,
+  Button,
   CircularProgress
 } from '@mui/material';
-import { 
-  Add as AddIcon, 
-  Edit as EditIcon, 
-  Delete as DeleteIcon,
-  Search as SearchIcon,
-  FilterList as FilterListIcon
-} from '@mui/icons-material';
 import { toast } from 'react-toastify';
-import { stringToColor, adjustColor, getInitials } from '../../utils/colorUtils';
 import { CreateUserDialog } from './components/CreateUserDialog';
 import { EditUserDialog } from './components/EditUserDialog';
 import { DeleteUserDialog } from './components/DeleteUserDialog';
+import { UserTableToolbar } from './components/UserTableToolbar';
+import { UserTableRow } from './components/UserTableRow';
+import { UserPagination } from './components/UserPagination';
+import { EnhancedTableContainer, StyledTableHead } from './components/SharedStyles';
 import logger from '../../utils/logger';
-import { EnhancedTableContainer, TableToolbar, SearchBar, StatusChip, StyledTableHead, StyledTableRow } from './components/SharedStyles';
 
 const UsersInterface = ({ token }) => {
   const [staffUsers, setStaffUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  
+
   const [page, setPage] = useState(1);
   const rowsPerPage = 5;
-  
+
   useEffect(() => {
     const fetchStaffUsers = async () => {
       try {
@@ -52,7 +43,7 @@ const UsersInterface = ({ token }) => {
             'accesstoken': token
           }
         });
-        
+
         logger.debug('Datos de staff recibidos:', response.data);
         setStaffUsers(response.data.users || []);
         setLoading(false);
@@ -68,13 +59,13 @@ const UsersInterface = ({ token }) => {
       fetchStaffUsers();
     }
   }, [token]);
-  
+
   const handlePageChange = (event, value) => {
     setPage(value);
   };
-  
+
   const openCreateDialog = () => setIsCreateOpen(true);
-  
+
   const openEditDialog = (user) => {
     setSelectedUser(user);
     setIsEditOpen(true);
@@ -107,8 +98,9 @@ const UsersInterface = ({ token }) => {
     const updatedUsers = staffUsers.filter(user => (user.userId || user.id) !== userId);
     setStaffUsers(updatedUsers);
   };
-  
+
   const currentUsers = staffUsers.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  const totalPages = Math.ceil(staffUsers.length / rowsPerPage);
 
   if (loading) {
     return (
@@ -122,8 +114,8 @@ const UsersInterface = ({ token }) => {
     return (
       <Box sx={{ textAlign: 'center', p: 3 }}>
         <Typography color="error">{error}</Typography>
-        <Button 
-          variant="contained" 
+        <Button
+          variant="contained"
           sx={{ mt: 2 }}
           onClick={() => window.location.reload()}
         >
@@ -135,40 +127,7 @@ const UsersInterface = ({ token }) => {
 
   return (
     <EnhancedTableContainer>
-      <TableToolbar>
-        <SearchBar>
-          <SearchIcon />
-          <TextField
-            placeholder="Buscar usuario..."
-            variant="standard"
-            InputProps={{
-              disableUnderline: true,
-            }}
-          />
-        </SearchBar>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button
-            variant="contained"
-            startIcon={<FilterListIcon />}
-          >
-            Filtrar
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={openCreateDialog}
-            sx={{
-              background: 'linear-gradient(135deg,rgb(0, 0, 0) 0%,rgb(0, 0, 0) 100%)',
-              color: 'white',
-              '&:hover': {
-                background: 'linear-gradient(135deg,rgb(0, 0, 0) 0%,rgb(207, 215, 224) 100%)',
-              },
-            }}
-          >
-            Nuevo Usuario
-          </Button>
-        </Box>
-      </TableToolbar>
+      <UserTableToolbar onOpenCreate={openCreateDialog} />
 
       <Table>
         <StyledTableHead>
@@ -176,123 +135,53 @@ const UsersInterface = ({ token }) => {
             <TableCell>Usuario</TableCell>
             <TableCell>Email</TableCell>
             <TableCell>Rol</TableCell>
-            <TableCell>Fecha de creación</TableCell>
-            <TableCell>Última actualización</TableCell>
+            <TableCell>Fecha de creaci&oacute;n</TableCell>
+            <TableCell>&Uacute;ltima actualizaci&oacute;n</TableCell>
             <TableCell align="right">Acciones</TableCell>
           </TableRow>
         </StyledTableHead>
         <TableBody>
-          {currentUsers.map((user, index) => {
-            const userKey = user.userId || user.id || `staff-${index}`;
-            
-            return (
-              <StyledTableRow key={userKey}>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Avatar sx={{ 
-                      background: user.name 
-                        ? `linear-gradient(135deg, ${stringToColor(user.name)} 0%, ${adjustColor(stringToColor(user.name), -20)} 100%)`
-                        : 'linear-gradient(135deg, #000000 0%, #333333 100%)',
-                      }}>
-                        {getInitials(user.name)}
-                      </Avatar>
-                      <Typography sx={{ color: '#3f4254', fontWeight: 500 }}>
-                        {user.name}
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <StatusChip status={user.role}>
-                      {user.role}
-                    </StatusChip>
-                  </TableCell>
-                  <TableCell>
-                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-ES', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    }) : '-'}
-                  </TableCell>
-                  <TableCell>
-                    {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString('es-ES', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    }) : '-'}
-                  </TableCell>
-                  <TableCell align="right">
-                    <IconButton
-                      onClick={() => openEditDialog(user)}
-                      sx={{ color: '#592d2d' }}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => openDeleteDialog(user)}
-                      sx={{ color: '#f1416c' }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </StyledTableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-  
-        <Box sx={{ 
-          padding: '20px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderTop: '1px solid #ebedf3',
-        }}>
-          <Typography sx={{ color: '#7e8299' }}>
-            Mostrando {currentUsers.length} de {staffUsers.length} usuarios
-          </Typography>
-          <Pagination
-            count={Math.ceil(staffUsers.length / rowsPerPage)}
-            page={page}
-            onChange={handlePageChange}
-            variant="outlined"
-            shape="rounded"
-            sx={{
-              '& .MuiPaginationItem-root': {
-                borderColor: '#e9ecef',
-                color: '#7e8299',
-                '&.Mui-selected': {
-                  background: '#f3f6f9',
-                  borderColor: '#3699ff',
-                  color: '#3699ff',
-                },
-              },
-            }}
-          />
-        </Box>
-  
-        <CreateUserDialog
-          open={isCreateOpen}
-          onClose={() => setIsCreateOpen(false)}
-          onSuccess={handleCreateSuccess}
-          token={token}
-        />
-        <EditUserDialog
-          open={isEditOpen}
-          user={selectedUser}
-          onClose={() => { setIsEditOpen(false); setSelectedUser(null); }}
-          onSuccess={handleEditSuccess}
-          token={token}
-        />
-        <DeleteUserDialog
-          open={isDeleteOpen}
-          user={selectedUser}
-          onClose={() => { setIsDeleteOpen(false); setSelectedUser(null); }}
-          onSuccess={handleDeleteSuccess}
-          token={token}
-        />
-      </EnhancedTableContainer>
-    );
-  };
-  
-  export default UsersInterface;
+          {currentUsers.map((user) => (
+            <UserTableRow
+              key={user.userId || user.id || user.email}
+              user={user}
+              onEdit={openEditDialog}
+              onDelete={openDeleteDialog}
+            />
+          ))}
+        </TableBody>
+      </Table>
+
+      <UserPagination
+        currentPage={page}
+        totalPages={totalPages}
+        currentCount={currentUsers.length}
+        totalCount={staffUsers.length}
+        onPageChange={handlePageChange}
+      />
+
+      <CreateUserDialog
+        open={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        onSuccess={handleCreateSuccess}
+        token={token}
+      />
+      <EditUserDialog
+        open={isEditOpen}
+        user={selectedUser}
+        onClose={() => { setIsEditOpen(false); setSelectedUser(null); }}
+        onSuccess={handleEditSuccess}
+        token={token}
+      />
+      <DeleteUserDialog
+        open={isDeleteOpen}
+        user={selectedUser}
+        onClose={() => { setIsDeleteOpen(false); setSelectedUser(null); }}
+        onSuccess={handleDeleteSuccess}
+        token={token}
+      />
+    </EnhancedTableContainer>
+  );
+};
+
+export default UsersInterface;

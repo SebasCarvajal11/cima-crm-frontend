@@ -13,11 +13,11 @@ const TaskManagementTabs = () => {
       className="bg-white rounded-lg mb-6 shadow-sm"
       sx={{
         '& .MuiTab-root': {
-          color: '#592d2d',
-          '&:hover': { color: '#000000' },
-          '&.Mui-selected': { color: '#000000' },
+          color: 'var(--color-brand-primary)',
+          '&:hover': { color: 'var(--color-brand-primary-light)' },
+          '&.Mui-selected': { color: 'var(--color-brand-primary-light)' },
         },
-        '& .MuiTabs-indicator': { backgroundColor: '#000000' },
+        '& .MuiTabs-indicator': { backgroundColor: 'var(--color-brand-primary-light)' },
       }}
     >
       <Tab label="Gestión de Tareas" />

@@ -1,291 +1,88 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import {
   Box,
-  Button,
   CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControl,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Pagination,
-  Select,
   Table,
   TableBody,
   TableCell,
-  TableContainer,
-  TableHead,
   TableRow,
-  TextField,
   Typography,
-  Avatar,
   Tabs,
   Tab,
 } from '@mui/material';
-import { 
-  Add as AddIcon, 
-  Edit as EditIcon, 
-  Delete as DeleteIcon,
-  Close as CloseIcon,
+import {
   People as PeopleIcon,
-  Person as PersonIcon
+  Person as PersonIcon,
 } from '@mui/icons-material';
 import 'react-toastify/dist/ReactToastify.css';
-import styled from '@emotion/styled';
-import { alpha } from '@mui/material/styles';
-import SearchIcon from '@mui/icons-material/Search';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { motion, AnimatePresence } from 'framer-motion';
-import { IoGridOutline, IoListOutline } from 'react-icons/io5';
-import Slide from '@mui/material/Slide';
+import { motion } from 'framer-motion';
 import UsersInterface from './UsersInterface';
-import { stringToColor, adjustColor, getInitials, getPlanColor } from '../../utils/colorUtils';
 import { CreateClientDialog } from './components/CreateClientDialog';
 import { EditClientDialog } from './components/EditClientDialog';
 import { DeleteClientDialog } from './components/DeleteClientDialog';
-import logger from '../../utils/logger';
-import { EnhancedTableContainer, TableToolbar, SearchBar, StatusChip, StyledTableHead, StyledTableRow } from './components/SharedStyles';
+import { ClientProvider, useClient } from '../../context/ClientContext';
+import { ClientTableToolbar } from './components/ClientTableToolbar';
+import { ClientTableRow } from './components/ClientTableRow';
+import { ClientPagination } from './components/ClientPagination';
+import { EnhancedTableContainer, StyledTableHead } from './components/SharedStyles';
 
-// TabPanel component to handle tab content
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
+function TabPanel({ children, value, index, ...other }) {
   return (
     <div
       role="tabpanel"
       hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
+      id={`client-tabpanel-${index}`}
+      aria-labelledby={`client-tab-${index}`}
       {...other}
       className="w-full"
     >
-      {value === index && (
-        <Box sx={{ pt: 3 }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
     </div>
   );
 }
 
-// Estilos personalizados usando styled-components
-const StyledBox = styled(Box)(({ theme }) => ({
-  padding: '40px',
-  background: 'linear-gradient(135deg, #f6f9fc 0%, #f1f5f9 100%)',
-  minHeight: '100vh',
-}));
-
-// Update PageHeader styling
-const PageHeader = styled(Box)(({ theme }) => ({
-  marginBottom: '48px',
-  textAlign: 'center',
-  position: 'relative',
-  '&::after': {
-    content: '""',
-    position: 'absolute',
-    bottom: '-15px',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    width: '60px',
-    height: '4px',
-    background: '#8e3031',
-    borderRadius: '2px',
-  }
-}));
-
-// Update ActionButton colors to match the maroon/burgundy theme
-const ActionButton = styled(Button)(({ variant }) => ({
-  background: variant === 'create' 
-    ? 'linear-gradient(45deg, #8e3031 30%, #592d2d 90%)'
-    : 'linear-gradient(45deg, #e74c3c 30%, #c0392b 90%)',
-  boxShadow: variant === 'create'
-    ? '0 3px 5px 2px rgba(142, 48, 49, .3)'
-    : '0 3px 5px 2px rgba(231, 76, 60, .3)',
-  borderRadius: '8px',
-  padding: '10px 25px',
-  color: 'white',
-  textTransform: 'none',
-  fontWeight: 600,
-}));
-
-const UserManagement = () => {
-  // Add tab state
-  const [tabValue, setTabValue] = useState(0);
-  
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-  };
-  
+const ClientListContent = () => {
   const token = useSelector((state) => state.auth.accessToken);
-  const userId = useSelector((state) =>  state.auth.user.userId);
+  const {
+    loading,
+    error,
+    paginatedClients,
+    isCreateOpen,
+    isEditOpen,
+    isDeleteOpen,
+    selectedClient,
+    fetchClients,
+    openEditDialog,
+    openDeleteDialog,
+    handleDeleteSuccess,
+    setIsCreateOpen,
+    setIsEditOpen,
+    setIsDeleteOpen,
+  } = useClient();
 
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-
-  const [page, setPage] = useState(1);
-  const rowsPerPage = 5;
-
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/clients`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'accesstoken': token
-        }
-      });
-      setUsers(response.data.clients || []);
-    } catch (err) {
-      logger.error('Error al cargar clientes:', err);
-      setError('Error al cargar clientes');
-      toast.error('Error al cargar clientes', { position: 'top-center' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (token) {
-      fetchUsers();
-    }
-  }, [token]);
-
-  const handlePageChange = (event, value) => {
-    setPage(value);
-  };
-
-  const openCreateDialog = () => setIsCreateOpen(true);
-  
-  const openEditDialog = (user) => {
-    setSelectedUser(user);
-    setIsEditOpen(true);
-  };
-  
-  const openDeleteDialog = (user) => {
-    setSelectedUser(user);
-    setIsDeleteOpen(true);
-  };
-
-  const handleDeleteSuccess = (deletedId) => {
-    setUsers(users.filter(user => user.clientId !== deletedId));
-  };
-  
-  const handleRoleChange = (userId, newRole) => {
-    const updatedUsers = users.map((u) =>
-      u.id === userId ? { ...u, role: newRole } : u
+  if (loading) {
+    return (
+      <div className="flex justify-center p-10">
+        <CircularProgress />
+      </div>
     );
-    setUsers(updatedUsers);
-    toast.success('Rol actualizado', { position: 'top-center' });
-  };
+  }
 
-  const currentUsers = users.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  if (error) {
+    return (
+      <Typography color="error" sx={{ p: 4, textAlign: 'center' }}>
+        {error}
+      </Typography>
+    );
+  }
 
   return (
-    <StyledBox>
-      <ToastContainer />
-      
-      <PageHeader>
-        <Typography variant="h4" sx={{
-          fontWeight: 700,
-          color: '#181c32',
-          mb: 1,
-        }}>
-          Gestión de Usuarios
-        </Typography>
-        <Typography variant="body1" sx={{ color: '#7e8299' }}>
-          Administra y gestiona todos los usuarios del sistema
-        </Typography>
-      </PageHeader>
-
-      <Box sx={{ 
-        width: '100%', 
-        bgcolor: 'background.paper',
-        borderRadius: '10px',
-        boxShadow: '0 0 20px 0 rgba(82, 63, 105, 0.1)',
-        mb: 3
-      }}>
-        <Tabs 
-          value={tabValue} 
-          onChange={handleTabChange} 
-          centered
-          sx={{
-            '& .MuiTabs-indicator': {
-              backgroundColor: '#8e3031',
-            },
-            '& .MuiTab-root': {
-              textTransform: 'none',
-              fontWeight: 500,
-              fontSize: '1rem',
-              color: '#7e8299',
-              '&.Mui-selected': {
-                color: '#8e3031',
-                fontWeight: 600,
-              },
-            },
-          }}
-        >
-          <Tab 
-            icon={<PersonIcon />} 
-            iconPosition="start" 
-            label="Clientes" 
-          />
-          <Tab 
-            icon={<PeopleIcon />} 
-            iconPosition="start" 
-            label="Usuarios" 
-          />
-        </Tabs>
-      </Box>
-
-      <TabPanel value={tabValue} index={0}>
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+    <>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <EnhancedTableContainer>
-          <TableToolbar>
-            <SearchBar>
-              <SearchIcon />
-              <TextField
-                placeholder="Buscar cliente..."
-                variant="standard"
-                InputProps={{
-                  disableUnderline: true,
-                }}
-              />
-            </SearchBar>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <Button
-                variant="contained"
-                startIcon={<FilterListIcon />}
-               
-              >
-                Filtrar
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={openCreateDialog}
-                sx={{
-                  background: 'linear-gradient(135deg, #8e3031 0%, #592d2d 100%)',
-                  color: 'white',
-                }}
-              >
-                Nuevo Cliente
-              </Button>
-            </Box>
-          </TableToolbar>
+          <ClientTableToolbar />
 
           <Table>
             <StyledTableHead>
@@ -300,128 +97,90 @@ const UserManagement = () => {
               </TableRow>
             </StyledTableHead>
             <TableBody>
-              {currentUsers.map((user, index) => {
-                const userKey = user.id || user.userId || user.user_id || user._id || `user-${index}`;
-                
-                return (
-                  <StyledTableRow key={userKey}>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Avatar sx={{ 
-                          background: user.name 
-                            ? `linear-gradient(135deg, ${stringToColor(user.name)} 0%, ${adjustColor(stringToColor(user.name), -20)} 100%)`
-                            : 'linear-gradient(135deg, #000000 0%, #333333 100%)',
-                        }}>
-                          {getInitials(user.name)}
-                        </Avatar>
-                        <Typography sx={{ color: '#3f4254', fontWeight: 500 }}>
-                          {user.name}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      <StatusChip status={user.role}>
-                        {user.role}
-                      </StatusChip>
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ 
-                        display: 'inline-block',
-                        px: 2,
-                        py: 0.5,
-                        borderRadius: '4px',
-                        bgcolor: getPlanColor(user.plan),
-                        color: 'white',
-                        fontWeight: 'medium'
-                      }}>
-                        {user.plan || 'Oro'}
-                      </Box>
-                    </TableCell>
-                    <TableCell>{user.address}</TableCell>
-                    <TableCell>{user.phone || user.contactInfo}</TableCell>
-                    <TableCell align="right">
-                      <IconButton
-                        onClick={() => openEditDialog(user)}
-                        sx={{ color: '#592d2d' }}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        onClick={() => openDeleteDialog(user)}
-                        sx={{ color: '#f1416c' }}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </StyledTableRow>
-                );
-              })}
+              {paginatedClients.map((client) => (
+                <ClientTableRow
+                  key={client.clientId || client.id || client.email}
+                  client={client}
+                  onEdit={openEditDialog}
+                  onDelete={openDeleteDialog}
+                />
+              ))}
             </TableBody>
           </Table>
 
-          <Box sx={{ 
-            padding: '20px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderTop: '1px solid #ebedf3',
-          }}>
-            <Typography sx={{ color: '#7e8299' }}>
-              Mostrando {currentUsers.length} de {users.length} usuarios
-            </Typography>
-            <Pagination
-              count={Math.ceil(users.length / rowsPerPage)}
-              page={page}
-              onChange={handlePageChange}
-              variant="outlined"
-              shape="rounded"
-              sx={{
-                '& .MuiPaginationItem-root': {
-                  borderColor: '#e9ecef',
-                  color: '#7e8299',
-                  '&.Mui-selected': {
-                    background: '#f3f6f9',
-                    borderColor: '#8e3031',
-                    color: '#8e3031',
-                  },
-                },
-              }}
-            />
-          </Box>
+          <ClientPagination />
         </EnhancedTableContainer>
-        </motion.div>
-      </TabPanel>
+      </motion.div>
 
-      <TabPanel value={tabValue} index={1}>
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <UsersInterface token={token} />
-        </motion.div>
-      </TabPanel>
+      <CreateClientDialog open={isCreateOpen} onClose={() => setIsCreateOpen(false)} onSuccess={fetchClients} token={token} />
+      <EditClientDialog open={isEditOpen} user={selectedClient} onClose={() => setIsEditOpen(false)} onSuccess={fetchClients} token={token} />
+      <DeleteClientDialog open={isDeleteOpen} user={selectedClient} onClose={() => setIsDeleteOpen(false)} onSuccess={handleDeleteSuccess} token={token} />
+    </>
+  );
+};
 
-      <CreateClientDialog
-        open={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
-        onSuccess={fetchUsers}
-        token={token}
-      />
-      
-      <EditClientDialog
-        open={isEditOpen}
-        user={selectedUser}
-        onClose={() => setIsEditOpen(false)}
-        onSuccess={fetchUsers}
-        token={token}
-      />
-      
-      <DeleteClientDialog
-        open={isDeleteOpen}
-        user={selectedUser}
-        onClose={() => setIsDeleteOpen(false)}
-        onSuccess={handleDeleteSuccess}
-        token={token}
-      />
-    </StyledBox>
+const UserManagement = () => {
+  const [tabValue, setTabValue] = useState(0);
+  const token = useSelector((state) => state.auth.accessToken);
+
+  const handleTabChange = (_, newValue) => {
+    setTabValue(newValue);
+  };
+
+  return (
+    <ClientProvider>
+      <Box sx={{ p: 5, background: 'linear-gradient(135deg, #f6f9fc 0%, #f1f5f9 100%)', minHeight: '100vh' }}>
+        <ToastContainer />
+
+        <Box sx={{ mb: 6, textAlign: 'center', position: 'relative', '&::after': { content: '""', position: 'absolute', bottom: '-15px', left: '50%', transform: 'translateX(-50%)', width: '60px', height: '4px', background: 'var(--color-brand-primary-light)', borderRadius: '2px' } }}>
+          <Typography variant="h4" sx={{ fontWeight: 700, color: '#181c32', mb: 1 }}>
+            Gestión de Usuarios
+          </Typography>
+          <Typography variant="body1" sx={{ color: '#7e8299' }}>
+            Administra y gestiona todos los usuarios del sistema
+          </Typography>
+        </Box>
+
+        <Box
+          sx={{
+            width: '100%',
+            bgcolor: 'background.paper',
+            borderRadius: '10px',
+            boxShadow: '0 0 20px 0 rgba(82, 63, 105, 0.1)',
+            mb: 3,
+          }}
+        >
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            centered
+            sx={{
+              '& .MuiTabs-indicator': { backgroundColor: 'var(--color-brand-primary-light)' },
+              '& .MuiTab-root': {
+                textTransform: 'none',
+                fontWeight: 500,
+                fontSize: '1rem',
+                color: '#7e8299',
+                '&.Mui-selected': { color: 'var(--color-brand-primary-light)', fontWeight: 600 },
+              },
+            }}
+          >
+            <Tab icon={<PersonIcon />} iconPosition="start" label="Clientes" />
+            <Tab icon={<PeopleIcon />} iconPosition="start" label="Usuarios" />
+          </Tabs>
+        </Box>
+
+        <TabPanel value={tabValue} index={0}>
+          <ClientListContent />
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={1}>
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+            <UsersInterface token={token} />
+          </motion.div>
+        </TabPanel>
+      </Box>
+    </ClientProvider>
   );
 };
 
