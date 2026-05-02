@@ -24,7 +24,7 @@ export function useNotification() {
   };
 
   const error = (message, err = null, options = {}) => {
-    const detail = err?.response?.data?.message || err?.message;
+    const detail = err?.userMessage || err?.response?.data?.message || err?.message;
     const fullMessage = detail ? `${message}: ${detail}` : message;
     return toast.error(fullMessage, { ...defaultOptions, autoClose: 5000, ...options });
   };

@@ -1,33 +1,9 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios'; // Para hacer las solicitudes HTTP
+import { createSlice } from '@reduxjs/toolkit';
 import { AUTH } from '../../constants';
 
-// Acción asincrónica para manejar el login
-export const login = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
-  try {
-    const response = await axios.post(`${import.meta.env.VITE_API_URL}/users/login`, credentials, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    // Almacenar los datos en localStorage al realizar el login exitoso
-    localStorage.setItem(AUTH.STORAGE_KEYS.USER, JSON.stringify(response.data.user));
-    localStorage.setItem(AUTH.STORAGE_KEYS.ACCESS_TOKEN, response.data.accessToken);
-
-    return response.data;
-  } catch (err) {
-    if (err.response && err.response.data) {
-      return rejectWithValue(err.response.data.error);
-    } else {
-      return rejectWithValue(err.message);
-    }
-  }
-});
-
 const initialState = {
-  user: JSON.parse(localStorage.getItem(AUTH.STORAGE_KEYS.USER)) || null, // Obtener el usuario desde localStorage
-  accessToken: localStorage.getItem(AUTH.STORAGE_KEYS.ACCESS_TOKEN) || null, // Obtener el token desde localStorage
+  user: JSON.parse(localStorage.getItem(AUTH.STORAGE_KEYS.USER)) || null,
+  accessToken: localStorage.getItem(AUTH.STORAGE_KEYS.ACCESS_TOKEN) || null,
   status: 'idle',
   error: null,
 };
@@ -36,31 +12,30 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    setCredentials: (state, action) => {
+      state.user = action.payload.user;
+      state.accessToken = action.payload.accessToken;
+      state.status = 'succeeded';
+      state.error = null;
+    },
+    setAuthError: (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload || 'Error en la autenticación';
+    },
+    setAuthLoading: (state) => {
+      state.status = 'loading';
+      state.error = null;
+    },
     logout: (state) => {
       state.user = null;
       state.accessToken = null;
-      localStorage.removeItem(AUTH.STORAGE_KEYS.USER); // Limpiar el localStorage al cerrar sesión
+      state.status = 'idle';
+      state.error = null;
+      localStorage.removeItem(AUTH.STORAGE_KEYS.USER);
       localStorage.removeItem(AUTH.STORAGE_KEYS.ACCESS_TOKEN);
     },
   },
-  extraReducers: (builder) => {
-    builder
-      .addCase(login.pending, (state) => {
-        state.status = 'loading';
-        state.error = null;
-      })
-      .addCase(login.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.user = action.payload.user;
-        state.accessToken = action.payload.accessToken;
-        state.error = null;
-      })
-      .addCase(login.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload || 'Error en la autenticación';
-      });
-  },
 });
 
-export const { logout } = authSlice.actions;
+export const { setCredentials, setAuthError, setAuthLoading, logout } = authSlice.actions;
 export default authSlice.reducer;

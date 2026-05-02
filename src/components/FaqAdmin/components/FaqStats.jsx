@@ -4,11 +4,8 @@ import {
   CheckCircle as CheckCircleIcon,
   HourglassEmpty as PendingIcon,
 } from '@mui/icons-material';
-import { useFaq } from '../../../context/FaqContext';
 
-export default function FaqStats() {
-  const { stats } = useFaq();
-
+export default function FaqStats({ stats }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 fluid-gap mb-6">
       <div className="bg-white rounded-xl fluid-padding shadow-sm text-center hover:-translate-y-1 hover:shadow-md transition-all">

@@ -1,4 +1,3 @@
-import React from 'react';
 import { ProjectFormProvider } from './Provider';
 import { ProjectForm } from './CompoundUI';
 

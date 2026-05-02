@@ -1,14 +1,10 @@
-import React from 'react';
 import { Tabs, Tab } from '@mui/material';
-import { useTask } from '../../../context/TaskContext';
 
-const TaskManagementTabs = () => {
-  const { tabValue, handleTabChange, isAdmin } = useTask();
-
+const TaskManagementTabs = ({ tabValue, onTabChange, isAdmin }) => {
   return (
     <Tabs
       value={tabValue}
-      onChange={handleTabChange}
+      onChange={onTabChange}
       variant="fullWidth"
       className="bg-white rounded-lg mb-6 shadow-sm"
       sx={{

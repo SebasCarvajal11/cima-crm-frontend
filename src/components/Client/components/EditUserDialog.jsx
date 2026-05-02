@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
@@ -7,6 +6,8 @@ import {
   IconButton, Button, CircularProgress, Box
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
+import { useUpdateUserMutation } from '../../../redux/api';
+import { ROLES } from '../../../constants';
 
 const ActionButton = ({ children, disabled, onClick }) => (
   <Button
@@ -29,17 +30,17 @@ const ActionButton = ({ children, disabled, onClick }) => (
   </Button>
 );
 
-export const EditUserDialog = ({ open, user, onClose, onSuccess, token }) => {
+export const EditUserDialog = ({ open, user, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
-    name: '', email: '', password: '', role: 'Worker'
+    name: '', email: '', password: '', role: ROLES.WORKER
   });
-  const [loading, setLoading] = useState(false);
+  const [updateUser, { isLoading }] = useUpdateUserMutation();
 
   useEffect(() => {
     if (user) {
       setFormData({
         ...user,
-        password: '', // Don't pre-fill password
+        password: '',
         department: user.department || '',
         position: user.position || ''
       });
@@ -59,7 +60,6 @@ export const EditUserDialog = ({ open, user, onClose, onSuccess, token }) => {
       return;
     }
 
-    setLoading(true);
     try {
       const updateData = {
         name: formData.name,
@@ -67,29 +67,17 @@ export const EditUserDialog = ({ open, user, onClose, onSuccess, token }) => {
         role: formData.role
       };
 
-      // Only include password if provided
       if (formData.password && formData.password.trim() !== '') {
         updateData.password = formData.password;
       }
 
-      await axios.put(
-        `${import.meta.env.VITE_API_URL}/users/${userId}`,
-        updateData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'accesstoken': token
-          }
-        }
-      );
+      await updateUser({ id: userId, ...updateData }).unwrap();
 
       toast.success('Usuario actualizado exitosamente', { position: 'top-center' });
       onSuccess(userId, updateData);
       onClose();
     } catch (err) {
-      toast.error(`Error: ${err.response?.data?.message || 'Ocurrió un problema'}`, { position: 'top-center' });
-    } finally {
-      setLoading(false);
+      toast.error(`Error: ${err.userMessage || err.message || 'Ocurrió un problema'}`, { position: 'top-center' });
     }
   };
 
@@ -147,12 +135,11 @@ export const EditUserDialog = ({ open, user, onClose, onSuccess, token }) => {
               onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               label="Rol"
             >
-              <MenuItem value="Admin">Administrador</MenuItem>
-              <MenuItem value="Worker">Trabajador</MenuItem>
+              <MenuItem value={ROLES.ADMIN}>Administrador</MenuItem>
+              <MenuItem value={ROLES.WORKER}>Trabajador</MenuItem>
             </Select>
           </FormControl>
 
-          {/* Read-only date fields */}
           {formData.createdAt && (
             <TextField
               fullWidth label="Fecha de creación"
@@ -171,8 +158,8 @@ export const EditUserDialog = ({ open, user, onClose, onSuccess, token }) => {
       </DialogContent>
       <DialogActions sx={{ padding: '1rem 1.5rem' }}>
         <Button onClick={onClose} sx={{ color: 'text.secondary' }}>Cancelar</Button>
-        <ActionButton onClick={handleSubmit} disabled={loading}>
-          {loading ? <CircularProgress size={24} color="inherit" /> : 'Guardar Cambios'}
+        <ActionButton onClick={handleSubmit} disabled={isLoading}>
+          {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Guardar Cambios'}
         </ActionButton>
       </DialogActions>
     </Dialog>

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../../redux/slices/authSlice';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useLoginMutation } from '../../redux/api';
+import { setCredentials, setAuthError, setAuthLoading } from '../../redux/slices/authSlice';
 import { ROUTES } from '../../constants';
 
 const Login = () => {
@@ -9,14 +10,17 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { error, status } = useSelector((state) => state.auth);
+  const [login, { isLoading, error }] = useLoginMutation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await dispatch(login({ email, password }));
-
-    if (login.fulfilled.match(result)) {
+    dispatch(setAuthLoading());
+    try {
+      const result = await login({ email, password }).unwrap();
+      dispatch(setCredentials(result));
       navigate(ROUTES.DASHBOARD);
+    } catch (err) {
+      dispatch(setAuthError(err.data?.error || err.message || 'Error en la autenticación'));
     }
   };
 
@@ -52,14 +56,14 @@ const Login = () => {
             
             <button 
               type="submit" 
-              disabled={status === 'loading'} 
-              aria-busy={status === 'loading'}
+              disabled={isLoading} 
+              aria-busy={isLoading}
               className="w-full py-3 px-4 bg-brand-primary text-white border-none rounded-xl text-base font-semibold cursor-pointer transition-all duration-300 hover:bg-brand-primary-light hover:scale-[1.02] active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-md hover:shadow-lg"
             >
-              {status === 'loading' ? 'Iniciando sesión...' : 'Iniciar sesión'}
+              {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </button>
             
-            {error && <p className="text-red-500 text-center fluid-text-sm mt-4 font-medium">{error}</p>}
+            {error && <p className="text-red-500 text-center fluid-text-sm mt-4 font-medium">{typeof error === 'string' ? error : error.data?.error || 'Error en la autenticación'}</p>}
           </form>
         </div>
       </div>

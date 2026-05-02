@@ -1,64 +1,36 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useState } from 'react';
 import {
   Container, Grid, Alert, Fade,
 } from '@mui/material';
 import FolderIcon from '@mui/icons-material/Folder';
 import { LoadingState, PageHeader } from '../ui';
-import api from '../../services/api';
-import { taskService } from '../../services/taskService';
-import logger from '../../utils/logger';
+import { useGetWorkerProjectsQuery, useGetTasksQuery, useUpdateTaskStatusMutation } from '../../redux/api';
 import { useNotification } from '../../hooks/useNotification';
 import ProjectCard from './components/ProjectCard';
 import TasksModal from './components/TasksModal';
 import TaskUpdateDialog from './components/TaskUpdateDialog';
 
 const WorkerProjects = () => {
-  const { accessToken } = useSelector((state) => state.auth);
   const notify = useNotification();
+  const { data: projects = [], isLoading, error } = useGetWorkerProjectsQuery();
 
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const [tasks, setTasks] = useState([]);
-  const [tasksModalOpen, setTasksModalOpen] = useState(false);
   const [selectedProjectTasks, setSelectedProjectTasks] = useState(null);
+  const { data: tasks = [] } = useGetTasksQuery(
+    { projectId: selectedProjectTasks },
+    { skip: !selectedProjectTasks }
+  );
 
   const [selectedTask, setSelectedTask] = useState(null);
   const [taskUpdateDialog, setTaskUpdateDialog] = useState(false);
   const [newTaskStatus, setNewTaskStatus] = useState('');
+  const [tasksModalOpen, setTasksModalOpen] = useState(false);
 
-  const fetchProjects = async () => {
-    try {
-      const response = await api.get('/projects/worker/projects');
-      setProjects(response.data.projects || []);
-      setError(null);
-    } catch (err) {
-      const msg = 'Error al cargar los proyectos';
-      setError(msg);
-      notify.error(msg, err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
-  useEffect(() => {
-    if (accessToken) {
-      fetchProjects();
-    }
-  }, [accessToken]);
-
-  const fetchProjectTasks = async (projectId) => {
+  const fetchProjectTasks = (projectId) => {
     if (!projectId) return;
-    try {
-      const response = await api.get(`/projects/${projectId}/worker/tasks`);
-      setTasks(response.data.tasks || []);
-      setSelectedProjectTasks(projectId);
-      setTasksModalOpen(true);
-    } catch (err) {
-      notify.error('Error al cargar las tareas', err);
-    }
+    setSelectedProjectTasks(projectId);
+    setTasksModalOpen(true);
   };
 
   const handleUpdateTask = (task) => {
@@ -69,18 +41,17 @@ const WorkerProjects = () => {
 
   const handleUpdateTaskStatus = async () => {
     try {
-      await taskService.updateTaskStatus(selectedTask.taskId, newTaskStatus);
-      await fetchProjectTasks(selectedProjectTasks);
+      await updateTaskStatus({ id: selectedTask.taskId, status: newTaskStatus }).unwrap();
       setTaskUpdateDialog(false);
       setSelectedTask(null);
       setNewTaskStatus('');
       notify.success('Estado de tarea actualizado');
     } catch (err) {
-      notify.error('Error al actualizar el estado de la tarea', err);
+      notify.error('Error al actualizar el estado de la tarea');
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return <LoadingState minHeight="24rem" />;
   }
 
@@ -93,7 +64,7 @@ const WorkerProjects = () => {
       />
 
       {error && (
-        <Alert severity="error" className="mb-8">{error}</Alert>
+        <Alert severity="error" className="mb-8">Error al cargar los proyectos</Alert>
       )}
 
       <Grid container spacing={3}>
@@ -111,7 +82,6 @@ const WorkerProjects = () => {
         onClose={() => {
           setTasksModalOpen(false);
           setSelectedProjectTasks(null);
-          setTasks([]);
         }}
         tasks={tasks}
         onUpdateTask={handleUpdateTask}

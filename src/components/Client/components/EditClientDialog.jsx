@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
+import { useState, useEffect } from 'react';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   TextField, FormControl, InputLabel, Select, MenuItem,
@@ -8,17 +6,21 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { ActionButton } from './DialogStyles';
+import { useUpdateClientMutation } from '../../../redux/api';
+import { ROLES } from '../../../constants';
+import { useNotification } from '../../../hooks/useNotification';
 
-export const EditClientDialog = ({ open, user, onClose, onSuccess, token }) => {
+export const EditClientDialog = ({ open, user, onClose, onSuccess }) => {
+  const notify = useNotification();
+  const [updateClient, { isLoading }] = useUpdateClientMutation();
   const [formData, setFormData] = useState({
-    name: '', email: '', role: 'Client',
+    name: '', email: '', role: ROLES.CLIENT,
     address: '', phone: '', contactInfo: '', additionalInfo: '', plan: 'Oro'
   });
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
-      setFormData({ 
+      setFormData({
         ...user,
         contactInfo: user.contactInfo || user.phone || '',
         phone: user.phone || user.contactInfo || '',
@@ -31,34 +33,28 @@ export const EditClientDialog = ({ open, user, onClose, onSuccess, token }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.email) {
-      toast.error('Nombre y Email son obligatorios', { position: 'top-center' }); return;
+      notify.error('Nombre y Email son obligatorios'); return;
     }
-    
-    const clientId = user.clientId;
+
+    const clientId = user.clientId || user.id;
     if (!clientId) {
-      toast.error('El cliente seleccionado no tiene un ID definido', { position: 'top-center' }); return;
+      notify.error('El cliente seleccionado no tiene un ID definido'); return;
     }
 
-    setLoading(true);
-    try {
-      const updateData = {
-        contactInfo: formData.contactInfo || formData.phone,
-        address: formData.address,
-        additionalInfo: formData.additionalInfo,
-        plan: formData.plan
-      };
+    const updateData = {
+      contactInfo: formData.contactInfo || formData.phone,
+      address: formData.address,
+      additionalInfo: formData.additionalInfo,
+      plan: formData.plan
+    };
 
-      await axios.put(`${import.meta.env.VITE_API_URL}/clients/${clientId}`, updateData, {
-        headers: { 'Content-Type': 'application/json', 'accesstoken': token }
-      });
-      
-      toast.success('Cliente actualizado exitosamente', { position: 'top-center' });
+    try {
+      await updateClient({ id: clientId, ...updateData }).unwrap();
+      notify.success('Cliente actualizado exitosamente');
       onSuccess();
       onClose();
     } catch (err) {
-      toast.error(`Error: ${err.response?.data?.message || 'Ocurrió un problema'}`, { position: 'top-center' });
-    } finally {
-      setLoading(false);
+      notify.error(`Error: ${err.message || 'Ocurrió un problema'}`);
     }
   };
 
@@ -93,8 +89,8 @@ export const EditClientDialog = ({ open, user, onClose, onSuccess, token }) => {
       </DialogContent>
       <DialogActions sx={{ padding: '1rem 1.5rem' }}>
         <Button onClick={onClose} sx={{ color: 'text.secondary' }}>Cancelar</Button>
-        <ActionButton variant="create" onClick={handleSubmit} disabled={loading}>
-          {loading ? <CircularProgress size={24} color="inherit" /> : 'Guardar Cambios'}
+        <ActionButton variant="create" onClick={handleSubmit} disabled={isLoading}>
+          {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Guardar Cambios'}
         </ActionButton>
       </DialogActions>
     </Dialog>

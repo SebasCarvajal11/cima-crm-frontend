@@ -1,39 +1,33 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   IconButton, Button, Typography, CircularProgress
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { ActionButton } from './DialogStyles';
+import { useDeleteClientMutation } from '../../../redux/api';
+import { useNotification } from '../../../hooks/useNotification';
 
-export const DeleteClientDialog = ({ open, user, onClose, onSuccess, token }) => {
-  const [loading, setLoading] = useState(false);
+export const DeleteClientDialog = ({ open, user, onClose, onSuccess }) => {
+  const notify = useNotification();
+  const [deleteClient, { isLoading }] = useDeleteClientMutation();
 
   const handleDelete = async () => {
     if (!user) {
-      toast.error('No se ha seleccionado ningún cliente para eliminar', { position: 'top-center' }); return;
-    }
-    
-    const clientId = user.clientId;
-    if (!clientId) {
-      toast.error('El cliente seleccionado no tiene un ID definido', { position: 'top-center' }); return;
+      notify.error('No se ha seleccionado ningún cliente para eliminar'); return;
     }
 
-    setLoading(true);
+    const clientId = user.clientId || user.id;
+    if (!clientId) {
+      notify.error('El cliente seleccionado no tiene un ID definido'); return;
+    }
+
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/clients/${clientId}`, {
-        headers: { 'Content-Type': 'application/json', 'accesstoken': token }
-      });
-      
-      toast.success('Cliente eliminado correctamente', { position: 'top-center' });
+      await deleteClient(clientId).unwrap();
+      notify.success('Cliente eliminado correctamente');
       onSuccess(clientId);
       onClose();
     } catch (err) {
-      toast.error(`Error al eliminar cliente: ${err.response?.data?.message || err.message}`, { position: 'top-center' });
-    } finally {
-      setLoading(false);
+      notify.error(`Error al eliminar cliente: ${err.message || err}`);
     }
   };
 
@@ -57,8 +51,8 @@ export const DeleteClientDialog = ({ open, user, onClose, onSuccess, token }) =>
       </DialogContent>
       <DialogActions sx={{ padding: '1rem 1.5rem' }}>
         <Button onClick={onClose} sx={{ color: 'text.secondary' }}>Cancelar</Button>
-        <ActionButton variant="delete" onClick={handleDelete} disabled={loading}>
-          {loading ? <CircularProgress size={24} color="inherit" /> : 'Eliminar Cliente'}
+        <ActionButton variant="delete" onClick={handleDelete} disabled={isLoading}>
+          {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Eliminar Cliente'}
         </ActionButton>
       </DialogActions>
     </Dialog>

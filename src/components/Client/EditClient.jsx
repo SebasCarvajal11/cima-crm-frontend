@@ -1,14 +1,16 @@
-// components/Client/EditClient.jsx
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { getClientById, updateClient } from '../../redux/slices/clientSlice';
 import { useParams } from 'react-router-dom';
+import { useGetClientByIdQuery, useUpdateClientMutation } from '../../redux/api';
+import { useNotification } from '../../hooks/useNotification';
+import { MESSAGES } from '../../constants';
+import { CircularProgress } from '@mui/material';
 
 const EditClient = () => {
   const { id } = useParams();
-  const dispatch = useDispatch();
-  const { client } = useSelector((state) => state.clients);
-  
+  const notify = useNotification();
+  const { data: client, isLoading: isLoadingClient } = useGetClientByIdQuery(id);
+  const [updateClient, { isLoading: isUpdating }] = useUpdateClientMutation();
+
   const [formData, setFormData] = useState({
     name: '',
     contact: '',
@@ -18,19 +20,34 @@ const EditClient = () => {
   });
 
   useEffect(() => {
-    dispatch(getClientById(id));
-  }, [dispatch, id]);
-
-  useEffect(() => {
     if (client) {
-      setFormData(client);
+      setFormData({
+        name: client.name || '',
+        contact: client.contact || '',
+        address: client.address || '',
+        email: client.email || '',
+        phone: client.phone || '',
+      });
     }
   }, [client]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(updateClient({ id, ...formData }));
+    try {
+      await updateClient({ id, ...formData }).unwrap();
+      notify.success(MESSAGES.SUCCESS.CLIENT.UPDATE);
+    } catch (err) {
+      notify.error(MESSAGES.ERROR.CLIENT.UPDATE, err);
+    }
   };
+
+  if (isLoadingClient) {
+    return (
+      <div className="flex justify-center p-10">
+        <CircularProgress />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-6 md:p-8 max-w-xl mx-auto my-10 md:my-12 rounded-xl shadow-[0_0_10px_rgba(0,0,0,0.1)] font-sans">
@@ -43,9 +60,33 @@ const EditClient = () => {
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           className="block w-full mb-4 p-3 border border-gray-300 rounded focus:outline-none focus:border-brand-secondary focus:ring-1 focus:ring-brand-secondary"
         />
-        {/* Similar para otros campos, si se añaden luego */}
-        <button type="submit" className="w-full p-3 bg-green-600 text-white rounded font-bold mt-4 hover:bg-green-700 transition-colors">
-          Actualizar Cliente
+        <input
+          type="email"
+          placeholder="Email"
+          value={formData.email || ''}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          className="block w-full mb-4 p-3 border border-gray-300 rounded focus:outline-none focus:border-brand-secondary focus:ring-1 focus:ring-brand-secondary"
+        />
+        <input
+          type="text"
+          placeholder="Teléfono"
+          value={formData.phone || ''}
+          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+          className="block w-full mb-4 p-3 border border-gray-300 rounded focus:outline-none focus:border-brand-secondary focus:ring-1 focus:ring-brand-secondary"
+        />
+        <input
+          type="text"
+          placeholder="Dirección"
+          value={formData.address || ''}
+          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+          className="block w-full mb-4 p-3 border border-gray-300 rounded focus:outline-none focus:border-brand-secondary focus:ring-1 focus:ring-brand-secondary"
+        />
+        <button
+          type="submit"
+          disabled={isUpdating}
+          className="w-full p-3 bg-green-600 text-white rounded font-bold mt-4 hover:bg-green-700 transition-colors disabled:opacity-50"
+        >
+          {isUpdating ? 'Actualizando...' : 'Actualizar Cliente'}
         </button>
       </form>
     </div>

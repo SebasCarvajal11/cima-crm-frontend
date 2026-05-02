@@ -1,11 +1,8 @@
 import { Box, Button, TextField } from '@mui/material';
 import { Add as AddIcon, FilterList as FilterListIcon, Search as SearchIcon } from '@mui/icons-material';
-import { useClient } from '../../../context/ClientContext';
 import { TableToolbar, SearchBar } from './SharedStyles';
 
-export const ClientTableToolbar = () => {
-  const { searchTerm, setSearchTerm, openCreateDialog } = useClient();
-
+export const ClientTableToolbar = ({ searchTerm, setSearchTerm, onCreate }) => {
   return (
     <TableToolbar>
       <SearchBar>
@@ -25,7 +22,7 @@ export const ClientTableToolbar = () => {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={openCreateDialog}
+          onClick={onCreate}
           className="bg-brand-gradient text-white"
         >
           Nuevo Cliente

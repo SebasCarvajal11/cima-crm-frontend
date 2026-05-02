@@ -1,4 +1,4 @@
-import { useSelector } from 'react-redux';
+import { useState, useMemo } from 'react';
 import {
   Box,
   Grid,
@@ -11,26 +11,29 @@ import {
   Add as AddIcon,
   Download as DownloadIcon,
 } from '@mui/icons-material';
-import { ClientProvider, useClient } from '../../context/ClientContext';
 import { CreateClientDialog } from '../Client/components/CreateClientDialog';
 import { ClientDashboardStats } from './ClientDashboardStats';
 import { ClientDashboardSearchBar } from './ClientDashboardSearchBar';
 import { ClientDashboardCard } from './ClientDashboardCard';
 import { EmptyState } from '../ui/EmptyState';
+import { useGetClientsQuery } from '../../redux/api';
 
-const ClientDashboardContent = () => {
-  const token = useSelector((state) => state.auth.accessToken);
-  const {
-    filteredClients,
-    loading,
-    error,
-    isCreateOpen,
-    openCreateDialog,
-    setIsCreateOpen,
-    fetchClients,
-  } = useClient();
+const ClientDashboard = () => {
+  const { data: clients = [], isLoading, error } = useGetClientsQuery();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  if (loading) {
+  const filteredClients = useMemo(() => {
+    if (!searchTerm) return clients;
+    const term = searchTerm.toLowerCase();
+    return clients.filter(
+      (client) =>
+        (client.name || '').toLowerCase().includes(term) ||
+        (client.email || '').toLowerCase().includes(term)
+    );
+  }, [clients, searchTerm]);
+
+  if (isLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', p: 10 }}>
         <CircularProgress />
@@ -41,7 +44,7 @@ const ClientDashboardContent = () => {
   if (error) {
     return (
       <Box sx={{ p: 4 }}>
-        <Alert severity="error">{error}</Alert>
+        <Alert severity="error">Error al cargar los clientes</Alert>
       </Box>
     );
   }
@@ -66,10 +69,10 @@ const ClientDashboardContent = () => {
               color: 'transparent',
             }}
           >
-            Gestin de Clientes
+            Gestión de Clientes
           </Typography>
           <Typography variant="subtitle1" color="text.secondary" sx={{ mt: 1 }}>
-            Administra y supervisa toda la informacin de tus clientes en un solo lugar
+            Administra y supervisa toda la información de tus clientes en un solo lugar
           </Typography>
         </Grid>
         <Grid item xs={12} md={4} sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
@@ -79,7 +82,7 @@ const ClientDashboardContent = () => {
           <Button
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={openCreateDialog}
+            onClick={() => setIsCreateOpen(true)}
             sx={{
               background: 'linear-gradient(45deg, var(--color-info) 30%, var(--color-info) 90%)',
               borderRadius: 2,
@@ -90,8 +93,8 @@ const ClientDashboardContent = () => {
         </Grid>
       </Grid>
 
-      <ClientDashboardSearchBar />
-      <ClientDashboardStats />
+      <ClientDashboardSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      <ClientDashboardStats clients={clients} />
 
       <Grid container spacing={3}>
         {filteredClients.map((client) => (
@@ -107,17 +110,10 @@ const ClientDashboardContent = () => {
       <CreateClientDialog
         open={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
-        onSuccess={fetchClients}
-        token={token}
+        onSuccess={() => setIsCreateOpen(false)}
       />
     </Box>
   );
 };
-
-const ClientDashboard = () => (
-  <ClientProvider>
-    <ClientDashboardContent />
-  </ClientProvider>
-);
 
 export default ClientDashboard;

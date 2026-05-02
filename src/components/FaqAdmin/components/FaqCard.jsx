@@ -1,25 +1,48 @@
-import { Card, CardContent, Typography, Button, TextField, Chip } from '@mui/material';
+import { useState } from 'react';
+import { Card, CardContent, Typography, Button, TextField, Chip, CircularProgress } from '@mui/material';
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Save as SaveIcon,
   Cancel as CancelIcon,
 } from '@mui/icons-material';
-import { useFaq } from '../../../context/FaqContext';
+import { useUpdateFaqMutation } from '../../../redux/api';
+import { useNotification } from '../../../hooks/useNotification';
+import { MESSAGES } from '../../../constants';
 
-export default function FaqCard({ faq }) {
-  const {
-    editFaq,
-    editQuestion, setEditQuestion,
-    editAnswer, setEditAnswer,
-    loading,
-    handleEditFaq,
-    handleSaveFaq,
-    handleCancelEdit,
-    openDeleteDialog,
-  } = useFaq();
+export default function FaqCard({ faq, onDelete }) {
+  const notify = useNotification();
+  const [updateFaq, { isLoading }] = useUpdateFaqMutation();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editQuestion, setEditQuestion] = useState('');
+  const [editAnswer, setEditAnswer] = useState('');
 
-  const isEditing = editFaq === faq.faqId;
+  const handleEdit = () => {
+    setEditQuestion(faq.question || '');
+    setEditAnswer(faq.answer || '');
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setEditQuestion('');
+    setEditAnswer('');
+  };
+
+  const handleSave = async () => {
+    if (!editQuestion.trim() || !editAnswer.trim()) {
+      notify.warning('Por favor, completa todos los campos');
+      return;
+    }
+
+    try {
+      await updateFaq({ id: faq.faqId, question: editQuestion, answer: editAnswer }).unwrap();
+      setIsEditing(false);
+      notify.success(MESSAGES.SUCCESS.FAQ.UPDATE);
+    } catch (err) {
+      notify.error(MESSAGES.ERROR.FAQ.UPDATE, err);
+    }
+  };
 
   if (isEditing) {
     return (
@@ -48,9 +71,9 @@ export default function FaqCard({ faq }) {
             <Button
               variant="contained"
               color="primary"
-              startIcon={<SaveIcon />}
-              onClick={() => handleSaveFaq(faq.faqId)}
-              disabled={loading}
+              startIcon={isLoading ? <CircularProgress size={20} /> : <SaveIcon />}
+              onClick={handleSave}
+              disabled={isLoading}
             >
               Guardar
             </Button>
@@ -58,9 +81,9 @@ export default function FaqCard({ faq }) {
               variant="outlined"
               color="secondary"
               startIcon={<CancelIcon />}
-              onClick={handleCancelEdit}
+              onClick={handleCancel}
               sx={{ ml: 1 }}
-              disabled={loading}
+              disabled={isLoading}
             >
               Cancelar
             </Button>
@@ -86,7 +109,7 @@ export default function FaqCard({ faq }) {
             variant="outlined"
             color="primary"
             startIcon={<EditIcon />}
-            onClick={() => handleEditFaq(faq)}
+            onClick={handleEdit}
             size="small"
           >
             Editar
@@ -95,7 +118,7 @@ export default function FaqCard({ faq }) {
             variant="outlined"
             color="error"
             startIcon={<DeleteIcon />}
-            onClick={() => openDeleteDialog(faq.faqId)}
+            onClick={() => onDelete(faq.faqId)}
             size="small"
             sx={{ ml: 1 }}
           >

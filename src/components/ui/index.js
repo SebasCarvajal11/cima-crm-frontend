@@ -9,3 +9,4 @@ export { PageHeader } from './PageHeader';
 export { DataTablePagination } from './DataTablePagination';
 export { FormDialog } from './StyledDialog';
 export { Section, Container, GridStack, Grid } from './Layout';
+export { AppErrorBoundary, SectionErrorBoundary } from './ErrorBoundary';

@@ -1,16 +1,13 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Box, Card, CardContent, Typography, Grid, Button, Fade } from "@mui/material";
 import { 
-  PersonAdd as PersonAddIcon, 
   Group as GroupIcon, 
-  Security as SecurityIcon,
   ArrowBack as ArrowBackIcon,
   Assignment as ProjectIcon,
   TaskAlt as TaskIcon,
 } from "@mui/icons-material";
 import UserManagement from "../Client/UserManagement";
 import ProjectsPage from "../Project/pages/ProjectsPage";
-import { ProjectProvider } from "../../context/ProjectContext";
 import TaskManagement from "../TaskManagement/TaskManagement";
 import { cn } from "../../utils/cn";
 
@@ -119,13 +116,7 @@ const AdminDashboard = () => {
 
             <Box className="bg-white rounded-3xl shadow-sm border border-gray-100 p-2 md:p-6 overflow-hidden">
               {selectedView === "clients" && <UserManagement />}
-
-              {selectedView === "createClient" && (
-                <ProjectProvider>
-                  <ProjectsPage />
-                </ProjectProvider>
-              )}
-
+              {selectedView === "createClient" && <ProjectsPage />}
               {selectedView === "roles" && (
                 <Box className="animate-in fade-in duration-500">
                   <TaskManagement />

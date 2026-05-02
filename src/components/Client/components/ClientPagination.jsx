@@ -1,9 +1,6 @@
 import { Box, Pagination, Typography } from '@mui/material';
-import { useClient } from '../../../context/ClientContext';
 
-export const ClientPagination = () => {
-  const { paginatedClients, clients, page, totalPages, handlePageChange } = useClient();
-
+export const ClientPagination = ({ paginatedCount, totalCount, page, totalPages, onPageChange }) => {
   return (
     <Box
       sx={{
@@ -18,12 +15,12 @@ export const ClientPagination = () => {
       }}
     >
       <Typography sx={{ color: 'text.secondary', textAlign: { xs: 'center', sm: 'left' } }}>
-        Mostrando {paginatedClients.length} de {clients.length} clientes
+        Mostrando {paginatedCount} de {totalCount} clientes
       </Typography>
       <Pagination
         count={totalPages}
         page={page}
-        onChange={handlePageChange}
+        onChange={onPageChange}
         variant="outlined"
         shape="rounded"
         siblingCount={0}

@@ -17,9 +17,12 @@ export const ENDPOINTS = {
   },
   PROJECTS: {
     BASE: '/projects',
+    STATS: '/projects/stats',
+    CLIENTS: '/projects/clients',
     MY_PROJECTS: '/projects/my-projects',
     WORKER_PROJECTS: '/projects/worker/projects',
     byId: (id) => `/projects/${id}`,
+    byClient: (id) => `/projects/client/${id}`,
     progress: (id) => `/projects/${id}/progress`,
     workerTasks: (id) => `/projects/${id}/worker/tasks`,
   },

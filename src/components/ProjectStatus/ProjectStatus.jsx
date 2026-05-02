@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Paper, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Chip, Typography, Box,
@@ -6,7 +6,7 @@ import {
 } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { LoadingState, PageHeader, SearchInput } from '../ui';
-import api from '../../services/api';
+import { useGetProjectsQuery } from '../../redux/api';
 import logger from '../../utils/logger';
 import ProjectProgressDialog from './components/ProjectProgressDialog';
 
@@ -20,55 +20,35 @@ const getStatusColor = (status) => {
 };
 
 const ProjectStatus = () => {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: projects = [], isLoading, error } = useGetProjectsQuery();
   const [searchTerm, setSearchTerm] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
   const [projectDetails, setProjectDetails] = useState(null);
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await api.get('/projects');
-        if (response.data.success) {
-          setProjects(response.data.projects);
-        }
-        setLoading(false);
-      } catch (err) {
-        setError('Error al cargar los proyectos');
-        setLoading(false);
-      }
-    };
-    fetchProjects();
-  }, []);
+  const filteredProjects = useMemo(() => {
+    return projects.filter((project) =>
+      (project.projectName || '').toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [projects, searchTerm]);
 
   const handleViewDetails = async (projectId) => {
     try {
-      const response = await api.get(`/projects/${projectId}/progress`);
-      if (response.data.success) {
-        setProjectDetails(response.data);
-        setOpenDialog(true);
-      }
+      const project = projects.find((p) => p.projectId === projectId || p.id === projectId);
+      setProjectDetails({ project });
+      setOpenDialog(true);
     } catch (err) {
       logger.error('Error al cargar detalles del proyecto:', err);
     }
   };
 
-  const filteredProjects = useMemo(() => {
-    return projects.filter((project) =>
-      project.projectName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [projects, searchTerm]);
-
-  if (loading) {
+  if (isLoading) {
     return <LoadingState minHeight="25rem" />;
   }
 
   if (error) {
     return (
       <Box p={3}>
-        <Typography color="error">{error}</Typography>
+        <Typography color="error">Error al cargar los proyectos</Typography>
       </Box>
     );
   }
@@ -102,24 +82,24 @@ const ProjectStatus = () => {
           </TableHead>
           <TableBody>
             {filteredProjects.map((project) => (
-              <TableRow key={project.projectId} hover sx={{ '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' } }}>
-                <TableCell>{project.projectName}</TableCell>
+              <TableRow key={project.projectId || project.id} hover sx={{ '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' } }}>
+                <TableCell>{project.projectName || project.name}</TableCell>
                 <TableCell>
                   <Box>
-                    <Typography variant="body2">{project.client.name}</Typography>
-                    <Typography variant="caption" color="textSecondary">{project.client.email}</Typography>
+                    <Typography variant="body2">{project.client?.name || project.clientName || 'N/A'}</Typography>
+                    <Typography variant="caption" color="textSecondary">{project.client?.email || ''}</Typography>
                   </Box>
                 </TableCell>
                 <TableCell className="hide-mobile">{project.description}</TableCell>
                 <TableCell>
                   <Chip label={project.status} color={getStatusColor(project.status)} size="small" />
                 </TableCell>
-                <TableCell className="hide-mobile">{new Date(project.createdAt).toLocaleDateString()}</TableCell>
-                <TableCell className="hide-mobile">{new Date(project.updatedAt).toLocaleDateString()}</TableCell>
+                <TableCell className="hide-mobile">{project.createdAt ? new Date(project.createdAt).toLocaleDateString() : '-'}</TableCell>
+                <TableCell className="hide-mobile">{project.updatedAt ? new Date(project.updatedAt).toLocaleDateString() : '-'}</TableCell>
                 <TableCell>
                   <Tooltip title="Ver detalles">
                     <IconButton
-                      onClick={() => handleViewDetails(project.projectId)}
+                      onClick={() => handleViewDetails(project.projectId || project.id)}
                       sx={{ color: 'grey.900', '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.08)', color: 'grey.900' } }}
                     >
                       <VisibilityIcon />

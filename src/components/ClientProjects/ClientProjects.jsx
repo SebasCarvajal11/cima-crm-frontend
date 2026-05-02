@@ -1,41 +1,20 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState } from 'react';
 import {
   Container, Grid, Typography, Alert, Box,
 } from '@mui/material';
 import { Assignment as ProjectIcon } from '@mui/icons-material';
 import { LoadingState, PageHeader } from '../ui';
 import { AnimatePresence } from 'framer-motion';
-import api from '../../services/api';
-import logger from '../../utils/logger';
+import { useGetMyProjectsQuery } from '../../redux/api';
 import ProjectCard from './components/ProjectCard';
 import ProjectDetailsDialog from './components/ProjectDetailsDialog';
 
 const ClientProjects = () => {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: projects = [], isLoading, error } = useGetMyProjectsQuery();
   const [selectedProject, setSelectedProject] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
 
-  const fetchProjects = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await api.get('/projects/my-projects');
-      setProjects(response.data.projects || []);
-      setError(null);
-    } catch (err) {
-      logger.error('Error fetching client projects:', err);
-      setError('Error al cargar los proyectos');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchProjects();
-  }, [fetchProjects]);
-
-  if (loading) {
+  if (isLoading) {
     return <LoadingState minHeight="24rem" />;
   }
 
@@ -48,7 +27,7 @@ const ClientProjects = () => {
       />
 
       {error && (
-        <Alert severity="error" className="mb-8 rounded-xl shadow-sm">{error}</Alert>
+        <Alert severity="error" className="mb-8 rounded-xl shadow-sm">Error al cargar los proyectos</Alert>
       )}
 
       <Grid container spacing={4}>

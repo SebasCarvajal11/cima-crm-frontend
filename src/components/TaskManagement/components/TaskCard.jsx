@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   IconButton,
   Typography,
@@ -16,7 +15,6 @@ import {
   Assignment as AssignmentIcon,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import { useTask } from '../../../context/TaskContext';
 import { cn } from '../../../utils/cn';
 
 const getStatusIcon = (status) => {
@@ -41,23 +39,9 @@ const getStatusClass = (status) => {
   }
 };
 
-const TaskCard = ({ task, index }) => {
-  const {
-    isAdmin,
-    selectedTasks,
-    handleTaskSelection: onSelect,
-    setSelectedTask,
-    setIsEditOpen,
-    handleDelete: onDelete,
-  } = useTask();
-
+const TaskCard = ({ task, index, isAdmin, selectedTasks, onSelect, onEdit, onDelete }) => {
   const taskId = task.taskId || task.id;
   const isSelected = selectedTasks.includes(taskId);
-
-  const handleEdit = (t) => {
-    setSelectedTask(t);
-    setIsEditOpen(true);
-  };
 
   return (
     <motion.div
@@ -109,7 +93,7 @@ const TaskCard = ({ task, index }) => {
           <Tooltip title="Editar">
             <IconButton
               size="small"
-              onClick={() => handleEdit(task)}
+              onClick={() => onEdit(task)}
               sx={{
                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
                 '&:hover': { backgroundColor: 'rgba(255, 255, 255, 1)' },

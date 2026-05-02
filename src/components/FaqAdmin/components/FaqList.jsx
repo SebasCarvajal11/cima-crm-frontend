@@ -1,12 +1,9 @@
 import { CircularProgress, Typography, Alert } from '@mui/material';
 import { Help as HelpIcon } from '@mui/icons-material';
-import { useFaq } from '../../../context/FaqContext';
 import FaqCard from './FaqCard';
 
-export default function FaqList() {
-  const { loading, error, filteredFaqs, searchTerm } = useFaq();
-
-  if (loading) {
+export default function FaqList({ faqs, isLoading, error, searchTerm, setDeleteDialogOpen, setFaqToDelete }) {
+  if (isLoading) {
     return (
       <div className="flex justify-center py-10">
         <CircularProgress />
@@ -15,10 +12,10 @@ export default function FaqList() {
   }
 
   if (error) {
-    return <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>;
+    return <Alert severity="error" sx={{ mt: 2 }}>Error al cargar las preguntas frecuentes</Alert>;
   }
 
-  if (filteredFaqs.length === 0) {
+  if (faqs.length === 0) {
     return (
       <div className="text-center py-10 text-gray-500 bg-white rounded-xl shadow-sm">
         <HelpIcon className="text-5xl mb-4 text-gray-400" />
@@ -35,8 +32,15 @@ export default function FaqList() {
 
   return (
     <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 fluid-gap-lg">
-      {filteredFaqs.map((faq) => (
-        <FaqCard key={faq.faqId} faq={faq} />
+      {faqs.map((faq) => (
+        <FaqCard
+          key={faq.faqId}
+          faq={faq}
+          onDelete={(id) => {
+            setFaqToDelete(id);
+            setDeleteDialogOpen(true);
+          }}
+        />
       ))}
     </div>
   );

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
@@ -7,6 +6,8 @@ import {
   IconButton, Button, CircularProgress, Box
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
+import { useCreateUserMutation } from '../../../redux/api';
+import { ROLES } from '../../../constants';
 
 const ActionButton = ({ children, disabled, onClick }) => (
   <Button
@@ -29,15 +30,14 @@ const ActionButton = ({ children, disabled, onClick }) => (
   </Button>
 );
 
-export const CreateUserDialog = ({ open, onClose, onSuccess, token }) => {
+export const CreateUserDialog = ({ open, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
-    name: '', email: '', password: '', role: 'Worker'
+    name: '', email: '', password: '', role: ROLES.WORKER
   });
-  const [loading, setLoading] = useState(false);
+  const [createUser, { isLoading }] = useCreateUserMutation();
 
-  // Reset form when dialog opens
   const handleEnter = () => {
-    setFormData({ name: '', email: '', password: '', role: 'Worker' });
+    setFormData({ name: '', email: '', password: '', role: ROLES.WORKER });
   };
 
   const handleSubmit = async (e) => {
@@ -51,32 +51,20 @@ export const CreateUserDialog = ({ open, onClose, onSuccess, token }) => {
       return;
     }
 
-    setLoading(true);
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/users/register`,
-        {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: formData.role
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'accesstoken': token
-          }
-        }
-      );
+      const response = await createUser({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role
+      }).unwrap();
 
-      const newUser = response.data.user || response.data;
+      const newUser = response.user || response;
       toast.success('Usuario creado exitosamente', { position: 'top-center' });
       onSuccess(newUser);
       onClose();
     } catch (err) {
-      toast.error(`Error: ${err.response?.data?.message || 'Ocurrió un problema'}`, { position: 'top-center' });
-    } finally {
-      setLoading(false);
+      toast.error(`Error: ${err.userMessage || err.message || 'Ocurrió un problema'}`, { position: 'top-center' });
     }
   };
 
@@ -133,16 +121,16 @@ export const CreateUserDialog = ({ open, onClose, onSuccess, token }) => {
               onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               label="Rol"
             >
-              <MenuItem value="Admin">Administrador</MenuItem>
-              <MenuItem value="Worker">Trabajador</MenuItem>
+              <MenuItem value={ROLES.ADMIN}>Administrador</MenuItem>
+              <MenuItem value={ROLES.WORKER}>Trabajador</MenuItem>
             </Select>
           </FormControl>
         </Box>
       </DialogContent>
       <DialogActions sx={{ padding: '1rem 1.5rem' }}>
         <Button onClick={onClose} sx={{ color: 'text.secondary' }}>Cancelar</Button>
-        <ActionButton onClick={handleSubmit} disabled={loading}>
-          {loading ? <CircularProgress size={24} color="inherit" /> : 'Crear Usuario'}
+        <ActionButton onClick={handleSubmit} disabled={isLoading}>
+          {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Crear Usuario'}
         </ActionButton>
       </DialogActions>
     </Dialog>

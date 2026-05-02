@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
+import { useState } from 'react';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   TextField, FormControl, InputLabel, Select, MenuItem,
@@ -8,45 +6,43 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { ActionButton } from './DialogStyles';
+import { useCreateClientMutation } from '../../../redux/api';
+import { ROLES } from '../../../constants';
+import { useNotification } from '../../../hooks/useNotification';
 
-export const CreateClientDialog = ({ open, onClose, onSuccess, token }) => {
+export const CreateClientDialog = ({ open, onClose, onSuccess }) => {
+  const notify = useNotification();
+  const [createClient, { isLoading }] = useCreateClientMutation();
   const [formData, setFormData] = useState({
-    name: '', email: '', password: '', role: 'Client',
+    name: '', email: '', password: '', role: ROLES.CLIENT,
     address: '', phone: '', contactInfo: '', additionalInfo: '', plan: 'Oro'
   });
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.email) {
-      toast.error('Nombre y Email son obligatorios', { position: 'top-center' }); return;
+      notify.error('Nombre y Email son obligatorios'); return;
     }
     if (!formData.password || formData.password.length < 6) {
-      toast.error('La contraseña es obligatoria y debe tener al menos 6 caracteres', { position: 'top-center' }); return;
+      notify.error('La contraseña es obligatoria y debe tener al menos 6 caracteres'); return;
     }
 
-    setLoading(true);
-    try {
-      const clientData = {
-        name: formData.name, email: formData.email,
-        password: formData.password, role: 'Client'
-      };
-      if (formData.contactInfo || formData.phone) clientData.contactInfo = formData.contactInfo || formData.phone;
-      if (formData.address) clientData.address = formData.address;
-      if (formData.additionalInfo) clientData.additionalInfo = formData.additionalInfo;
-      if (formData.plan) clientData.plan = formData.plan;
+    const clientData = {
+      name: formData.name, email: formData.email,
+      password: formData.password, role: ROLES.CLIENT
+    };
+    if (formData.contactInfo || formData.phone) clientData.contactInfo = formData.contactInfo || formData.phone;
+    if (formData.address) clientData.address = formData.address;
+    if (formData.additionalInfo) clientData.additionalInfo = formData.additionalInfo;
+    if (formData.plan) clientData.plan = formData.plan;
 
-      await axios.post(`${import.meta.env.VITE_API_URL}/clients/register`, clientData, {
-        headers: { 'Content-Type': 'application/json', 'accesstoken': token }
-      });
-      
-      toast.success('Cliente creado exitosamente', { position: 'top-center' });
+    try {
+      await createClient(clientData).unwrap();
+      notify.success('Cliente creado exitosamente');
       onSuccess();
       onClose();
     } catch (err) {
-      toast.error(`Error: ${err.response?.data?.message || 'Ocurrió un problema'}`, { position: 'top-center' });
-    } finally {
-      setLoading(false);
+      notify.error(`Error: ${err.message || 'Ocurrió un problema'}`);
     }
   };
 
@@ -82,8 +78,8 @@ export const CreateClientDialog = ({ open, onClose, onSuccess, token }) => {
       </DialogContent>
       <DialogActions sx={{ padding: '1rem 1.5rem' }}>
         <Button onClick={onClose} sx={{ color: 'text.secondary' }}>Cancelar</Button>
-        <ActionButton variant="create" onClick={handleSubmit} disabled={loading}>
-          {loading ? <CircularProgress size={24} color="inherit" /> : 'Crear Cliente'}
+        <ActionButton variant="create" onClick={handleSubmit} disabled={isLoading}>
+          {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Crear Cliente'}
         </ActionButton>
       </DialogActions>
     </Dialog>

@@ -1,10 +1,7 @@
 import { Paper, TextField, InputAdornment } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
-import { useClient } from '../../context/ClientContext';
 
-export const ClientDashboardSearchBar = () => {
-  const { searchTerm, setSearchTerm } = useClient();
-
+export const ClientDashboardSearchBar = ({ searchTerm, setSearchTerm }) => {
   return (
     <Paper sx={{ p: 2, mb: 4, borderRadius: 3, display: 'flex', gap: 2 }}>
       <TextField

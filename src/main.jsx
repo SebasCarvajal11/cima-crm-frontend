@@ -3,14 +3,14 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider, createTheme, responsiveFontSizes } from '@mui/material/styles';
 import App from './App';
 import './index.css';
 
 const HEADING_FONT = '"Outfit", system-ui, sans-serif';
 const BODY_FONT = '"Inter", system-ui, sans-serif';
 
-const theme = createTheme({
+let theme = createTheme({
   cssVariables: true,
   palette: {
     primary: {
@@ -23,6 +23,7 @@ const theme = createTheme({
     },
     background: {
       default: '#f4f6f9',
+      paper: '#ffffff',
     },
     success: {
       main: '#10b981',
@@ -55,7 +56,34 @@ const theme = createTheme({
     h5: { fontFamily: HEADING_FONT, fontWeight: 600 },
     h6: { fontFamily: HEADING_FONT, fontWeight: 600 },
   },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: '0.5rem',
+          textTransform: 'none',
+          fontWeight: 600,
+        },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          borderRadius: '1rem',
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: '0.75rem',
+        },
+      },
+    },
+  },
 });
+
+theme = responsiveFontSizes(theme);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

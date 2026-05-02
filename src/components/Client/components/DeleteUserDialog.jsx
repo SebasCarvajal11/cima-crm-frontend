@@ -1,11 +1,10 @@
-import { useState } from 'react';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   IconButton, Button, Typography, CircularProgress
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
+import { useDeleteUserMutation } from '../../../redux/api';
 
 const ActionButton = ({ children, disabled, onClick }) => (
   <Button
@@ -28,8 +27,8 @@ const ActionButton = ({ children, disabled, onClick }) => (
   </Button>
 );
 
-export const DeleteUserDialog = ({ open, user, onClose, onSuccess, token }) => {
-  const [loading, setLoading] = useState(false);
+export const DeleteUserDialog = ({ open, user, onClose, onSuccess }) => {
+  const [deleteUser, { isLoading }] = useDeleteUserMutation();
 
   const handleDelete = async () => {
     if (!user) {
@@ -43,22 +42,13 @@ export const DeleteUserDialog = ({ open, user, onClose, onSuccess, token }) => {
       return;
     }
 
-    setLoading(true);
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/users/${userId}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'accesstoken': token
-        }
-      });
-
+      await deleteUser(userId).unwrap();
       toast.success('Usuario eliminado correctamente', { position: 'top-center' });
       onSuccess(userId);
       onClose();
     } catch (err) {
-      toast.error(`Error al eliminar usuario: ${err.response?.data?.message || err.message}`, { position: 'top-center' });
-    } finally {
-      setLoading(false);
+      toast.error(`Error al eliminar usuario: ${err.userMessage || err.message}`, { position: 'top-center' });
     }
   };
 
@@ -91,8 +81,8 @@ export const DeleteUserDialog = ({ open, user, onClose, onSuccess, token }) => {
       </DialogContent>
       <DialogActions sx={{ padding: '1rem 1.5rem' }}>
         <Button onClick={onClose} sx={{ color: 'text.secondary' }}>Cancelar</Button>
-        <ActionButton onClick={handleDelete} disabled={loading}>
-          {loading ? <CircularProgress size={24} color="inherit" /> : 'Eliminar Usuario'}
+        <ActionButton onClick={handleDelete} disabled={isLoading}>
+          {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Eliminar Usuario'}
         </ActionButton>
       </DialogActions>
     </Dialog>

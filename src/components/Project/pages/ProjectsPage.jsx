@@ -1,5 +1,4 @@
-// src/pages/projects/ProjectsPage.js
-import React, { useState, useContext, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Container,
   Typography,
@@ -11,7 +10,13 @@ import {
   Alert
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { ProjectContext } from '../../../context/ProjectContext';
+import {
+  useGetProjectsQuery,
+  useGetProjectStatsQuery,
+  useCreateProjectMutation,
+  useUpdateProjectMutation,
+  useDeleteProjectMutation,
+} from '../../../redux/api';
 import ProjectList from '../components/ProjectList';
 import { CreateProjectDialog, EditProjectDialog } from '../components/ProjectForm';
 import ProjectStats from '../components/ProjectStats';
@@ -19,49 +24,35 @@ import { useNotification } from '../../../hooks/useNotification';
 import logger from '../../../utils/logger';
 
 const ProjectsPage = () => {
-  const projectContext = useContext(ProjectContext);
   const notify = useNotification();
-  
-  if (!projectContext) {
-    return (
-      <Container maxWidth="xl">
-        <Box sx={{ py: 4 }}>
-          <Alert severity="error">
-            Error: ProjectContext no está disponible. Asegúrate de que este componente esté dentro de un ProjectContextProvider.
-          </Alert>
-        </Box>
-      </Container>
-    );
-  }
-  
-  const {
-    projects,
-    filteredProjects,
-    projectStats,
-    loading,
-    error,
-    createProject,
-    deleteProject,
-    fetchProjects,
-    updateProject
-  } = projectContext;
+  const { data: projects = [], isLoading, error } = useGetProjectsQuery();
+  const { data: projectStats } = useGetProjectStatsQuery();
+  const [createProject] = useCreateProjectMutation();
+  const [updateProject] = useUpdateProjectMutation();
+  const [deleteProject] = useDeleteProjectMutation();
 
   const [openForm, setOpenForm] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [openEditForm, setOpenEditForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
 
-  // Asegurarse de cargar los proyectos cuando el componente se monta
-  useEffect(() => {
-    fetchProjects();
-  }, []);
+  const filteredProjects = useMemo(() => {
+    return projects.filter((project) => {
+      const matchesName = !searchTerm || (project.projectName || '').toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter ? project.status === statusFilter : true;
+      return matchesName && matchesStatus;
+    });
+  }, [projects, searchTerm, statusFilter]);
 
   const handleCreateProject = async (projectData) => {
     try {
-      await createProject(projectData);
-      fetchProjects(); // Recargar la lista después de crear
+      await createProject(projectData).unwrap();
       setOpenForm(false);
+      notify.success('Proyecto creado exitosamente');
     } catch (error) {
       logger.error('Error al crear proyecto:', error);
+      notify.error('Error al crear el proyecto', error);
     }
   };
 
@@ -84,24 +75,36 @@ const ProjectsPage = () => {
         status: formData.status
       };
 
-      await updateProject(selectedProject.id, projectData);
+      await updateProject({ id: selectedProject.id, ...projectData }).unwrap();
       setOpenEditForm(false);
       notify.success('Proyecto actualizado exitosamente');
     } catch (error) {
       logger.error('Error en la actualización:', error);
-      notify.error('Error al actualizar el proyecto');
+      notify.error('Error al actualizar el proyecto', error);
     }
   };
 
   const handleDeleteProject = async (id) => {
     if (window.confirm('¿Está seguro de eliminar este proyecto?')) {
       try {
-        await deleteProject(id);
+        await deleteProject(id).unwrap();
+        notify.success('Proyecto eliminado exitosamente');
       } catch (error) {
         logger.error('Error deleting project:', error);
+        notify.error('Error al eliminar el proyecto', error);
       }
     }
   };
+
+  if (error) {
+    return (
+      <Container maxWidth="xl">
+        <Box sx={{ py: 4 }}>
+          <Alert severity="error">Error al cargar los proyectos</Alert>
+        </Box>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="xl">
@@ -130,14 +133,36 @@ const ProjectsPage = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <ProjectStats stats={projectStats} />
+              <ProjectStats stats={projectStats?.stats || {}} />
             </Grid>
 
             <Grid item xs={12}>
-              <Paper>
+              <Paper sx={{ p: 2, mb: 2 }}>
+                <Box className="flex items-center gap-2.5 mb-5 flex-wrap">
+                  <input
+                    type="text"
+                    placeholder="Buscar por nombre..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="p-2 border rounded"
+                  />
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="p-2 border rounded"
+                  >
+                    <option value="">Todos</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                  <Button variant="outlined" onClick={() => { setSearchTerm(''); setStatusFilter(''); }}>
+                    Reiniciar
+                  </Button>
+                </Box>
                 <ProjectList
                   projects={filteredProjects}
-                  loading={loading}
+                  loading={isLoading}
                   onEdit={handleEdit}
                   onDelete={handleDeleteProject}
                 />

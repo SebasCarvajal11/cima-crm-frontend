@@ -5,20 +5,12 @@ import {
   Search as SearchIcon,
   Cancel as CancelIcon,
   FilterList as FilterIcon,
-  Refresh as RefreshIcon,
   CheckCircle as CheckCircleIcon,
   HourglassEmpty as PendingIcon,
 } from '@mui/icons-material';
 import { cn } from '../../../utils/cn';
-import { useFaq } from '../../../context/FaqContext';
 
-export default function FaqFilters() {
-  const {
-    searchTerm, setSearchTerm,
-    activeFilter, setActiveFilter,
-    fetchFaqs,
-  } = useFaq();
-
+export default function FaqFilters({ searchTerm, setSearchTerm, activeFilter, setActiveFilter }) {
   const filterBtnBase = 'px-4 py-2 rounded-md font-medium transition-all cursor-pointer border';
 
   return (
@@ -91,11 +83,6 @@ export default function FaqFilters() {
             >
               Borradores
             </Button>
-            <Tooltip title="Actualizar">
-              <IconButton color="primary" onClick={fetchFaqs}>
-                <RefreshIcon />
-              </IconButton>
-            </Tooltip>
           </div>
         </Grid>
       </Grid>

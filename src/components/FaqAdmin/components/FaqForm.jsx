@@ -1,14 +1,32 @@
-import { Paper, Typography, TextField, Button, Box } from '@mui/material';
+import { useState } from 'react';
+import { Paper, Typography, TextField, Button, Box, CircularProgress } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
-import { useFaq } from '../../../context/FaqContext';
+import { useCreateFaqMutation } from '../../../redux/api';
+import { useNotification } from '../../../hooks/useNotification';
+import { MESSAGES } from '../../../constants';
 
-export default function FaqForm() {
-  const {
-    newQuestion, setNewQuestion,
-    newAnswer, setNewAnswer,
-    loading,
-    handleAddFaq,
-  } = useFaq();
+export default function FaqForm({ onCreated }) {
+  const notify = useNotification();
+  const [question, setQuestion] = useState('');
+  const [answer, setAnswer] = useState('');
+  const [createFaq, { isLoading }] = useCreateFaqMutation();
+
+  const handleSubmit = async () => {
+    if (!question.trim() || !answer.trim()) {
+      notify.warning('Por favor, completa todos los campos');
+      return;
+    }
+
+    try {
+      await createFaq({ question, answer }).unwrap();
+      setQuestion('');
+      setAnswer('');
+      notify.success(MESSAGES.SUCCESS.FAQ.CREATE);
+      if (onCreated) onCreated();
+    } catch (err) {
+      notify.error(MESSAGES.ERROR.FAQ.CREATE, err);
+    }
+  };
 
   return (
     <Paper className="mb-6 bg-white rounded-xl fluid-padding shadow-md border-l-4 border-info">
@@ -19,8 +37,8 @@ export default function FaqForm() {
         fullWidth
         label="Pregunta"
         variant="outlined"
-        value={newQuestion}
-        onChange={(e) => setNewQuestion(e.target.value)}
+        value={question}
+        onChange={(e) => setQuestion(e.target.value)}
         margin="normal"
         placeholder="Escribe la pregunta aquí..."
       />
@@ -28,8 +46,8 @@ export default function FaqForm() {
         fullWidth
         label="Respuesta"
         variant="outlined"
-        value={newAnswer}
-        onChange={(e) => setNewAnswer(e.target.value)}
+        value={answer}
+        onChange={(e) => setAnswer(e.target.value)}
         margin="normal"
         multiline
         rows={4}
@@ -39,9 +57,9 @@ export default function FaqForm() {
         <Button
           variant="contained"
           color="primary"
-          startIcon={<AddIcon />}
-          onClick={handleAddFaq}
-          disabled={loading || !newQuestion.trim() || !newAnswer.trim()}
+          startIcon={isLoading ? <CircularProgress size={20} /> : <AddIcon />}
+          onClick={handleSubmit}
+          disabled={isLoading || !question.trim() || !answer.trim()}
         >
           Añadir Pregunta
         </Button>

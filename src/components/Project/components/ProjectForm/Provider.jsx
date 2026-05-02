@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useMemo } from 'react';
 import { ProjectFormContext } from './context';
-import logger from '../../../../utils/logger';
+import { useGetClientsQuery } from '../../../../redux/api';
+import { normalizeClient } from '../../../../utils/normalizeEntity';
+import { PROJECT_STATUS } from '../../../../constants';
 
 export function ProjectFormProvider({ children, initialData, onSubmit, open }) {
   const [formData, setFormData] = useState(
@@ -9,56 +10,27 @@ export function ProjectFormProvider({ children, initialData, onSubmit, open }) {
       clientId: '',
       projectName: '',
       description: '',
-      status: 'Pending'
+      status: PROJECT_STATUS.PENDING
     }
   );
-  const [clients, setClients] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
-  useEffect(() => {
-    if (!open) return;
-    let isMounted = true;
-    const fetchClients = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/clients`, {
-          headers: {
-            'accesstoken': localStorage.getItem('accessToken')
-          }
-        });
-        
-        if (isMounted) {
-          const clientsData = response.data.clients || [];
-          const formattedClients = clientsData.map(client => ({
-            id: client.clientId || client.id,
-            name: client.name || client.clientName || `Cliente ${client.clientId || client.id}`,
-            email: client.email,
-            address: client.address
-          }));
-          
-          setClients(formattedClients);
-        }
-      } catch (err) {
-        if (isMounted) {
-          logger.error('Error al cargar clientes:', err);
-          setError('No se pudieron cargar los clientes. Por favor, inténtelo de nuevo.');
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
+  const { data: rawClients = [], isLoading, error } = useGetClientsQuery(undefined, {
+    skip: !open,
+  });
 
-    fetchClients();
-    return () => {
-      isMounted = false;
-    };
-  }, [open]);
+  const clients = useMemo(() => {
+    return rawClients.map((client) => {
+      const normalized = normalizeClient(client);
+      return {
+        id: normalized.id,
+        name: normalized.name,
+        email: normalized.email,
+        address: normalized.address,
+      };
+    });
+  }, [rawClients]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -74,9 +46,10 @@ export function ProjectFormProvider({ children, initialData, onSubmit, open }) {
 
     try {
       setIsSubmitting(true);
+      setSubmitError(null);
       await onSubmit(formData);
-    } catch (err) {
-      setError('Error al procesar el formulario. Por favor, inténtelo de nuevo.');
+    } catch {
+      setSubmitError('Error al procesar el formulario. Por favor, inténtelo de nuevo.');
     } finally {
       setIsSubmitting(false);
     }
@@ -88,8 +61,8 @@ export function ProjectFormProvider({ children, initialData, onSubmit, open }) {
     state: {
       formData,
       clients,
-      loading,
-      error,
+      loading: isLoading,
+      error: error ? 'No se pudieron cargar los clientes. Por favor, inténtelo de nuevo.' : submitError,
       isSubmitting,
       isValid,
     },

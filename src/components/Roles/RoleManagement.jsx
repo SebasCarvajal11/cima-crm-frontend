@@ -1,7 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import { fetchUsers, updateRole } from '../../redux/slices/roleSlice';
+import React, { useState } from 'react';
 import {
   Alert,
   Pagination,
@@ -17,12 +14,14 @@ import { LoadingState, PageHeader } from '../ui';
 import { RoleTableRow } from './components/RoleTableRow';
 import { RoleChangeDialog } from './components/RoleChangeDialog';
 import { EnhancedTableContainer, TableToolbar, StyledTableHead } from '../Client/components/SharedStyles';
+import { useGetUsersQuery, useUpdateUserMutation } from '../../redux/api';
+import { useNotification } from '../../hooks/useNotification';
 import logger from '../../utils/logger';
 
 const RoleManagement = () => {
-  const dispatch = useDispatch();
-  const { users, loading, error } = useSelector((state) => state.roles);
-  const accessToken = useSelector((state) => state.auth.accessToken);
+  const notify = useNotification();
+  const { data: users = [], isLoading, error } = useGetUsersQuery();
+  const [updateUser] = useUpdateUserMutation();
 
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 5;
@@ -34,12 +33,6 @@ const RoleManagement = () => {
     newRole: ''
   });
 
-  useEffect(() => {
-    if (accessToken) {
-      dispatch(fetchUsers(accessToken));
-    }
-  }, [dispatch, accessToken]);
-
   const handleRoleChangeClick = (user, newRole) => {
     if (user.role === newRole) return;
 
@@ -47,20 +40,20 @@ const RoleManagement = () => {
       open: true,
       userId: user.userId || user.id,
       userName: user.name || user.userName || `Usuario #${user.userId || user.id}`,
-      newRole
+      newRole,
     });
   };
 
   const handleConfirmRoleChange = async () => {
     const { userId, newRole, userName } = confirmDialog;
-    setConfirmDialog(prev => ({ ...prev, open: false }));
+    setConfirmDialog((prev) => ({ ...prev, open: false }));
 
     try {
-      await dispatch(updateRole({ userId, role: newRole, token: accessToken })).unwrap();
-      toast.success(`Rol actualizado a ${newRole} para ${userName}`);
+      await updateUser({ id: userId, role: newRole }).unwrap();
+      notify.success(`Rol actualizado a ${newRole} para ${userName}`);
     } catch (err) {
       logger.error('Error al actualizar rol:', err);
-      toast.error(`Error: ${err}`);
+      notify.error(`Error: ${err.message || err}`);
     }
   };
 
@@ -79,7 +72,7 @@ const RoleManagement = () => {
 
       {error && (
         <Alert severity="error" className="mb-6 rounded-xl">
-          {error}
+          Error al cargar usuarios
         </Alert>
       )}
 
@@ -90,7 +83,7 @@ const RoleManagement = () => {
           </Typography>
         </TableToolbar>
 
-        {loading ? (
+        {isLoading ? (
           <LoadingState minHeight="12rem" />
         ) : (
           <Table>
@@ -138,7 +131,7 @@ const RoleManagement = () => {
         open={confirmDialog.open}
         userName={confirmDialog.userName}
         newRole={confirmDialog.newRole}
-        onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
+        onClose={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
         onConfirm={handleConfirmRoleChange}
       />
     </Box>

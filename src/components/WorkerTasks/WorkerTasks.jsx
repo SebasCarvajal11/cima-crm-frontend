@@ -1,38 +1,32 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import {
   Box,
   Typography,
-  CircularProgress,
   Alert,
   Grid,
   Card,
   CardContent,
   Chip,
-  IconButton,
-  Tooltip,
-  TextField,
-  Button,
-  Select,
-  MenuItem,
   FormControl,
   InputLabel,
+  Select,
+  MenuItem,
   Avatar,
   Divider,
+  CircularProgress,
 } from '@mui/material';
 import {
   Assignment as TaskIcon,
   CheckCircle as CheckCircleIcon,
   Schedule as ScheduleIcon,
   HourglassEmpty as PendingIcon,
-  Update as UpdateIcon,
-  Description as DescriptionIcon,
-  Person as PersonIcon,
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LoadingState, PageHeader } from '../ui';
-import { taskService } from '../../services/taskService';
+import { useGetTasksQuery, useUpdateTaskStatusMutation } from '../../redux/api';
 import logger from '../../utils/logger';
+import { useNotification } from '../../hooks/useNotification';
 
 const getStatusIcon = (status) => {
   switch (status?.toLowerCase()) {
@@ -64,47 +58,30 @@ const getStatusColor = (status) => {
 };
 
 const WorkerTasks = () => {
-  const { user, accessToken } = useSelector((state) => state.auth);
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const notify = useNotification();
+  const { user } = useSelector((state) => state.auth);
   const [updatingId, setUpdatingId] = useState(null);
 
-  const fetchTasks = useCallback(async () => {
-    if (!user?.userId) return;
-    try {
-      setLoading(true);
-      const data = await taskService.getTasksByWorker(user.userId);
-      setTasks(data || []);
-      setError(null);
-    } catch (err) {
-      logger.error('Error fetching worker tasks:', err);
-      setError('Error al cargar las tareas asignadas.');
-    } finally {
-      setLoading(false);
-    }
-  }, [user?.userId]);
-
-  useEffect(() => {
-    fetchTasks();
-  }, [fetchTasks]);
+  const { data: tasks = [], isLoading, error } = useGetTasksQuery(
+    { workerId: user?.userId },
+    { skip: !user?.userId }
+  );
+  const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
   const handleUpdateStatus = async (taskId, newStatus) => {
     try {
       setUpdatingId(taskId);
-      await taskService.updateTaskStatus(taskId, newStatus);
-      setTasks((prev) =>
-        prev.map((t) => ((t.taskId || t.id) === taskId ? { ...t, status: newStatus } : t))
-      );
+      await updateTaskStatus({ id: taskId, status: newStatus }).unwrap();
+      notify.success('Estado actualizado');
     } catch (err) {
       logger.error('Error updating task status:', err);
-      alert('Error al actualizar el estado de la tarea.');
+      notify.error('Error al actualizar el estado de la tarea');
     } finally {
       setUpdatingId(null);
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return <LoadingState />;
   }
 
@@ -118,17 +95,17 @@ const WorkerTasks = () => {
 
       {error && (
         <Alert severity="error" className="mb-6 rounded-xl">
-          {error}
+          Error al cargar las tareas asignadas.
         </Alert>
       )}
 
       {tasks.length === 0 ? (
-        <Paper className="fluid-padding-lg text-center rounded-2xl bg-white shadow-sm border border-gray-100">
+        <Box className="fluid-padding-lg text-center rounded-2xl bg-white shadow-sm border border-gray-100">
           <TaskIcon sx={{ fontSize: '4rem', color: 'text.disabled', mb: 2 }} />
           <Typography variant="h6" color="text.secondary">
             No tienes tareas asignadas en este momento.
           </Typography>
-        </Paper>
+        </Box>
       ) : (
         <Grid container spacing={4}>
           <AnimatePresence>
@@ -185,7 +162,7 @@ const WorkerTasks = () => {
                           </Select>
                         </FormControl>
                       </CardContent>
-                      
+
                       <Box className="px-6 py-3 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
                         <Box className="flex items-center gap-1 text-gray-500">
                           <ScheduleIcon sx={{ fontSize: '0.875rem' }} />

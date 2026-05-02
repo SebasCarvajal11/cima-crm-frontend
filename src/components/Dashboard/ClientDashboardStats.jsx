@@ -1,11 +1,8 @@
 import { Grid } from '@mui/material';
 import { useMemo } from 'react';
-import { useClient } from '../../context/ClientContext';
 import { StatsCard } from '../ui/StatsCard';
 
-export const ClientDashboardStats = () => {
-  const { clients } = useClient();
-
+export const ClientDashboardStats = ({ clients }) => {
   const stats = useMemo(() => {
     const total = clients.length;
     return [
