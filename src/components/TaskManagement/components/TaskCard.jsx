@@ -17,6 +17,7 @@ import {
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useTask } from '../../../context/TaskContext';
+import { cn } from '../../../utils/cn';
 
 const getStatusIcon = (status) => {
   switch (status) {
@@ -82,7 +83,7 @@ const TaskCard = ({ task, index }) => {
             size="small"
             onClick={() => onDelete(taskId)}
             sx={{
-              color: '#d32f2f',
+              color: 'error.main',
               backgroundColor: 'rgba(255, 255, 255, 0.8)',
               '&:hover': { backgroundColor: 'rgba(255, 255, 255, 1)' },
             }}
@@ -99,7 +100,7 @@ const TaskCard = ({ task, index }) => {
             {task.projectName || `Proyecto #${task.projectId}`}
           </Typography>
           <span
-            className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${getStatusClass(task.status)}`}
+            className={cn('inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium', getStatusClass(task.status))}
           >
             {getStatusIcon(task.status)} {task.status}
           </span>
@@ -126,7 +127,7 @@ const TaskCard = ({ task, index }) => {
 
       <div className="flex justify-between items-center text-xs text-gray-500 border-t border-gray-100 pt-3">
         <div className="flex items-center gap-2">
-          <Avatar sx={{ width: 24, height: 24, bgcolor: '#000000' }}>
+          <Avatar sx={{ width: 24, height: 24, bgcolor: 'grey.900' }}>
             {task.workerName ? (
               task.workerName.charAt(0).toUpperCase()
             ) : (

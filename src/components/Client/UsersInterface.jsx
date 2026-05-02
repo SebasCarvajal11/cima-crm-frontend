@@ -104,7 +104,7 @@ const UsersInterface = ({ token }) => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '18.75rem' }}>
         <CircularProgress />
       </Box>
     );

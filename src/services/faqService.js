@@ -1,29 +1,11 @@
-import axios from 'axios';
-import { store } from '../redux/store';
+import api from './api';
 import logger from '../utils/logger';
 
-const API_URL = `${import.meta.env.VITE_API_URL}/faqs`;
-
-// Helper function to get the authentication token from Redux store
-const getAuthToken = () => {
-  const state = store.getState();
-  return state.auth?.token || localStorage.getItem('accessToken');
-};
-
-// Helper to create headers with authentication token
-const getHeaders = () => ({
-  headers: {
-    'Content-Type': 'application/json',
-    'accesstoken': getAuthToken()
-  }
-});
-
 export const faqService = {
-  // Get all FAQs
   async getAllFaqs() {
     try {
       logger.debug('Fetching all FAQs');
-      const response = await axios.get(`${API_URL}/all`);
+      const response = await api.get('/faqs/all');
       logger.debug('FAQs fetched successfully:', response.data);
       return response.data.faqs;
     } catch (error) {
@@ -32,11 +14,10 @@ export const faqService = {
     }
   },
 
-  // Create a new FAQ
   async createFaq(faqData) {
     try {
       logger.debug('Creating new FAQ:', faqData);
-      const response = await axios.post(API_URL, faqData, getHeaders());
+      const response = await api.post('/faqs', faqData);
       logger.debug('FAQ created successfully:', response.data);
       return response.data.faq;
     } catch (error) {
@@ -45,27 +26,21 @@ export const faqService = {
     }
   },
 
-  // Update an existing FAQ
   async updateFaq(id, faqData) {
     try {
       logger.debug(`Updating FAQ with ID ${id}:`, faqData);
-      
-      // Check if id is undefined, null, or empty string
+
       if (!id) {
         logger.error('Missing FAQ ID for update operation');
         throw new Error('FAQ ID is required for update');
       }
-      
-      // Ensure we have the correct headers
-      const headers = getHeaders();
-      
-      // Make sure the ID is properly formatted for the API request
+
       const formattedId = id.toString().trim();
-      
-      const response = await axios.put(`${API_URL}/${formattedId}`, faqData, headers);
-      
+
+      const response = await api.put(`/faqs/${formattedId}`, faqData);
+
       logger.debug('FAQ updated successfully:', response.data);
-      
+
       return response.data.faq;
     } catch (error) {
       logger.error(`Error updating FAQ with ID ${id}:`, error);
@@ -73,11 +48,10 @@ export const faqService = {
     }
   },
 
-  // Delete a FAQ
   async deleteFaq(id) {
     try {
       logger.debug(`Deleting FAQ with ID ${id}`);
-      await axios.delete(`${API_URL}/${id}`, getHeaders());
+      await api.delete(`/faqs/${id}`);
       logger.debug('FAQ deleted successfully');
       return true;
     } catch (error) {
@@ -86,11 +60,10 @@ export const faqService = {
     }
   },
 
-  // Search FAQs by term
   async searchFaqs(searchTerm) {
     try {
       logger.debug(`Searching FAQs with term: ${searchTerm}`);
-      const response = await axios.get(`${API_URL}/search/${searchTerm}`);
+      const response = await api.get(`/faqs/search/${searchTerm}`);
       logger.debug('Search results:', response.data);
       return response.data.faqs;
     } catch (error) {
@@ -99,11 +72,10 @@ export const faqService = {
     }
   },
 
-  // Get FAQ by ID
   async getFaqById(id) {
     try {
       logger.debug(`Fetching FAQ with ID ${id}`);
-      const response = await axios.get(`${API_URL}/${id}`);
+      const response = await api.get(`/faqs/${id}`);
       logger.debug('FAQ fetched successfully:', response.data);
       return response.data.faq;
     } catch (error) {

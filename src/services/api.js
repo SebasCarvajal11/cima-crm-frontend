@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { store } from '../redux/store';
 import logger from '../utils/logger';
+import { AUTH } from '../constants';
 
 /**
  * Instancia centralizada de Axios con interceptores automáticos.
@@ -19,10 +20,10 @@ api.interceptors.request.use(
   (config) => {
     // Prioridad: Redux store > localStorage
     const state = store.getState();
-    const token = state.auth?.accessToken || localStorage.getItem('accessToken');
+    const token = state.auth?.accessToken || localStorage.getItem(AUTH.STORAGE_KEYS.ACCESS_TOKEN);
     
     if (token) {
-      config.headers['accesstoken'] = token;
+      config.headers[AUTH.HEADER_NAME] = token;
     }
     
     return config;
@@ -43,7 +44,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Verificar si no estamos ya en login para evitar loops
       if (!window.location.pathname.includes('/login')) {
-        localStorage.removeItem('accessToken');
+        localStorage.removeItem(AUTH.STORAGE_KEYS.ACCESS_TOKEN);
         // El redirect al login se manejará por el ProtectedRoute
       }
     }
@@ -51,17 +52,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-/**
- * Funciones de conveniencia para métodos HTTP comunes.
- * Simplifican las llamadas API en los componentes.
- */
-export const apiClient = {
-  get: (url, config) => api.get(url, config),
-  post: (url, data, config) => api.post(url, data, config),
-  put: (url, data, config) => api.put(url, data, config),
-  patch: (url, data, config) => api.patch(url, data, config),
-  delete: (url, config) => api.delete(url, config),
-};
 
 export default api;

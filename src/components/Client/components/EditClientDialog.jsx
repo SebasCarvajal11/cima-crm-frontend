@@ -65,7 +65,7 @@ export const EditClientDialog = ({ open, user, onClose, onSuccess, token }) => {
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm"
       PaperProps={{
-        sx: { borderRadius: '16px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', '& .MuiDialogTitle-root': { background: '#8e3031', color: 'white', padding: '20px 24px' } }
+        sx: { borderRadius: '1rem', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', '& .MuiDialogTitle-root': { background: 'var(--color-brand-primary)', color: 'white', padding: '1.25rem 1.5rem' } }
       }}
     >
       <DialogTitle>
@@ -74,7 +74,7 @@ export const EditClientDialog = ({ open, user, onClose, onSuccess, token }) => {
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent sx={{ padding: '24px' }}>
+      <DialogContent sx={{ padding: '1.5rem' }}>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
           <TextField fullWidth label="Nombre" value={formData.name} margin="normal" disabled />
           <TextField fullWidth label="Email" type="email" value={formData.email} margin="normal" disabled />
@@ -91,8 +91,8 @@ export const EditClientDialog = ({ open, user, onClose, onSuccess, token }) => {
           <TextField fullWidth label="Información Adicional" value={formData.additionalInfo} onChange={(e) => setFormData({ ...formData, additionalInfo: e.target.value })} margin="normal" multiline rows={3} />
         </Box>
       </DialogContent>
-      <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} sx={{ color: '#7e8299' }}>Cancelar</Button>
+      <DialogActions sx={{ padding: '1rem 1.5rem' }}>
+        <Button onClick={onClose} sx={{ color: 'text.secondary' }}>Cancelar</Button>
         <ActionButton variant="create" onClick={handleSubmit} disabled={loading}>
           {loading ? <CircularProgress size={24} color="inherit" /> : 'Guardar Cambios'}
         </ActionButton>

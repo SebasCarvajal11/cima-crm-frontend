@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../../redux/slices/authSlice';
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../constants';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -15,7 +16,7 @@ const Login = () => {
     const result = await dispatch(login({ email, password }));
 
     if (login.fulfilled.match(result)) {
-      navigate('/dashboard');
+      navigate(ROUTES.DASHBOARD);
     }
   };
 

@@ -21,7 +21,7 @@ export const ExcelProjectSelector = () => {
             justifyContent: 'center',
           }}
         >
-          <ProjectIcon sx={{ color: '#592d2d', fontSize: 28 }} />
+          <ProjectIcon sx={{ color: 'primary.main', fontSize: 28 }} />
         </Box>
         <FormControl fullWidth>
           <InputLabel>Seleccionar Proyecto</InputLabel>
@@ -31,10 +31,10 @@ export const ExcelProjectSelector = () => {
             label="Seleccionar Proyecto"
             sx={{
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#000000',
+                borderColor: 'text.primary',
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#592d2d',
+                borderColor: 'primary.main',
               },
             }}
           >

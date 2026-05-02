@@ -22,10 +22,10 @@ export function Header({ title, onClose }) {
   return (
     <StyledDialogTitle>
       <Box display="flex" alignItems="center">
-        <AssignmentIcon sx={{ mr: 1, color: '#fff' }} />
+        <AssignmentIcon sx={{ mr: 1, color: 'white' }} />
         <Typography variant="h6">{title}</Typography>
       </Box>
-      <IconButton onClick={onClose} size="small" sx={{ color: '#fff' }}>
+      <IconButton onClick={onClose} size="small" sx={{ color: 'white' }}>
         <CloseIcon />
       </IconButton>
     </StyledDialogTitle>
@@ -65,7 +65,7 @@ export function Actions({ onCancel, submitLabel }) {
         startIcon={<CloseIcon />}
         disabled={isSubmitting}
         sx={{
-          color: '#fff',
+          color: 'white',
           backgroundColor: 'var(--color-brand-primary)',
           '&:hover': { backgroundColor: 'var(--color-brand-primary-light)' },
         }}
@@ -78,7 +78,7 @@ export function Actions({ onCancel, submitLabel }) {
         disabled={!isValid || loading || isSubmitting}
         sx={{
           ml: 2,
-          color: '#fff',
+          color: 'white',
           bgcolor: 'var(--color-brand-primary)',
           '&:hover': { bgcolor: 'var(--color-brand-primary-light)' },
           '&.Mui-disabled': { bgcolor: 'rgba(89, 45, 45, 0.3)', color: 'rgba(255, 255, 255, 0.7)' },

@@ -51,12 +51,12 @@ export const ExcelUploader = () => {
             display: 'flex', 
             flexDirection: 'column', 
             alignItems: 'center',
-            background: 'linear-gradient(135deg, #f8faff 0%, #ffffff 100%)',
+            background: 'linear-gradient(135deg, #f8faff 0%, white 100%)',
             borderRadius: 3,
           }}
         >
           <Box sx={{ backgroundColor: 'primary.lighter', borderRadius: '50%', p: 2, mb: 2 }}>
-            <UploadIcon sx={{ fontSize: 40, color: '#8e3031' }} />
+            <UploadIcon sx={{ fontSize: 40, color: 'primary.main' }} />
           </Box>
           <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
             Arrastra archivos aquí

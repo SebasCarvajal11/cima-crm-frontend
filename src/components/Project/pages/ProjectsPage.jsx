@@ -8,18 +8,19 @@ import {
   Grid,
   Paper,
   Fade,
-  Alert,
-  Snackbar
+  Alert
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { ProjectContext } from '../../../context/ProjectContext';
 import ProjectList from '../components/ProjectList';
 import { CreateProjectDialog, EditProjectDialog } from '../components/ProjectForm';
 import ProjectStats from '../components/ProjectStats';
+import { useNotification } from '../../../hooks/useNotification';
 import logger from '../../../utils/logger';
 
 const ProjectsPage = () => {
   const projectContext = useContext(ProjectContext);
+  const notify = useNotification();
   
   if (!projectContext) {
     return (
@@ -39,13 +40,10 @@ const ProjectsPage = () => {
     projectStats,
     loading,
     error,
-    notification,
-    setNotification,
     createProject,
     deleteProject,
     fetchProjects,
-    updateProject,
-    showNotification
+    updateProject
   } = projectContext;
 
   const [openForm, setOpenForm] = useState(false);
@@ -75,13 +73,10 @@ const ProjectsPage = () => {
   const handleUpdateProject = async (formData) => {
     try {
       if (!selectedProject?.id) {
-        showNotification('No se ha seleccionado ningún proyecto para actualizar', 'error');
+        notify.error('No se ha seleccionado ningún proyecto para actualizar');
         return;
       }
 
-      //logger.debug.log('Actualizando proyecto:', selectedProject.id, formData);
-
-      // Formatear los datos según lo requiere el backend
       const projectData = {
         clientId: Number(formData.clientId),
         projectName: formData.projectName,
@@ -91,10 +86,10 @@ const ProjectsPage = () => {
 
       await updateProject(selectedProject.id, projectData);
       setOpenEditForm(false);
-      showNotification('Proyecto actualizado exitosamente', 'success');
+      notify.success('Proyecto actualizado exitosamente');
     } catch (error) {
       logger.error('Error en la actualización:', error);
-      showNotification('Error al actualizar el proyecto', 'error');
+      notify.error('Error al actualizar el proyecto');
     }
   };
 
@@ -106,10 +101,6 @@ const ProjectsPage = () => {
         logger.error('Error deleting project:', error);
       }
     }
-  };
-
-  const handleCloseNotification = () => {
-    setNotification({ ...notification, open: false });
   };
 
   return (
@@ -172,21 +163,6 @@ const ProjectsPage = () => {
             onSubmit={handleUpdateProject}
             project={selectedProject}
           />
-
-          <Snackbar
-            open={notification.open}
-            autoHideDuration={6000}
-            onClose={handleCloseNotification}
-            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-          >
-            <Alert
-              onClose={handleCloseNotification}
-              severity={notification.type}
-              sx={{ width: '100%' }}
-            >
-              {notification.message}
-            </Alert>
-          </Snackbar>
         </Box>
       </Fade>
     </Container>

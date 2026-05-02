@@ -1,4 +1,5 @@
 import { Paper, Typography } from '@mui/material';
+import { cn } from '../../utils/cn';
 
 export function StatsCard({ value, label, icon, gradient, iconColor, ...props }) {
   return (
@@ -17,7 +18,7 @@ export function StatsCard({ value, label, icon, gradient, iconColor, ...props })
       }}
     >
       {icon && (
-        <div className={`flex items-center justify-center w-12 h-12 rounded-xl mb-3 ${iconColor || 'text-brand-primary bg-brand-primary/10'}`}>
+        <div className={cn('flex items-center justify-center w-12 h-12 rounded-xl mb-3', iconColor || 'text-brand-primary bg-brand-primary/10')}>
           {icon}
         </div>
       )}

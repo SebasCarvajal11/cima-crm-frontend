@@ -12,6 +12,7 @@ import UserManagement from "../Client/UserManagement";
 import ProjectsPage from "../Project/pages/ProjectsPage";
 import { ProjectProvider } from "../../context/ProjectContext";
 import TaskManagement from "../TaskManagement/TaskManagement";
+import { cn } from "../../utils/cn";
 
 const AdminDashboard = () => {
   const [selectedView, setSelectedView] = useState("dashboard");
@@ -68,7 +69,7 @@ const AdminDashboard = () => {
                     className="h-full cursor-pointer rounded-3xl bg-white border border-gray-100 transition-all duration-500 ease-out hover:-translate-y-3 hover:shadow-[0_30px_60px_rgba(0,0,0,0.12)] shadow-sm overflow-hidden group"
                   >
                     <CardContent className="p-10 h-full flex flex-col items-center text-center relative">
-                      <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+                      <div className={cn('absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500', item.gradient)}></div>
                       
                       <div className="relative z-10">
                         <div className="w-20 h-20 rounded-2xl bg-gray-50 flex items-center justify-center mb-8 shadow-inner border border-gray-100 group-hover:bg-white group-hover:scale-110 transition-all duration-500">

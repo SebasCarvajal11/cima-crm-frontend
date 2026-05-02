@@ -3,14 +3,15 @@ import { Box, Pagination, Typography } from '@mui/material';
 export const UserPagination = ({ currentPage, totalPages, currentCount, totalCount, onPageChange }) => (
   <Box
     sx={{
-      padding: '20px',
+      padding: '1.25rem',
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      borderTop: '1px solid #ebedf3',
+      borderTop: '1px solid',
+      borderColor: 'divider',
     }}
   >
-    <Typography sx={{ color: '#7e8299' }}>
+    <Typography sx={{ color: 'text.secondary' }}>
       Mostrando {currentCount} de {totalCount} usuarios
     </Typography>
     <Pagination
@@ -21,12 +22,12 @@ export const UserPagination = ({ currentPage, totalPages, currentCount, totalCou
       shape="rounded"
       sx={{
         '& .MuiPaginationItem-root': {
-          borderColor: '#e9ecef',
-          color: '#7e8299',
+          borderColor: 'divider',
+          color: 'text.secondary',
           '&.Mui-selected': {
-            background: '#f3f6f9',
-            borderColor: '#3699ff',
-            color: '#3699ff',
+            background: 'grey.50',
+            borderColor: 'info.main',
+            color: 'info.main',
           },
         },
       }}

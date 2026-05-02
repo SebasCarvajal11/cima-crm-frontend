@@ -49,15 +49,25 @@ npm run preview  # Preview del build
 
 ```
 src/
-  App.jsx                    # Rutas principales (React Router con lazy loading)
+  App.jsx                    # Rutas principales (React Router con lazy loading + constantes ROUTES/ROLES)
   main.jsx                   # Punto de entrada: Redux Provider, ThemeProvider, BrowserRouter
-  index.css                  # Tailwind @theme tokens + resets globales
-  App.css                    # Estilos residuales (en proceso de migracion)
-  
-  api/
-    users.js                 # Modulo API para usuarios (Axios directo)
+  index.css                  # Tailwind @theme tokens + resets globales + utilidades fluidas
 
   assets/                    # Recursos estaticos (imagenes, fuentes)
+
+  constants/                 # ** NUEVO ** Centralizacion de valores hardcodeados
+    index.js                 #   Re-exports publicos
+    routes.js                #   Rutas de la aplicacion (ROUTES.LOGIN, ROUTES.DASHBOARD, etc.)
+    roles.js                 #   Roles + labels (ROLES.ADMIN, ROLE_LABELS, ROLE_COLORS)
+    statuses.js              #   Estados de proyecto/tarea + labels + colores
+    plans.js                 #   Planes de cliente + labels + colores
+    pagination.js            #   Tamanos de pagina por defecto
+    auth.js                  #   Header name, localStorage keys
+    validation.js            #   Regex, longitudes minimas, campos requeridos
+    notification.js          #   Posicion y duracion de toasts
+    apiEndpoints.js          #   Todos los paths de API centralizados
+    messages.js              #   Mensajes de error/exito/confirmacion (i18n-ready)
+    ui.js                    #   Labels, placeholders, textos de botones y navegacion
 
   components/
     Auth/
@@ -79,10 +89,7 @@ src/
                              #   Usa ClientContext para estado y API.
       UsersInterface.jsx     # Tab "Usuarios" dentro de UserManagement: gestion de staff
                              #   (Admin/Worker). Fetch independiente a /users/staff.
-      CreateClient.jsx       # Formulario legacy de creacion (NO se usa activamente)
       EditClient.jsx         # Formulario legacy de edicion (ruta /edit-client/:id)
-      DeleteClient.jsx       # Componente legacy de eliminacion
-      ClientHistory.jsx      # Historial de un cliente
       components/
         CreateClientDialog.jsx   # Variante explicita: crear cliente
         EditClientDialog.jsx     # Variante explicita: editar cliente
@@ -189,9 +196,9 @@ src/
     store.js                 # configureStore con 3 reducers: auth, clients, roles
     slices/
       authSlice.js           # Autenticacion: login (async thunk), logout, user, accessToken.
-                             #   Persiste en localStorage.
-      clientSlice.js         # CRUD de clientes via async thunks. NOTA: existe pero NO se usa
-                             #   en los componentes actuales (UserManagement hace fetch propio).
+                             #   Persiste en localStorage. Usa constantes AUTH.STORAGE_KEYS.
+      clientSlice.js         # CRUD de clientes via async thunks. NOTA: DEAD CODE - NO se usa
+                             #   en los componentes actuales. Los componentes activos usan ClientContext.
       roleSlice.js           # Slice de roles.
 
   routes/
@@ -201,9 +208,9 @@ src/
     api.js                   # Instancia Axios centralizada con interceptor de token.
                              #   Usa: import api from '../services/api'
     taskService.js           # Modulo API para tareas: CRUD, filtros, stats, bulk actions.
-                             #   Obtiene token de Redux store o localStorage.
+                             #   Usa instancia api.js centralizada.
     clientService.js         # Modulo API para clientes: CRUD.
-    projectService.js        # Modulo API para proyectos: CRUD.
+    userService.js           # Modulo API para usuarios: CRUD, getStaff, getWorkers.
     faqService.js            # Modulo API para FAQs.
 
   styles/

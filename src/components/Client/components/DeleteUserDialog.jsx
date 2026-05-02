@@ -12,15 +12,15 @@ const ActionButton = ({ children, disabled, onClick }) => (
     onClick={onClick}
     disabled={disabled}
     sx={{
-      background: 'linear-gradient(45deg, #e74c3c 30%, #c0392b 90%)',
+      background: 'linear-gradient(45deg, var(--color-error) 30%, var(--color-error) 90%)',
       boxShadow: '0 3px 5px 2px rgba(231, 76, 60, .3)',
-      borderRadius: '8px',
-      padding: '10px 25px',
+      borderRadius: '0.5rem',
+      padding: '0.625rem 1.5625rem',
       color: 'white',
       textTransform: 'none',
       fontWeight: 600,
       '&:hover': {
-        background: 'linear-gradient(45deg, #c0392b 30%, #a93226 90%)',
+        background: 'linear-gradient(45deg, var(--color-error) 30%, var(--color-error) 90%)',
       }
     }}
   >
@@ -68,12 +68,12 @@ export const DeleteUserDialog = ({ open, user, onClose, onSuccess, token }) => {
       onClose={onClose}
       PaperProps={{
         sx: {
-          borderRadius: '16px',
+          borderRadius: '1rem',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
         }
       }}
     >
-      <DialogTitle sx={{ background: '#f1416c', color: 'white' }}>
+      <DialogTitle sx={{ background: 'var(--color-error)', color: 'white' }}>
         Confirmar Eliminación
         <IconButton
           aria-label="close"
@@ -83,14 +83,14 @@ export const DeleteUserDialog = ({ open, user, onClose, onSuccess, token }) => {
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent sx={{ padding: '24px', paddingTop: '24px' }}>
+      <DialogContent sx={{ padding: '1.5rem', paddingTop: '1.5rem' }}>
         <Typography variant="body1">
           ¿Estás seguro de que deseas eliminar al usuario <strong>{user?.name}</strong>?
           Esta acción no se puede deshacer.
         </Typography>
       </DialogContent>
-      <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} sx={{ color: '#7e8299' }}>Cancelar</Button>
+      <DialogActions sx={{ padding: '1rem 1.5rem' }}>
+        <Button onClick={onClose} sx={{ color: 'text.secondary' }}>Cancelar</Button>
         <ActionButton onClick={handleDelete} disabled={loading}>
           {loading ? <CircularProgress size={24} color="inherit" /> : 'Eliminar Usuario'}
         </ActionButton>

@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
-  Container, Grid, Typography, Alert, Box, CircularProgress,
+  Container, Grid, Typography, Alert, Box,
 } from '@mui/material';
 import { Assignment as ProjectIcon } from '@mui/icons-material';
+import { LoadingState, PageHeader } from '../ui';
 import { AnimatePresence } from 'framer-motion';
 import api from '../../services/api';
 import logger from '../../utils/logger';
@@ -35,26 +36,16 @@ const ClientProjects = () => {
   }, [fetchProjects]);
 
   if (loading) {
-    return (
-      <Container maxWidth="lg" className="mt-12 flex justify-center">
-        <CircularProgress />
-      </Container>
-    );
+    return <LoadingState minHeight="24rem" />;
   }
 
   return (
     <Container maxWidth="lg" className="py-8">
-      <Box className="mb-8">
-        <Typography variant="h4" className="font-bold mb-2 flex items-center gap-3">
-          <ProjectIcon fontSize="large" className="text-brand-primary" />
-          <span className="bg-gradient-to-r from-brand-primary to-brand-primary-light bg-clip-text text-transparent">
-            Mis Proyectos
-          </span>
-        </Typography>
-        <Typography variant="subtitle1" className="text-gray-600 font-medium">
-          Gestiona y visualiza el progreso de tus proyectos activos
-        </Typography>
-      </Box>
+      <PageHeader
+        icon={ProjectIcon}
+        title="Mis Proyectos"
+        subtitle="Gestiona y visualiza el progreso de tus proyectos activos"
+      />
 
       {error && (
         <Alert severity="error" className="mb-8 rounded-xl shadow-sm">{error}</Alert>

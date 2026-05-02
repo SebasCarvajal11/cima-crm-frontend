@@ -9,6 +9,7 @@ import {
   CheckCircle as CheckCircleIcon,
   HourglassEmpty as PendingIcon,
 } from '@mui/icons-material';
+import { cn } from '../../../utils/cn';
 import { useFaq } from '../../../context/FaqContext';
 
 export default function FaqFilters() {
@@ -18,8 +19,10 @@ export default function FaqFilters() {
     fetchFaqs,
   } = useFaq();
 
+  const filterBtnBase = 'px-4 py-2 rounded-md font-medium transition-all cursor-pointer border';
+
   return (
-    <Paper className="search-container" elevation={0}>
+    <Paper className="mb-5 bg-white rounded-lg shadow-sm hover:shadow-md transition-all" elevation={0}>
       <Grid container spacing={2} alignItems="center" padding={2}>
         <Grid item xs={12} md={6}>
           <TextField
@@ -45,13 +48,18 @@ export default function FaqFilters() {
           />
         </Grid>
         <Grid item xs={12} md={6}>
-          <div className="faq-filters">
+          <div className="flex gap-2.5 flex-wrap">
             <Button
               variant={activeFilter === 'all' ? 'contained' : 'outlined'}
               color="primary"
               onClick={() => setActiveFilter('all')}
               startIcon={<FilterIcon />}
-              className={`faq-filter-button ${activeFilter === 'all' ? 'active' : ''}`}
+              className={cn(
+                filterBtnBase,
+                activeFilter === 'all'
+                  ? 'bg-info text-white border-info'
+                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+              )}
             >
               Todas
             </Button>
@@ -60,7 +68,12 @@ export default function FaqFilters() {
               color="primary"
               onClick={() => setActiveFilter('active')}
               startIcon={<CheckCircleIcon />}
-              className={`faq-filter-button ${activeFilter === 'active' ? 'active' : ''}`}
+              className={cn(
+                filterBtnBase,
+                activeFilter === 'active'
+                  ? 'bg-info text-white border-info'
+                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+              )}
             >
               Activas
             </Button>
@@ -69,7 +82,12 @@ export default function FaqFilters() {
               color="primary"
               onClick={() => setActiveFilter('draft')}
               startIcon={<PendingIcon />}
-              className={`faq-filter-button ${activeFilter === 'draft' ? 'active' : ''}`}
+              className={cn(
+                filterBtnBase,
+                activeFilter === 'draft'
+                  ? 'bg-info text-white border-info'
+                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+              )}
             >
               Borradores
             </Button>

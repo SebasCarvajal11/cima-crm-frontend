@@ -13,15 +13,15 @@ const ActionButton = ({ children, disabled, onClick }) => (
     onClick={onClick}
     disabled={disabled}
     sx={{
-      background: 'linear-gradient(45deg, #8e3031 30%, #592d2d 90%)',
+      background: 'linear-gradient(45deg, var(--color-brand-primary) 30%, var(--color-brand-primary) 90%)',
       boxShadow: '0 3px 5px 2px rgba(142, 48, 49, .3)',
-      borderRadius: '8px',
-      padding: '10px 25px',
+      borderRadius: '0.5rem',
+      padding: '0.625rem 1.5625rem',
       color: 'white',
       textTransform: 'none',
       fontWeight: 600,
       '&:hover': {
-        background: 'linear-gradient(45deg, #592d2d 30%, #3d1e1e 90%)',
+        background: 'linear-gradient(45deg, var(--color-brand-primary) 30%, var(--color-brand-primary) 90%)',
       }
     }}
   >
@@ -89,12 +89,12 @@ export const CreateUserDialog = ({ open, onClose, onSuccess, token }) => {
       maxWidth="sm"
       PaperProps={{
         sx: {
-          borderRadius: '16px',
+          borderRadius: '1rem',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
           '& .MuiDialogTitle-root': {
-            background: '#8e3031',
+            background: 'var(--color-brand-primary)',
             color: 'white',
-            padding: '20px 24px'
+            padding: '1.25rem 1.5rem'
           }
         }
       }}
@@ -109,7 +109,7 @@ export const CreateUserDialog = ({ open, onClose, onSuccess, token }) => {
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent sx={{ padding: '24px' }}>
+      <DialogContent sx={{ padding: '1.5rem' }}>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
           <TextField
             fullWidth label="Nombre" value={formData.name}
@@ -139,8 +139,8 @@ export const CreateUserDialog = ({ open, onClose, onSuccess, token }) => {
           </FormControl>
         </Box>
       </DialogContent>
-      <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} sx={{ color: '#7e8299' }}>Cancelar</Button>
+      <DialogActions sx={{ padding: '1rem 1.5rem' }}>
+        <Button onClick={onClose} sx={{ color: 'text.secondary' }}>Cancelar</Button>
         <ActionButton onClick={handleSubmit} disabled={loading}>
           {loading ? <CircularProgress size={24} color="inherit" /> : 'Crear Usuario'}
         </ActionButton>

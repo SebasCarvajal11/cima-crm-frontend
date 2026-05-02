@@ -4,7 +4,7 @@
   --font-sans: "Inter", system-ui, sans-serif;
   --font-heading: "Outfit", system-ui, sans-serif;
   
-  /* Brand Colors extracted from AdminDashboard */
+  /* Brand Colors */
   --color-brand-primary: #592d2d;
   --color-brand-primary-light: #8e3031;
   --color-brand-secondary: #1a237e;
@@ -20,6 +20,38 @@
   --color-error-light: #fee2e2;
   --color-info: #3b82f6;
   --color-info-light: #dbeafe;
+
+  /* Semantic Text Colors */
+  --color-text-primary: #1a1a2e;
+  --color-text-secondary: #7e8299;
+  --color-text-muted: #a0aec0;
+
+  /* Semantic Border Colors */
+  --color-border: #ebedf3;
+  --color-border-light: #f3f6f9;
+
+  /* Semantic Surface Colors */
+  --color-surface: #ffffff;
+  --color-surface-hover: #f8fafc;
+  --color-surface-muted: #f3f6f9;
+
+  /* Neutral Grays (for hardcoded #2c3e50, #3f4254, etc.) */
+  --color-gray-900: #1a1a2e;
+  --color-gray-800: #2c3e50;
+  --color-gray-700: #3f4254;
+  --color-gray-600: #4a5568;
+  --color-gray-500: #64748b;
+  --color-gray-400: #94a3b8;
+  --color-gray-300: #cbd5e1;
+  --color-gray-200: #e2e8f0;
+  --color-gray-100: #f1f5f9;
+  --color-gray-50: #f8fafc;
+
+  /* Breakpoints in rem (for reference, Tailwind handles these natively) */
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
 }
 
 /* Custom utilities */
@@ -29,22 +61,64 @@
 
 @utility scrollbar-brand {
   &::-webkit-scrollbar {
-    width: 8px;
+    width: 0.5rem;
   }
   &::-webkit-scrollbar-track {
     background: #f1f1f1;
-    border-radius: 4px;
+    border-radius: 0.25rem;
   }
   &::-webkit-scrollbar-thumb {
     background: var(--color-brand-primary-light);
-    border-radius: 4px;
+    border-radius: 0.25rem;
   }
   &::-webkit-scrollbar-thumb:hover {
     background: var(--color-brand-primary);
   }
 }
 
-/* Global resets for base HTML elements to complement Tailwind */
+/* Fluid typography utility */
+@utility fluid-text-sm {
+  font-size: clamp(0.8125rem, 0.5vw + 0.7rem, 0.9375rem);
+}
+
+@utility fluid-text-base {
+  font-size: clamp(0.875rem, 0.5vw + 0.75rem, 1rem);
+}
+
+@utility fluid-text-lg {
+  font-size: clamp(1rem, 0.75vw + 0.8rem, 1.25rem);
+}
+
+@utility fluid-text-xl {
+  font-size: clamp(1.25rem, 1vw + 0.9rem, 1.75rem);
+}
+
+@utility fluid-text-2xl {
+  font-size: clamp(1.5rem, 1.5vw + 1rem, 2.25rem);
+}
+
+@utility fluid-text-3xl {
+  font-size: clamp(1.875rem, 2vw + 1.2rem, 2.75rem);
+}
+
+/* Fluid spacing utilities */
+@utility fluid-padding {
+  padding: clamp(0.75rem, 3vw, 1.5rem);
+}
+
+@utility fluid-padding-lg {
+  padding: clamp(1rem, 5vw, 2.5rem);
+}
+
+@utility fluid-gap {
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+}
+
+@utility fluid-gap-lg {
+  gap: clamp(1rem, 3vw, 2rem);
+}
+
+/* Media containment */
 @layer base {
   body {
     @apply font-sans bg-background text-gray-800 antialiased;
@@ -53,19 +127,9 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading font-semibold tracking-tight text-gray-900;
   }
-}
 
-/* 
- * NOTA: Los siguientes estilos globales se han mantenido temporalmente 
- * para no romper vistas no refactorizadas, pero se deben ir eliminando 
- * conforme se migren los componentes a Tailwind utility classes.
- */
-.container {
-  @apply max-w-7xl mx-auto p-5;
-}
-
-@media (max-width: 768px) {
-  .container {
-    @apply p-2.5;
+  img, svg, video {
+    max-inline-size: 100%;
+    block-size: auto;
   }
-}
+}

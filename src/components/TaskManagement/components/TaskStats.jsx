@@ -14,6 +14,7 @@ import {
   Person as PersonIcon,
 } from '@mui/icons-material';
 import { useTask } from '../../../context/TaskContext';
+import { cn } from '../../../utils/cn';
 
 const StatCard = ({ icon, value, label, gradient, iconColor }) => (
   <Grid item xs={12} sm={6} md={3}>
@@ -21,7 +22,7 @@ const StatCard = ({ icon, value, label, gradient, iconColor }) => (
       elevation={3}
       sx={{
         p: 3,
-        borderRadius: '12px',
+        borderRadius: '0.75rem',
         background: gradient,
         transition: 'transform 0.3s, box-shadow 0.3s',
         '&:hover': {
@@ -32,7 +33,7 @@ const StatCard = ({ icon, value, label, gradient, iconColor }) => (
     >
       <div className="flex items-center justify-between">
         <div
-          className={`flex items-center justify-center w-12 h-12 rounded-xl mr-4 ${iconColor}`}
+          className={cn('flex items-center justify-center w-12 h-12 rounded-xl mr-4', iconColor)}
         >
           {icon}
         </div>
@@ -40,7 +41,7 @@ const StatCard = ({ icon, value, label, gradient, iconColor }) => (
           <Typography variant="h3" sx={{ fontWeight: 700 }}>
             {value}
           </Typography>
-          <Typography variant="subtitle1" sx={{ color: '#64748b' }}>
+          <Typography variant="subtitle1" sx={{ color: 'text.secondary' }}>
             {label}
           </Typography>
         </div>
@@ -53,14 +54,14 @@ const ProgressBar = ({ label, colorClass, percentage }) => (
   <div className="flex flex-col gap-2">
     <div className="flex justify-between text-sm">
       <Typography sx={{ display: 'flex', alignItems: 'center' }}>
-        <span className={`w-3 h-3 rounded-full mr-2 ${colorClass}`}></span>
+        <span className={cn('w-3 h-3 rounded-full mr-2', colorClass)}></span>
         {label}
       </Typography>
       <Typography sx={{ fontWeight: 600 }}>{percentage}%</Typography>
     </div>
     <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
       <div
-        className={`h-full rounded-full transition-all duration-500 ${colorClass}`}
+        className={cn('h-full rounded-full transition-all duration-500', colorClass)}
         style={{ width: `${percentage}%` }}
       ></div>
     </div>
@@ -92,7 +93,7 @@ const TaskStats = () => {
           mb: 4,
           display: 'flex',
           alignItems: 'center',
-          color: '#2c3e50',
+          color: 'text.primary',
           fontWeight: 600,
         }}
       >
@@ -134,10 +135,10 @@ const TaskStats = () => {
         <Grid item xs={12} md={6}>
           <Paper
             elevation={3}
-            sx={{ p: 3, borderRadius: '12px', height: '100%', background: 'white' }}
+            sx={{ p: 3, borderRadius: '0.75rem', height: '100%', background: 'white' }}
           >
             <Typography variant="h6" sx={{ mb: 3, display: 'flex', alignItems: 'center', fontWeight: 600 }}>
-              <BarChartIcon sx={{ mr: 1, color: '#3498db' }} /> Distribución de Tareas
+              <BarChartIcon sx={{ mr: 1, color: 'info.main' }} /> Distribución de Tareas
             </Typography>
             <div className="flex flex-col gap-4">
               <ProgressBar label="Completadas" colorClass="bg-green-500" percentage={completedPct} />
@@ -150,10 +151,10 @@ const TaskStats = () => {
         <Grid item xs={12} md={6}>
           <Paper
             elevation={3}
-            sx={{ p: 3, borderRadius: '12px', height: '100%', background: 'white' }}
+            sx={{ p: 3, borderRadius: '0.75rem', height: '100%', background: 'white' }}
           >
             <Typography variant="h6" sx={{ mb: 3, display: 'flex', alignItems: 'center', fontWeight: 600 }}>
-              <PersonIcon sx={{ mr: 1, color: '#9c27b0' }} /> Resumen de tareas
+              <PersonIcon sx={{ mr: 1, color: 'purple.600' }} /> Resumen de tareas
             </Typography>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-5">
               <div className="flex items-center p-4 bg-gray-50 rounded-lg hover:-translate-y-1 hover:shadow-md transition-all duration-200">
@@ -164,7 +165,7 @@ const TaskStats = () => {
                   <Typography variant="h4" sx={{ fontWeight: 700 }}>
                     {completedPct}%
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#64748b' }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     Tasa de Finalización
                   </Typography>
                 </div>

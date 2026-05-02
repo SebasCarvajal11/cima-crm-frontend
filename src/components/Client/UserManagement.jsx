@@ -132,11 +132,11 @@ const UserManagement = () => {
       <Box sx={{ p: 5, background: 'linear-gradient(135deg, #f6f9fc 0%, #f1f5f9 100%)', minHeight: '100vh' }}>
         <ToastContainer />
 
-        <Box sx={{ mb: 6, textAlign: 'center', position: 'relative', '&::after': { content: '""', position: 'absolute', bottom: '-15px', left: '50%', transform: 'translateX(-50%)', width: '60px', height: '4px', background: 'var(--color-brand-primary-light)', borderRadius: '2px' } }}>
-          <Typography variant="h4" sx={{ fontWeight: 700, color: '#181c32', mb: 1 }}>
+        <Box sx={{ mb: 6, textAlign: 'center', position: 'relative', '&::after': { content: '""', position: 'absolute', bottom: '-0.9375rem', left: '50%', transform: 'translateX(-50%)', width: '3.75rem', height: '0.25rem', background: 'var(--color-brand-primary-light)', borderRadius: '0.125rem' } }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
             Gestión de Usuarios
           </Typography>
-          <Typography variant="body1" sx={{ color: '#7e8299' }}>
+            <Typography variant="body1" sx={{ color: 'text.secondary' }}>
             Administra y gestiona todos los usuarios del sistema
           </Typography>
         </Box>
@@ -145,7 +145,7 @@ const UserManagement = () => {
           sx={{
             width: '100%',
             bgcolor: 'background.paper',
-            borderRadius: '10px',
+            borderRadius: '0.625rem',
             boxShadow: '0 0 20px 0 rgba(82, 63, 105, 0.1)',
             mb: 3,
           }}
@@ -160,7 +160,7 @@ const UserManagement = () => {
                 textTransform: 'none',
                 fontWeight: 500,
                 fontSize: '1rem',
-                color: '#7e8299',
+                color: 'text.secondary',
                 '&.Mui-selected': { color: 'var(--color-brand-primary-light)', fontWeight: 600 },
               },
             }}

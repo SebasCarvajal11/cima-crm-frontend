@@ -24,12 +24,12 @@ export const UserTableRow = ({ user, onEdit, onDelete }) => {
             sx={{
               background: user.name
                 ? `linear-gradient(135deg, ${stringToColor(user.name)} 0%, ${adjustColor(stringToColor(user.name), -20)} 100%)`
-                : 'linear-gradient(135deg, #000000 0%, #333333 100%)',
+                : 'linear-gradient(135deg, grey.900 0%, grey.700 100%)',
             }}
           >
             {getInitials(user.name)}
           </Avatar>
-          <Typography sx={{ color: '#3f4254', fontWeight: 500 }}>
+          <Typography sx={{ color: 'text.primary', fontWeight: 500 }}>
             {user.name}
           </Typography>
         </Box>
@@ -44,7 +44,7 @@ export const UserTableRow = ({ user, onEdit, onDelete }) => {
         <IconButton onClick={() => onEdit(user)} sx={{ color: 'var(--color-brand-primary)' }}>
           <EditIcon />
         </IconButton>
-        <IconButton onClick={() => onDelete(user)} sx={{ color: '#f1416c' }}>
+        <IconButton onClick={() => onDelete(user)} sx={{ color: 'error.main' }}>
           <DeleteIcon />
         </IconButton>
       </TableCell>

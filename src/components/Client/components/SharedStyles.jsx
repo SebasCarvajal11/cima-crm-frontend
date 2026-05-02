@@ -1,57 +1,56 @@
 import { TableContainer, TableHead, TableRow } from '@mui/material';
 import styled from '@emotion/styled';
-import { alpha } from '@mui/material/styles';
 
 export const EnhancedTableContainer = styled(TableContainer)(() => ({
-  background: '#ffffff',
-  borderRadius: '20px',
+  background: 'var(--color-surface)',
+  borderRadius: '1.25rem',
   boxShadow: '0 0 50px 0 rgba(82, 63, 105, 0.15)',
   overflow: 'hidden',
-  border: '1px solid #ebedf3',
+  border: '1px solid var(--color-border)',
 }));
 
 export const TableToolbar = styled('div')(() => ({
-  padding: '20px 24px',
-  background: '#ffffff',
-  borderBottom: '1px solid #ebedf3',
+  padding: '1.25rem 1.5rem',
+  background: 'var(--color-surface)',
+  borderBottom: '1px solid var(--color-border)',
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  gap: '16px',
+  gap: '1rem',
 }));
 
 export const SearchBar = styled('div')(() => ({
   position: 'relative',
   flex: '1',
-  maxWidth: '400px',
+    maxWidth: '25rem',
   '& .MuiInputBase-root': {
     width: '100%',
-    background: alpha('#f3f6f9', 0.7),
-    borderRadius: '10px',
+    background: 'rgba(243, 246, 249, 0.7)',
+    borderRadius: '0.625rem',
     '&:hover': {
       background: '#f3f6f9',
     },
   },
   '& .MuiInputBase-input': {
-    padding: '12px 12px 12px 45px',
+    padding: '0.75rem 0.75rem 0.75rem 2.8125rem',
   },
   '& .MuiSvgIcon-root': {
     position: 'absolute',
-    left: '12px',
+    left: '0.75rem',
     top: '50%',
     transform: 'translateY(-50%)',
-    color: '#b5b5c3',
+    color: 'var(--color-text-muted)',
   },
 }));
 
 export const StyledTableHead = styled(TableHead)(() => ({
   '& .MuiTableCell-head': {
     background: 'var(--color-brand-primary-light)',
-    color: '#ffffff',
+    color: 'var(--color-surface)',
     fontWeight: 600,
     fontSize: '0.95rem',
-    padding: '16px 24px',
-    borderBottom: '1px solid #ebedf3',
+    padding: '1rem 1.5rem',
+    borderBottom: '1px solid var(--color-border)',
     whiteSpace: 'nowrap',
   },
 }));
@@ -59,11 +58,11 @@ export const StyledTableHead = styled(TableHead)(() => ({
 export const StyledTableRow = styled(TableRow)(() => ({
   transition: 'all 0.2s',
   '&:hover': {
-    backgroundColor: alpha('#f3f6f9', 0.7),
+    backgroundColor: 'rgba(243, 246, 249, 0.7)',
   },
   '& .MuiTableCell-root': {
-    padding: '16px 24px',
-    borderBottom: '1px solid #ebedf3',
-    color: '#3f4254',
+    padding: '1rem 1.5rem',
+    borderBottom: '1px solid var(--color-border)',
+    color: 'var(--color-gray-700)',
   },
 }));

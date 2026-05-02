@@ -21,9 +21,9 @@ export const StyledCard = styled(Card)(({ theme }) => ({
     top: 0,
     left: 0,
     right: 0,
-    height: '4px',
+    height: '0.25rem',
     background: 'var(--color-brand-primary-light)',
-    borderRadius: '4px 4px 0 0',
+    borderRadius: '0.25rem 0.25rem 0 0',
   },
 }));
 
@@ -44,7 +44,7 @@ export const ModalHeader = styled(Box)(({ theme }) => ({
     bottom: 0,
     left: 0,
     right: 0,
-    height: '4px',
+    height: '0.25rem',
     background: 'rgba(255, 255, 255, 0.1)',
   },
 }));

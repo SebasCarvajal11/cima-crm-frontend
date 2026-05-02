@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ProtectedRoute from './routes/ProtectedRoute';
+import { ROUTES, ROLES } from './constants';
 
 // Lazy loading para mejorar el rendimiento inicial (Code Splitting)
 const Login = lazy(() => import('./components/Auth/Login'));
@@ -20,13 +21,13 @@ const App = () => {
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
         {/* Ruta para el login */}
-        <Route path="/login" element={<Login />} />
+        <Route path={ROUTES.LOGIN} element={<Login />} />
 
         {/* Ruta protegida para el Dashboard del Administrador */}
         <Route
-          path="/admin-dashboard"
+          path={ROUTES.ADMIN_DASHBOARD}
           element={
-            <ProtectedRoute roles={['Admin']}>
+            <ProtectedRoute roles={[ROLES.ADMIN]}>
               <AdminDashboard />
             </ProtectedRoute>
           }
@@ -35,14 +36,14 @@ const App = () => {
         {/* Ruta legacy redirigida a UserManagement */}
         <Route
           path="/create-users-register"
-          element={<Navigate to="/clients" replace />}
+          element={<Navigate to={ROUTES.CLIENTS} replace />}
         />
 
         {/* Ruta protegida para editar un cliente */}
         <Route
-          path="/edit-client/:id"
+          path={`${ROUTES.EDIT_CLIENT}/:id`}
           element={
-            <ProtectedRoute roles={['Admin']}>
+            <ProtectedRoute roles={[ROLES.ADMIN]}>
               <EditClient />
             </ProtectedRoute>
           }
@@ -50,9 +51,9 @@ const App = () => {
 
         {/* Ruta protegida para ver la tabla de clientes */}
         <Route
-          path="/clients"
+          path={ROUTES.CLIENTS}
           element={
-            <ProtectedRoute roles={['Admin', 'Worker']}>
+            <ProtectedRoute roles={[ROLES.ADMIN, ROLES.WORKER]}>
               <UserManagement />
             </ProtectedRoute>
           }
@@ -60,9 +61,9 @@ const App = () => {
 
         {/* Ruta protegida para gestionar roles */}
         <Route
-          path="/roles"
+          path={ROUTES.ROLES}
           element={
-            <ProtectedRoute roles={['Admin']}>
+            <ProtectedRoute roles={[ROLES.ADMIN]}>
               <RoleManagement /> {/* Nueva gestión de roles */}
             </ProtectedRoute>
           }
@@ -70,19 +71,19 @@ const App = () => {
 
         {/* Ruta protegida para el Dashboard de Clientes/Trabajadores */}
         <Route
-          path="/dashboard"
+          path={ROUTES.DASHBOARD}
           element={
-            <ProtectedRoute roles={['Admin', 'Worker', 'Client']}>
+            <ProtectedRoute roles={[ROLES.ADMIN, ROLES.WORKER, ROLES.CLIENT]}>
               <Dashboard />
             </ProtectedRoute>
           }
         />
 
         {/* Redirección condicional a dashboard o login */}
-        <Route path="/" element={<Navigate to={user ? '/dashboard' : '/login'} />} />
+        <Route path="/" element={<Navigate to={user ? ROUTES.DASHBOARD : ROUTES.LOGIN} />} />
 
         {/* Ruta de acceso denegado */}
-        <Route path="/unauthorized" element={<h1>Acceso no autorizado</h1>} />
+        <Route path={ROUTES.UNAUTHORIZED} element={<h1>Acceso no autorizado</h1>} />
       </Routes>
       </Suspense>
     </div>

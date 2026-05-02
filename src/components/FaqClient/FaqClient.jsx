@@ -10,9 +10,9 @@ import {
   Box,
   Paper,
   Divider,
-  CircularProgress,
   Alert
 } from '@mui/material';
+import { LoadingState } from '../ui';
 import { 
   ExpandMore as ExpandMoreIcon,
   QuestionAnswer as QuestionIcon
@@ -56,11 +56,7 @@ const FaqClient = () => {
   };
 
   if (loading) {
-    return (
-      <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
-        <CircularProgress />
-      </Container>
-    );
+    return <LoadingState minHeight="24rem" />;
   }
 
   if (error) {
@@ -83,7 +79,7 @@ const FaqClient = () => {
           sx={{ 
             p: 4, 
             borderRadius: 3,
-            background: 'linear-gradient(to right bottom, #ffffff, #f8f9fa)'
+            background: 'linear-gradient(to right bottom, white, var(--color-background))'
           }}
         >
           <Box sx={{ mb: 5, textAlign: 'center' }}>

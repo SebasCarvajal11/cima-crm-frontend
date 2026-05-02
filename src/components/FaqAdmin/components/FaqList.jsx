@@ -8,7 +8,7 @@ export default function FaqList() {
 
   if (loading) {
     return (
-      <div className="loading-container">
+      <div className="flex justify-center py-10">
         <CircularProgress />
       </div>
     );
@@ -20,10 +20,10 @@ export default function FaqList() {
 
   if (filteredFaqs.length === 0) {
     return (
-      <div className="faq-empty-state">
-        <HelpIcon />
-        <Typography variant="h6">No se encontraron preguntas</Typography>
-        <Typography variant="body2">
+      <div className="text-center py-10 text-gray-500 bg-white rounded-xl shadow-sm">
+        <HelpIcon className="text-5xl mb-4 text-gray-400" />
+        <Typography variant="h6" className="text-lg mb-2 text-gray-800">No se encontraron preguntas</Typography>
+        <Typography variant="body2" className="text-sm max-w-sm mx-auto">
           {searchTerm
             ? 'Intenta con otra búsqueda o'
             : 'Comienza'}{' '}
@@ -34,7 +34,7 @@ export default function FaqList() {
   }
 
   return (
-    <div className="faq-list">
+    <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
       {filteredFaqs.map((faq) => (
         <FaqCard key={faq.faqId} faq={faq} />
       ))}

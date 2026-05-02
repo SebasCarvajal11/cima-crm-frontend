@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios'; // Para hacer las solicitudes HTTP
+import { AUTH } from '../../constants';
 
 // Acción asincrónica para manejar el login
 export const login = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
@@ -11,8 +12,8 @@ export const login = createAsyncThunk('auth/login', async (credentials, { reject
     });
 
     // Almacenar los datos en localStorage al realizar el login exitoso
-    localStorage.setItem('user', JSON.stringify(response.data.user));
-    localStorage.setItem('accessToken', response.data.accessToken);
+    localStorage.setItem(AUTH.STORAGE_KEYS.USER, JSON.stringify(response.data.user));
+    localStorage.setItem(AUTH.STORAGE_KEYS.ACCESS_TOKEN, response.data.accessToken);
 
     return response.data;
   } catch (err) {
@@ -25,8 +26,8 @@ export const login = createAsyncThunk('auth/login', async (credentials, { reject
 });
 
 const initialState = {
-  user: JSON.parse(localStorage.getItem('user')) || null, // Obtener el usuario desde localStorage
-  accessToken: localStorage.getItem('accessToken') || null, // Obtener el token desde localStorage
+  user: JSON.parse(localStorage.getItem(AUTH.STORAGE_KEYS.USER)) || null, // Obtener el usuario desde localStorage
+  accessToken: localStorage.getItem(AUTH.STORAGE_KEYS.ACCESS_TOKEN) || null, // Obtener el token desde localStorage
   status: 'idle',
   error: null,
 };
@@ -38,8 +39,8 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.accessToken = null;
-      localStorage.removeItem('user'); // Limpiar el localStorage al cerrar sesión
-      localStorage.removeItem('accessToken');
+      localStorage.removeItem(AUTH.STORAGE_KEYS.USER); // Limpiar el localStorage al cerrar sesión
+      localStorage.removeItem(AUTH.STORAGE_KEYS.ACCESS_TOKEN);
     },
   },
   extraReducers: (builder) => {

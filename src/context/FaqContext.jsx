@@ -2,6 +2,7 @@ import { createContext, useState, useEffect, useContext, useCallback, useMemo } 
 import { faqService } from '../services/faqService';
 import logger from '../utils/logger';
 import { useNotification } from '../hooks/useNotification';
+import { MESSAGES } from '../constants';
 
 const FaqContext = createContext();
 
@@ -60,7 +61,7 @@ export const FaqProvider = ({ children }) => {
       setFaqs(fetchedFaqs || []);
       setError(null);
     } catch (err) {
-      setError('Error al cargar las preguntas frecuentes. Por favor, intenta de nuevo.');
+      setError(MESSAGES.ERROR.FAQ.LOAD);
       logger.error('Error fetching FAQs:', err);
     } finally {
       setLoading(false);
@@ -86,9 +87,9 @@ export const FaqProvider = ({ children }) => {
       setFaqs((prev) => [...prev, newFaq]);
       setNewQuestion('');
       setNewAnswer('');
-      notify.success('Pregunta añadida correctamente');
+      notify.success(MESSAGES.SUCCESS.FAQ.CREATE);
     } catch (err) {
-      notify.error('Error al añadir la pregunta', err);
+      notify.error(MESSAGES.ERROR.FAQ.CREATE, err);
     } finally {
       setLoading(false);
     }
@@ -101,9 +102,9 @@ export const FaqProvider = ({ children }) => {
       setLoading(true);
       await faqService.deleteFaq(faqToDelete);
       setFaqs((prev) => prev.filter((faq) => faq.faqId !== faqToDelete));
-      notify.success('Pregunta eliminada correctamente');
+      notify.success(MESSAGES.SUCCESS.FAQ.DELETE);
     } catch (err) {
-      notify.error('Error al eliminar la pregunta', err);
+      notify.error(MESSAGES.ERROR.FAQ.DELETE, err);
     } finally {
       setLoading(false);
       setDeleteDialogOpen(false);
@@ -144,9 +145,9 @@ export const FaqProvider = ({ children }) => {
       setEditFaq(null);
       setEditQuestion('');
       setEditAnswer('');
-      notify.success('Pregunta actualizada correctamente');
+      notify.success(MESSAGES.SUCCESS.FAQ.UPDATE);
     } catch (err) {
-      notify.error('Error al actualizar la pregunta', err);
+      notify.error(MESSAGES.ERROR.FAQ.UPDATE, err);
     } finally {
       setLoading(false);
     }

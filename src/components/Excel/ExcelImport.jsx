@@ -20,7 +20,7 @@ const ExcelManagerContainer = () => {
           p: 4, 
           mb: 4,
           borderRadius: 4,
-          background: 'linear-gradient(135deg, #f8faff 0%, #ffffff 100%)',
+          background: 'linear-gradient(135deg, #f8faff 0%, white 100%)',
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.05)',
         }}
       >
@@ -31,14 +31,14 @@ const ExcelManagerContainer = () => {
               fontWeight: 700, 
               color: 'primary.main', 
               mb: 1,
-              background: 'linear-gradient(90deg, #592d2d, #592d2d)',
+              background: 'linear-gradient(90deg, var(--color-brand-primary), var(--color-brand-primary))',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}
           >
             Gestor de Documentos
           </Typography>
-          <Typography variant="subtitle1" color="#000000" sx={{ mb: 4 }}>
+          <Typography variant="subtitle1" color="text.primary" sx={{ mb: 4 }}>
             Gestiona y organiza archivos de cualquier tipo para tus proyectos
           </Typography>
 

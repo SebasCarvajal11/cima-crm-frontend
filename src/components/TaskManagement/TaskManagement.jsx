@@ -66,7 +66,7 @@ const TaskManagementContent = () => {
                   ))
                 ) : (
                   <div className="col-span-full text-center py-8">
-                    <Typography variant="body1" sx={{ color: '#666' }}>
+                    <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                       No se encontraron tareas con los filtros aplicados.
                     </Typography>
                   </div>

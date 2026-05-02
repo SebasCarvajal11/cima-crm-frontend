@@ -1,100 +1,172 @@
 import React, { useState, useCallback, Suspense, lazy } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
+import { Drawer, IconButton } from '@mui/material';
+import { Menu as MenuIcon, Close as CloseIcon } from '@mui/icons-material';
 
 const AdminDashboard = lazy(() => import('./AdminDashboard'));
 const ExcelImport = lazy(() => import('../Excel/ExcelImport'));
 const ExcelExport = lazy(() => import('../Excel/ExcelExport'));
-const ProjectStatus = lazy(() => import('../ProjectStatus/ProjectStatus')); 
+const ProjectStatus = lazy(() => import('../ProjectStatus/ProjectStatus'));
 const CustomerSupport = lazy(() => import('../CustomerSupport/CustomerSupport'));
-const ClientProjects = lazy(() => import('../ClientProjects/ClientProjects')); 
-const WorkerProjects = lazy(() => import('../WorkerProjects/WorkerProjects'));  
+const ClientProjects = lazy(() => import('../ClientProjects/ClientProjects'));
+const WorkerProjects = lazy(() => import('../WorkerProjects/WorkerProjects'));
 const WorkerTasks = lazy(() => import('../WorkerTasks/WorkerTasks'));
 const FaqClient = lazy(() => import('../FaqClient/FaqClient'));
 const FaqAdmin = lazy(() => import('../FaqAdmin/FaqAdmin'));
 import { logout } from '../../redux/slices/authSlice';
+import { ROUTES, ROLES, UI } from '../../constants';
+
+const menuItems = {
+  [ROLES.ADMIN]: [
+    { id: 'adminDashboard', icon: 'fas fa-home', label: UI.NAVIGATION.HOME },
+    { id: 'excelImport', icon: 'fas fa-file-excel', label: UI.NAVIGATION.DOCUMENTS },
+    { id: 'projectStatus', icon: 'fas fa-chart-line', label: UI.NAVIGATION.PROJECT_STATUS },
+    { id: 'customerSupport', icon: 'fas fa-headset', label: UI.NAVIGATION.SUPPORT },
+    { id: 'faqAdmin', icon: 'fas fa-question-circle', label: UI.NAVIGATION.MANAGE_FAQS },
+  ],
+  [ROLES.WORKER]: [
+    { id: 'workerProjects', icon: 'fas fa-project-diagram', label: UI.NAVIGATION.PROJECTS },
+  ],
+  [ROLES.CLIENT]: [
+    { id: 'clientProjects', icon: 'fas fa-project-diagram', label: UI.NAVIGATION.MY_PROJECTS },
+    { id: 'customerSupport', icon: 'fas fa-headset', label: UI.NAVIGATION.CUSTOMER_SUPPORT },
+    { id: 'faqClient', icon: 'fas fa-question-circle', label: UI.NAVIGATION.FAQ },
+  ],
+};
+
+const SidebarContent = ({ user, activeView, onNavigate, onLogout }) => (
+  <div className="flex flex-col h-full bg-gray-950 text-white p-4 md:p-6">
+    <div className="text-center mb-6 md:mb-8">
+      <h2 className="mb-1 text-xl md:text-2xl font-bold tracking-tight">{user.name}</h2>
+      <p className="text-gray-400 text-xs md:text-sm font-medium">
+        {user.role === ROLES.ADMIN ? 'Administrador' : user.role}
+      </p>
+    </div>
+
+    <ul className="flex flex-col gap-1.5 flex-grow">
+      {(menuItems[user.role] || []).map((item) => (
+        <li
+          key={item.id}
+          className={`py-2.5 px-4 rounded-lg cursor-pointer flex items-center transition-all duration-300 hover:bg-red-900 hover:translate-x-1 ${
+            activeView === item.id ? 'bg-red-900/50 border-l-2 border-white' : ''
+          }`}
+          onClick={() => onNavigate(item.id)}
+        >
+          <i className={`${item.icon} mr-3 text-lg w-6 text-center`} />
+          <span className="text-sm font-medium">{item.label}</span>
+        </li>
+      ))}
+    </ul>
+
+    <li
+      className="py-2.5 px-4 rounded-lg cursor-pointer flex items-center transition-all duration-300 hover:bg-red-700 list-none mt-auto"
+      onClick={onLogout}
+    >
+      <i className="fas fa-sign-out-alt mr-3 text-lg w-6 text-center" />
+      <span className="text-sm font-medium">Cerrar Sesión</span>
+    </li>
+  </div>
+);
 
 const Dashboard = () => {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  // Estado para manejar la vista activa
-  const [activeView, setActiveView] = useState('adminDashboard'); // Vista por defecto
+  const [activeView, setActiveView] = useState('adminDashboard');
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   if (!user || !user.role) {
     return <p>Acceso no autorizado</p>;
   }
 
-  // Función para cambiar la vista activa
   const changeView = useCallback((view) => {
     setActiveView(view);
+    setDrawerOpen(false);
   }, []);
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/login');
+    navigate(ROUTES.LOGIN);
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-100 overflow-hidden font-sans">
-      <aside className="w-full md:w-64 bg-[#0a0a0a] text-white p-4 md:p-6 flex flex-col shrink-0 shadow-xl z-10">
-        <div className="hidden md:block text-center mb-8">
-          <h2 className="mb-1 text-2xl font-bold tracking-tight">{user.name}</h2>
-          <p className="text-gray-400 text-sm font-medium">{user.role === 'Admin' ? 'Administrador' : user.role}</p>
-        </div>
-        
-        {/* On mobile, this menu becomes a horizontal scrolling row. On desktop, a vertical list */}
-        <ul className="flex flex-row md:flex-col overflow-x-auto md:overflow-visible gap-1.5 pb-2 md:pb-0 flex-grow scrollbar-hide mt-6">
-          {user.role === 'Admin' && (
-            <>
-              <li className="flex-shrink-0 md:flex-shrink py-2.5 px-4 rounded-lg cursor-pointer flex flex-row items-center transition-all duration-300 hover:bg-[#910000] hover:translate-x-1" onClick={() => changeView('adminDashboard')}><i className="fas fa-home mr-3 text-lg w-6 text-center"></i> <span className="text-sm font-medium whitespace-nowrap">Inicio</span></li>
-              <li className="flex-shrink-0 md:flex-shrink py-2.5 px-4 rounded-lg cursor-pointer flex flex-row items-center transition-all duration-300 hover:bg-[#910000] hover:translate-x-1" onClick={() => changeView('excelImport')}><i className="fas fa-file-excel mr-3 text-lg w-6 text-center"></i> <span className="text-sm font-medium whitespace-nowrap">Documentos</span></li>
-              <li className="flex-shrink-0 md:flex-shrink py-2.5 px-4 rounded-lg cursor-pointer flex flex-row items-center transition-all duration-300 hover:bg-[#910000] hover:translate-x-1" onClick={() => changeView('projectStatus')}><i className="fas fa-chart-line mr-3 text-lg w-6 text-center"></i> <span className="text-sm font-medium whitespace-nowrap">Estado del Proyecto</span></li>
-              <li className="flex-shrink-0 md:flex-shrink py-2.5 px-4 rounded-lg cursor-pointer flex flex-row items-center transition-all duration-300 hover:bg-[#910000] hover:translate-x-1" onClick={() => changeView('customerSupport')}><i className="fas fa-headset mr-3 text-lg w-6 text-center"></i> <span className="text-sm font-medium whitespace-nowrap">Soporte</span></li>
-              <li className="flex-shrink-0 md:flex-shrink py-2.5 px-4 rounded-lg cursor-pointer flex flex-row items-center transition-all duration-300 hover:bg-[#910000] hover:translate-x-1" onClick={() => changeView('faqAdmin')}><i className="fas fa-question-circle mr-3 text-lg w-6 text-center"></i> <span className="text-sm font-medium whitespace-nowrap">Gestionar FAQs</span></li>
-            </>
-          )}
-          {user.role === 'Worker' && (
-            <>
-              <li className="flex-shrink-0 md:flex-shrink py-2.5 px-4 rounded-lg cursor-pointer flex flex-row items-center transition-all duration-300 hover:bg-[#910000] hover:translate-x-1" onClick={() => changeView('workerProjects')}><i className="fas fa-project-diagram mr-3 text-lg w-6 text-center"></i> <span className="text-sm font-medium whitespace-nowrap">Proyectos</span></li>
-            </>
-          )}
-          {user.role === 'Client' && (
-            <>
-              <li className="flex-shrink-0 md:flex-shrink py-2.5 px-4 rounded-lg cursor-pointer flex flex-row items-center transition-all duration-300 hover:bg-[#910000] hover:translate-x-1" onClick={() => changeView('clientProjects')}><i className="fas fa-project-diagram mr-3 text-lg w-6 text-center"></i> <span className="text-sm font-medium whitespace-nowrap">Mis Proyectos</span></li>
-              <li className="flex-shrink-0 md:flex-shrink py-2.5 px-4 rounded-lg cursor-pointer flex flex-row items-center transition-all duration-300 hover:bg-[#910000] hover:translate-x-1" onClick={() => changeView('customerSupport')}><i className="fas fa-headset mr-3 text-lg w-6 text-center"></i> <span className="text-sm font-medium whitespace-nowrap">Soporte al Cliente</span></li>
-              <li className="flex-shrink-0 md:flex-shrink py-2.5 px-4 rounded-lg cursor-pointer flex flex-row items-center transition-all duration-300 hover:bg-[#910000] hover:translate-x-1" onClick={() => changeView('faqClient')}><i className="fas fa-question-circle mr-3 text-lg w-6 text-center"></i> <span className="text-sm font-medium whitespace-nowrap">Preguntas Frecuentes</span></li>
-            </>
-          )}
-          <li className="flex-shrink-0 md:flex-shrink py-2.5 px-4 mt-auto rounded-lg cursor-pointer flex flex-row items-center transition-all duration-300 hover:bg-red-700 hover:translate-x-1" onClick={handleLogout}><i className="fas fa-sign-out-alt mr-3 text-lg w-6 text-center"></i> <span className="text-sm font-medium whitespace-nowrap">Cerrar Sesión</span></li>
-        </ul>
+    <div className="flex h-screen bg-gray-100 overflow-hidden font-sans">
+      {/* Desktop sidebar */}
+      <aside className="hidden md:flex md:w-64 md:flex-col shrink-0 shadow-xl z-10">
+        <SidebarContent
+          user={user}
+          activeView={activeView}
+          onNavigate={changeView}
+          onLogout={handleLogout}
+        />
       </aside>
 
+      {/* Mobile drawer */}
+      <Drawer
+        anchor="left"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        PaperProps={{
+          sx: { width: '16rem', backgroundColor: 'transparent', boxShadow: 'none' },
+        }}
+        className="md:hidden"
+      >
+        <div className="relative w-64 h-full">
+          <IconButton
+            onClick={() => setDrawerOpen(false)}
+            sx={{ position: 'absolute', right: 8, top: 8, color: 'white', zIndex: 10 }}
+          >
+            <CloseIcon />
+          </IconButton>
+          <SidebarContent
+            user={user}
+            activeView={activeView}
+            onNavigate={changeView}
+            onLogout={handleLogout}
+          />
+        </div>
+      </Drawer>
+
+      {/* Main content */}
       <main className="flex-grow flex flex-col h-full overflow-hidden">
-        <header className="bg-black text-white p-4 md:p-5 text-center shadow-md shrink-0">
-          {/* Vacío por ahora, pero mantiene el espacio */}
+        <header className="bg-gray-900 text-white p-4 flex items-center shadow-md shrink-0">
+          <IconButton
+            onClick={() => setDrawerOpen(true)}
+            sx={{ color: 'white', display: { md: 'none' }, mr: 1 }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <span className="text-sm font-medium">
+            {menuItems[user.role]?.find((m) => m.id === activeView)?.label || 'Dashboard'}
+          </span>
         </header>
 
-        <section className="p-4 md:p-8 flex-grow overflow-y-auto bg-gray-100">
-          <Suspense fallback={<div className="flex justify-center items-center h-full p-8 text-gray-500 font-medium">Cargando panel...</div>}>
-            {activeView === 'adminDashboard' && user.role === 'Admin' ? <AdminDashboard /> : null}
+        <section className="fluid-padding flex-grow overflow-y-auto bg-gray-100">
+          <Suspense
+            fallback={
+              <div className="flex justify-center items-center h-full p-8 text-gray-500 font-medium">
+                Cargando panel...
+              </div>
+            }
+          >
+            {activeView === 'adminDashboard' && user.role === ROLES.ADMIN ? <AdminDashboard /> : null}
             {activeView === 'excelImport' ? <ExcelImport /> : null}
             {activeView === 'excelExport' ? <ExcelExport /> : null}
-            {(activeView === 'projectStatus' || activeView.startsWith('project-status/')) ? (
-              <ProjectStatus 
-                userRole={user.role} 
+            {activeView === 'projectStatus' || activeView.startsWith('project-status/') ? (
+              <ProjectStatus
+                userRole={user.role}
                 projectId={activeView.startsWith('project-status/') ? activeView.split('/')[1] : null}
               />
             ) : null}
             {activeView === 'customerSupport' ? <CustomerSupport /> : null}
-            {activeView === 'clientProjects' && user.role === 'Client' ? (
+            {activeView === 'clientProjects' && user.role === ROLES.CLIENT ? (
               <ClientProjects onChangeView={changeView} />
             ) : null}
-            {activeView === 'faqClient' && user.role === 'Client' ? <FaqClient /> : null}
-            {activeView === 'workerProjects' && user.role === 'Worker' ? <WorkerProjects /> : null}
-            {activeView === 'workerTasks' && user.role === 'Worker' ? <WorkerTasks /> : null}
-            {activeView === 'faqAdmin' && user.role === 'Admin' ? <FaqAdmin /> : null}
+            {activeView === 'faqClient' && user.role === ROLES.CLIENT ? <FaqClient /> : null}
+            {activeView === 'workerProjects' && user.role === ROLES.WORKER ? <WorkerProjects /> : null}
+            {activeView === 'workerTasks' && user.role === ROLES.WORKER ? <WorkerTasks /> : null}
+            {activeView === 'faqAdmin' && user.role === ROLES.ADMIN ? <FaqAdmin /> : null}
           </Suspense>
         </section>
       </main>

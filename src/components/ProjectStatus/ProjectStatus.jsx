@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
-  CircularProgress, Paper, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Chip, Typography, Box, TextField, InputAdornment,
+  Paper, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Chip, Typography, Box,
   IconButton, Tooltip,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { LoadingState, PageHeader, SearchInput } from '../ui';
 import api from '../../services/api';
 import logger from '../../utils/logger';
 import ProjectProgressDialog from './components/ProjectProgressDialog';
@@ -62,11 +62,7 @@ const ProjectStatus = () => {
   }, [projects, searchTerm]);
 
   if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-        <CircularProgress />
-      </Box>
-    );
+    return <LoadingState minHeight="25rem" />;
   }
 
   if (error) {
@@ -79,42 +75,28 @@ const ProjectStatus = () => {
 
   return (
     <Box className="w-full bg-white rounded-xl shadow-[0_8px_20px_rgba(0,0,0,0.05)] text-brand-primary font-sans" sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom sx={{ mb: 4, color: '#8e3031' }}>
-        Estado de Proyectos
-      </Typography>
+      <PageHeader
+        title="Estado de Proyectos"
+        subtitle="Visualiza y gestiona el estado de todos los proyectos"
+      />
 
       <Box sx={{ mb: 3 }}>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="Buscar proyecto por nombre..."
+        <SearchInput
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-          sx={{
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            '& .MuiOutlinedInput-root': {
-              transition: 'all 0.3s ease',
-              '&:hover': { backgroundColor: 'rgba(89, 45, 45, 0.04)' },
-              '&.Mui-focused': { backgroundColor: 'white', boxShadow: '0 2px 8px rgba(89, 45, 45, 0.1)' },
-            },
-          }}
+          placeholder="Buscar proyecto por nombre..."
+          onClear={() => setSearchTerm('')}
+          size="small"
+          sx={{ width: '100%' }}
         />
       </Box>
 
       <TableContainer component={Paper} elevation={3}>
         <Table>
           <TableHead>
-            <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+            <TableRow sx={{ backgroundColor: 'grey.100' }}>
               {['Nombre del Proyecto', 'Cliente', 'Descripción', 'Estado', 'Fecha de Creación', 'Última Actualización', 'Acciones'].map((header) => (
-                <TableCell key={header} sx={{ fontWeight: 600, color: '#333' }}>{header}</TableCell>
+                <TableCell key={header} sx={{ fontWeight: 600, color: 'text.primary' }}>{header}</TableCell>
               ))}
             </TableRow>
           </TableHead>
@@ -138,7 +120,7 @@ const ProjectStatus = () => {
                   <Tooltip title="Ver detalles">
                     <IconButton
                       onClick={() => handleViewDetails(project.projectId)}
-                      sx={{ color: '#000', '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.08)', color: '#000' } }}
+                      sx={{ color: 'grey.900', '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.08)', color: 'grey.900' } }}
                     >
                       <VisibilityIcon />
                     </IconButton>

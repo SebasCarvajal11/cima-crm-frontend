@@ -50,7 +50,7 @@ const ClientDashboardContent = () => {
     <Box
       sx={{
         p: 4,
-        background: 'linear-gradient(135deg, #f6f9fc 0%, #f1f5f9 100%)',
+        background: 'linear-gradient(135deg, var(--color-background) 0%, var(--color-background) 100%)',
         minHeight: '100vh',
       }}
     >
@@ -60,7 +60,7 @@ const ClientDashboardContent = () => {
             variant="h3"
             sx={{
               fontWeight: 700,
-              background: 'linear-gradient(45deg, #2c3e50 30%, #3498db 90%)',
+              background: 'linear-gradient(45deg, var(--color-text-primary) 30%, var(--color-info) 90%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               color: 'transparent',
@@ -81,7 +81,7 @@ const ClientDashboardContent = () => {
             startIcon={<AddIcon />}
             onClick={openCreateDialog}
             sx={{
-              background: 'linear-gradient(45deg, #3498db 30%, #2980b9 90%)',
+              background: 'linear-gradient(45deg, var(--color-info) 30%, var(--color-info) 90%)',
               borderRadius: 2,
             }}
           >

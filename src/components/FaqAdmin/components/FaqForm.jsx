@@ -11,7 +11,7 @@ export default function FaqForm() {
   } = useFaq();
 
   return (
-    <Paper className="faq-add-container">
+    <Paper className="mb-6 bg-white rounded-xl p-5 shadow-md border-l-4 border-info">
       <Typography variant="h6" component="h2" gutterBottom>
         <AddIcon /> Añadir Nueva Pregunta Frecuente
       </Typography>

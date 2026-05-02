@@ -1,10 +1,11 @@
-import { Typography, Paper, Tabs, Tab } from '@mui/material';
+import { Paper, Tabs, Tab } from '@mui/material';
 import {
   QuestionAnswer as FaqIcon,
   Add as AddIcon,
+  HelpOutline as HelpOutlineIcon,
 } from '@mui/icons-material';
-import './FaqAdmin.css';
 import { FaqProvider, useFaq } from '../../context/FaqContext';
+import { PageHeader } from '../ui';
 import FaqStats from './components/FaqStats';
 import FaqFilters from './components/FaqFilters';
 import FaqList from './components/FaqList';
@@ -15,19 +16,16 @@ const FaqAdminContent = () => {
   const { tabValue, setTabValue } = useFaq();
 
   return (
-    <div className="faq-admin-container">
-      <div className="faq-admin-header">
-        <Typography variant="h4" component="h1" gutterBottom>
-          Gestión de Preguntas Frecuentes
-        </Typography>
-        <Typography variant="subtitle1" color="textSecondary">
-          Administra las preguntas frecuentes para ayudar a tus usuarios
-        </Typography>
-      </div>
+    <div className="mx-auto max-w-6xl bg-gray-50 rounded-xl shadow-sm fluid-padding-lg">
+      <PageHeader
+        icon={HelpOutlineIcon}
+        title="Gestión de Preguntas Frecuentes"
+        subtitle="Administra las preguntas frecuentes para ayudar a tus usuarios"
+      />
 
       <FaqStats />
 
-      <Paper className="faq-tabs">
+      <Paper className="mb-6">
         <Tabs
           value={tabValue}
           onChange={(_, v) => setTabValue(v)}
@@ -40,12 +38,12 @@ const FaqAdminContent = () => {
         </Tabs>
       </Paper>
 
-      <div className="faq-tab-panel" hidden={tabValue !== 0}>
+      <div hidden={tabValue !== 0}>
         <FaqFilters />
         <FaqList />
       </div>
 
-      <div className="faq-tab-panel" hidden={tabValue !== 1}>
+      <div hidden={tabValue !== 1}>
         <FaqForm />
       </div>
 

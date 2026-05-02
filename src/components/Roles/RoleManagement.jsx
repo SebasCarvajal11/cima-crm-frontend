@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { fetchUsers, updateRole } from '../../redux/slices/roleSlice';
 import {
-  CircularProgress,
   Alert,
   Pagination,
   Box,
@@ -14,6 +13,7 @@ import {
   TableRow,
 } from '@mui/material';
 import { Security as SecurityIcon } from '@mui/icons-material';
+import { LoadingState, PageHeader } from '../ui';
 import { RoleTableRow } from './components/RoleTableRow';
 import { RoleChangeDialog } from './components/RoleChangeDialog';
 import { EnhancedTableContainer, TableToolbar, StyledTableHead } from '../Client/components/SharedStyles';
@@ -71,15 +71,11 @@ const RoleManagement = () => {
 
   return (
     <Box className="p-4 md:p-8 max-w-6xl mx-auto">
-      <Box className="mb-8">
-        <Typography variant="h4" className="font-bold text-gray-800 mb-2 flex items-center gap-3">
-          <SecurityIcon fontSize="large" className="text-brand-primary" />
-          Gestin de Roles y Permisos
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Asigna roles a los usuarios para controlar su nivel de acceso al sistema.
-        </Typography>
-      </Box>
+      <PageHeader
+        icon={SecurityIcon}
+        title="Gestión de Roles y Permisos"
+        subtitle="Asigna roles a los usuarios para controlar su nivel de acceso al sistema."
+      />
 
       {error && (
         <Alert severity="error" className="mb-6 rounded-xl">
@@ -95,9 +91,7 @@ const RoleManagement = () => {
         </TableToolbar>
 
         {loading ? (
-          <Box className="flex justify-center p-12">
-            <CircularProgress />
-          </Box>
+          <LoadingState minHeight="12rem" />
         ) : (
           <Table>
             <StyledTableHead>

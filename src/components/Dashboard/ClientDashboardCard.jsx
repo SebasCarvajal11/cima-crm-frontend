@@ -20,8 +20,8 @@ export const ClientDashboardCard = ({ client }) => {
             <Avatar
               sx={{
                 bgcolor: stringToColor(clientName),
-                width: 56,
-                height: 56,
+                width: '3.5rem',
+                height: '3.5rem',
                 mr: 2,
               }}
             >

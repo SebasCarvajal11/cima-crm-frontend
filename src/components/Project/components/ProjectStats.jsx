@@ -13,11 +13,12 @@ import {
   Timeline as TimelineIcon
 } from '@mui/icons-material';
 import logger from '../../../utils/logger';
+import { cn } from '../../../utils/cn';
 
 const StatCard = ({ title, value, icon, borderColor, barColor }) => (
   <Paper
     elevation={2}
-    className={`p-4 h-full flex flex-col bg-white border-2 ${borderColor} rounded-lg transition-transform hover:-translate-y-1 hover:shadow-md`}
+    className={cn('p-4 h-full flex flex-col bg-white border-2 rounded-lg transition-transform hover:-translate-y-1 hover:shadow-md', borderColor)}
   >
     <Box className="flex items-center mb-2">
       <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-50 mr-2 text-gray-600">
@@ -71,7 +72,7 @@ const ProjectStats = ({ stats }) => {
           value={completed}
           icon={<CheckCircleIcon />}
           borderColor="border-green-500/20"
-          barColor="#10b981" // Tailwind green-500
+          barColor="var(--color-success)" // Tailwind green-500
         />
       </Grid>
       <Grid item xs={12} sm={6} md={3}>
@@ -80,7 +81,7 @@ const ProjectStats = ({ stats }) => {
           value={pending}
           icon={<PendingIcon />}
           borderColor="border-orange-500/20"
-          barColor="#f59e0b" // Tailwind orange-500
+          barColor="var(--color-warning)" // Tailwind orange-500
         />
       </Grid>
       <Grid item xs={12} sm={6} md={3}>
@@ -89,7 +90,7 @@ const ProjectStats = ({ stats }) => {
           value={inProgress}
           icon={<TimelineIcon />}
           borderColor="border-blue-500/20"
-          barColor="#3b82f6" // Tailwind blue-500
+          barColor="var(--color-info)" // Tailwind blue-500
         />
       </Grid>
     </Grid>

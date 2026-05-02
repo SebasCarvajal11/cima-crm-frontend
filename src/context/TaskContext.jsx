@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { taskService } from '../services/taskService';
 import logger from '../utils/logger';
 import { useNotification } from '../hooks/useNotification';
+import { MESSAGES } from '../constants';
 
 const TaskContext = createContext();
 
@@ -120,18 +121,16 @@ export const TaskProvider = ({ children }) => {
   }, [tasks, searchTerm, statusFilter, projectFilter, workerFilter]);
 
   const handleDelete = async (id) => {
-    if (window.confirm('¿Está seguro de eliminar esta tarea?')) {
-      setLoading(true);
-      try {
-        await taskService.deleteTask(id);
-        notify.success('Tarea eliminada exitosamente');
-        loadTasks();
-      } catch (error) {
-        logger.error('Error al eliminar la tarea:', error);
-        notify.error('Error al eliminar la tarea', error);
-      } finally {
-        setLoading(false);
-      }
+    setLoading(true);
+    try {
+      await taskService.deleteTask(id);
+      notify.success(MESSAGES.SUCCESS.TASK.DELETE);
+      loadTasks();
+    } catch (error) {
+      logger.error('Error al eliminar la tarea:', error);
+      notify.error(MESSAGES.ERROR.TASK.DELETE, error);
+    } finally {
+      setLoading(false);
     }
   };
 

@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import logger from '../utils/logger';
 import { clientService } from '../services/clientService';
 import { useNotification } from '../hooks/useNotification';
+import { MESSAGES } from '../constants';
 
 const ClientContext = createContext();
 
@@ -34,8 +35,8 @@ export const ClientProvider = ({ children }) => {
       setClients(data);
     } catch (err) {
       logger.error('Error al cargar clientes:', err);
-      setError('Error al cargar clientes');
-      notify.error('Error al cargar clientes', err);
+      setError(MESSAGES.ERROR.CLIENT.LOAD);
+      notify.error(MESSAGES.ERROR.CLIENT.LOAD, err);
     } finally {
       setLoading(false);
     }
@@ -85,13 +86,13 @@ export const ClientProvider = ({ children }) => {
   const handleCreateSuccess = () => {
     fetchClients();
     closeAllDialogs();
-    notify.success('Cliente creado exitosamente');
+    notify.success(MESSAGES.SUCCESS.CLIENT.CREATE);
   };
 
   const handleEditSuccess = () => {
     fetchClients();
     closeAllDialogs();
-    notify.success('Cliente actualizado exitosamente');
+    notify.success(MESSAGES.SUCCESS.CLIENT.UPDATE);
   };
 
   const handleDeleteSuccess = (deletedId) => {
@@ -99,7 +100,7 @@ export const ClientProvider = ({ children }) => {
       prev.filter((c) => (c.clientId || c.id) !== deletedId)
     );
     closeAllDialogs();
-    notify.success('Cliente eliminado exitosamente');
+    notify.success(MESSAGES.SUCCESS.CLIENT.DELETE);
   };
 
   const handlePageChange = (_, value) => {

@@ -23,8 +23,8 @@ export default function FaqCard({ faq }) {
 
   if (isEditing) {
     return (
-      <Card className="faq-item">
-        <CardContent className="faq-edit-container">
+      <Card className="transition-all bg-white rounded-xl overflow-hidden shadow-sm border-t-3 border-gray-200">
+        <CardContent className="mb-6 bg-white rounded-xl p-5 shadow-md border-l-4 border-info">
           <Typography variant="h6" gutterBottom>Editar Pregunta</Typography>
           <TextField
             fullWidth
@@ -44,7 +44,7 @@ export default function FaqCard({ faq }) {
             multiline
             rows={4}
           />
-          <div className="faq-actions">
+          <div className="flex mt-4 justify-end border-t border-gray-100 pt-4">
             <Button
               variant="contained"
               color="primary"
@@ -71,17 +71,17 @@ export default function FaqCard({ faq }) {
   }
 
   return (
-    <Card className="faq-item">
-      <CardContent className="faq-view-container">
+    <Card className="transition-all bg-white rounded-xl overflow-hidden shadow-sm border-t-3 border-gray-200 hover:shadow-lg hover:-translate-y-1">
+      <CardContent className="p-5">
         <Chip
           label={faq.isDeleted ? 'Borrador' : 'Activa'}
           color={faq.isDeleted ? 'default' : 'success'}
           size="small"
-          className={`faq-status-badge ${faq.isDeleted ? 'draft' : 'active'}`}
+          className="mb-3"
         />
-        <Typography variant="h6" component="h2">{faq.question}</Typography>
-        <Typography variant="body1" component="p">{faq.answer}</Typography>
-        <div className="faq-actions">
+        <Typography variant="h6" component="h2" className="text-gray-800 font-semibold mb-3">{faq.question}</Typography>
+        <Typography variant="body1" component="p" className="text-gray-600 whitespace-pre-line leading-relaxed">{faq.answer}</Typography>
+        <div className="flex mt-4 justify-end border-t border-gray-100 pt-4">
           <Button
             variant="outlined"
             color="primary"

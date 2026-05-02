@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 
 export const StyledDialog = styled(Dialog)(() => ({
   '& .MuiDialog-paper': {
-    borderRadius: 16,
+    borderRadius: '1rem',
     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
     overflowX: 'hidden',
   },
@@ -11,11 +11,11 @@ export const StyledDialog = styled(Dialog)(() => ({
 
 export const StyledDialogTitle = styled(DialogTitle)(() => ({
   background: 'var(--color-brand-primary)',
-  color: '#fff',
+  color: 'var(--color-surface)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: '16px',
+  padding: '1rem',
 }));
 
 export const FormSection = styled(Box)(({ theme }) => ({

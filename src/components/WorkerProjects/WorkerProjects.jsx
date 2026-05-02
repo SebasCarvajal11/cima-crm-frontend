@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import {
-  Container, Grid, Typography, Alert, Fade, LinearProgress, Box,
+  Container, Grid, Alert, Fade,
 } from '@mui/material';
+import FolderIcon from '@mui/icons-material/Folder';
+import { LoadingState, PageHeader } from '../ui';
 import api from '../../services/api';
 import { taskService } from '../../services/taskService';
 import logger from '../../utils/logger';
@@ -79,33 +81,16 @@ const WorkerProjects = () => {
   };
 
   if (loading) {
-    return (
-      <Container maxWidth="lg" className="mt-8">
-        <LinearProgress />
-      </Container>
-    );
+    return <LoadingState minHeight="24rem" />;
   }
 
   return (
     <Container maxWidth="lg" className="py-8">
-      <Box className="mb-8">
-        <Typography
-          variant="h4"
-          component="h1"
-          gutterBottom
-          sx={{
-            fontWeight: 700,
-            background: 'linear-gradient(45deg, #8e3031 30%, #592d2d 90%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}
-        >
-          Mis Proyectos
-        </Typography>
-        <Typography variant="subtitle1" color="text.secondary">
-          Gestiona y visualiza el progreso de tus proyectos
-        </Typography>
-      </Box>
+      <PageHeader
+        icon={FolderIcon}
+        title="Mis Proyectos"
+        subtitle="Gestiona y visualiza el progreso de tus proyectos"
+      />
 
       {error && (
         <Alert severity="error" className="mb-8">{error}</Alert>

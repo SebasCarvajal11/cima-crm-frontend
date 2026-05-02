@@ -15,12 +15,12 @@ export const ClientTableRow = ({ client, onEdit, onDelete }) => {
             sx={{
               background: client.name
                 ? `linear-gradient(135deg, ${stringToColor(client.name)} 0%, ${adjustColor(stringToColor(client.name), -20)} 100%)`
-                : 'linear-gradient(135deg, #000000 0%, #333333 100%)',
+                : 'linear-gradient(135deg, grey.900 0%, grey.700 100%)',
             }}
           >
             {getInitials(client.name)}
           </Avatar>
-          <Typography sx={{ color: '#3f4254', fontWeight: 500 }}>
+          <Typography sx={{ color: 'text.primary', fontWeight: 500 }}>
             {client.name}
           </Typography>
         </Box>
@@ -35,7 +35,7 @@ export const ClientTableRow = ({ client, onEdit, onDelete }) => {
             display: 'inline-block',
             px: 2,
             py: 0.5,
-            borderRadius: '4px',
+            borderRadius: '0.25rem',
             bgcolor: getPlanColor(client.plan),
             color: 'white',
             fontWeight: 'medium',
@@ -50,7 +50,7 @@ export const ClientTableRow = ({ client, onEdit, onDelete }) => {
         <IconButton onClick={() => onEdit(client)} sx={{ color: 'var(--color-brand-primary)' }}>
           <EditIcon />
         </IconButton>
-        <IconButton onClick={() => onDelete(client)} sx={{ color: '#f1416c' }}>
+        <IconButton onClick={() => onDelete(client)} sx={{ color: 'error.main' }}>
           <DeleteIcon />
         </IconButton>
       </TableCell>

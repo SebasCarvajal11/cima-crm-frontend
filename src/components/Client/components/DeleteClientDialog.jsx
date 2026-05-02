@@ -40,23 +40,23 @@ export const DeleteClientDialog = ({ open, user, onClose, onSuccess, token }) =>
   return (
     <Dialog open={open} onClose={onClose}
       PaperProps={{
-        sx: { borderRadius: '16px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', '& .MuiDialogTitle-root': { background: '#f1416c', color: 'white', padding: '20px 24px' } }
+        sx: { borderRadius: '1rem', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', '& .MuiDialogTitle-root': { background: 'var(--color-error)', color: 'white', padding: '1.25rem 1.5rem' } }
       }}
     >
-      <DialogTitle sx={{ background: '#f1416c', color: 'white' }}>
+      <DialogTitle sx={{ background: 'var(--color-error)', color: 'white' }}>
         Confirmar Eliminación
         <IconButton aria-label="close" onClick={onClose} sx={{ position: 'absolute', right: 16, top: 16, color: 'white' }}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent sx={{ padding: '24px', paddingTop: '24px' }}>
+      <DialogContent sx={{ padding: '1.5rem', paddingTop: '1.5rem' }}>
         <Typography variant="body1">
           ¿Estás seguro de que deseas eliminar al cliente <strong>{user?.name}</strong>?
           Esta acción no se puede deshacer.
         </Typography>
       </DialogContent>
-      <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} sx={{ color: '#7e8299' }}>Cancelar</Button>
+      <DialogActions sx={{ padding: '1rem 1.5rem' }}>
+        <Button onClick={onClose} sx={{ color: 'text.secondary' }}>Cancelar</Button>
         <ActionButton variant="delete" onClick={handleDelete} disabled={loading}>
           {loading ? <CircularProgress size={24} color="inherit" /> : 'Eliminar Cliente'}
         </ActionButton>

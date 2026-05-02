@@ -30,6 +30,7 @@ import {
   Person as PersonIcon,
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
+import { LoadingState, PageHeader } from '../ui';
 import { taskService } from '../../services/taskService';
 import logger from '../../utils/logger';
 
@@ -104,26 +105,16 @@ const WorkerTasks = () => {
   };
 
   if (loading) {
-    return (
-      <Box className="flex justify-center items-center h-64">
-        <CircularProgress />
-      </Box>
-    );
+    return <LoadingState />;
   }
 
   return (
     <Box className="p-4 md:p-8 max-w-7xl mx-auto">
-      <Box className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <Box>
-          <Typography variant="h4" className="font-bold text-gray-800 mb-2 flex items-center gap-3">
-            <TaskIcon fontSize="large" className="text-brand-primary" />
-            Mis Tareas Asignadas
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Gestiona el progreso de las tareas que tienes asignadas.
-          </Typography>
-        </Box>
-      </Box>
+      <PageHeader
+        icon={TaskIcon}
+        title="Mis Tareas Asignadas"
+        subtitle="Gestiona el progreso de las tareas que tienes asignadas."
+      />
 
       {error && (
         <Alert severity="error" className="mb-6 rounded-xl">

@@ -4,6 +4,8 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import qs from 'qs';
 import logger from '../utils/logger';
+import { useNotification } from '../hooks/useNotification';
+import { MESSAGES } from '../constants';
 
 export const ProjectContext = createContext();
 
@@ -12,6 +14,7 @@ const API_BASE_URL = `${import.meta.env.VITE_API_URL}/projects`;
 export const ProjectProvider = ({ children }) => {
   const auth = useSelector((state) => state.auth);
   const accessToken = auth?.accessToken;
+  const notify = useNotification();
 
   const [projects, setProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
@@ -56,7 +59,7 @@ export const ProjectProvider = ({ children }) => {
       (response) => response,
       (error) => {
         if (error.response?.status === 401) {
-          showNotification('Error de autenticación. Verificando sesión...', 'error');
+          notify.error('Error de autenticación. Verificando sesión...');
         }
         return Promise.reject(error);
       }
@@ -78,7 +81,7 @@ export const ProjectProvider = ({ children }) => {
         setProjectStats(response.data.stats);
       }
     } catch (error) {
-      handleError(error, 'Error al obtener estadísticas');
+      handleError(error, MESSAGES.ERROR.PROJECT.STATS);
     }
   };
 
@@ -101,7 +104,7 @@ export const ProjectProvider = ({ children }) => {
         setFilteredProjects(response.data.projects);
       }
     } catch (error) {
-      handleError(error, 'Error al cargar los proyectos');
+      handleError(error, MESSAGES.ERROR.PROJECT.LOAD);
     } finally {
       setLoading(false);
     }
@@ -112,7 +115,7 @@ export const ProjectProvider = ({ children }) => {
     const errorMessage = error.response?.data?.message || defaultMessage;
     logger.error(defaultMessage, error);
     setError(errorMessage);
-    setNotification({ open: true, message: errorMessage, type: 'error' });
+    notify.error(errorMessage);
   };
 
   // Efecto para cargar datos iniciales
@@ -162,11 +165,11 @@ export const ProjectProvider = ({ children }) => {
       
       if (response.data.success) {
         await Promise.all([fetchProjects(), fetchProjectStats()]);
-        showNotification(response.data.message, 'success');
+        notify.success(response.data.message);
       }
       return response.data.project;
     } catch (error) {
-      handleError(error, 'Error al crear el proyecto');
+      handleError(error, MESSAGES.ERROR.PROJECT.CREATE);
       throw error;
     }
   };
@@ -177,7 +180,7 @@ export const ProjectProvider = ({ children }) => {
       const response = await axiosInstance.get(`/${id}`);
       return response.data;
     } catch (error) {
-      handleError(error, 'Error al obtener el proyecto');
+      handleError(error, MESSAGES.ERROR.PROJECT.LOAD);
       throw error;
     }
   };
@@ -188,11 +191,11 @@ export const ProjectProvider = ({ children }) => {
       const response = await axiosInstance.patch(`/${id}/status`, { status });
       if (response.data.success) {
         await Promise.all([fetchProjects(), fetchProjectStats()]);
-        showNotification(response.data.message, 'success');
+        notify.success(response.data.message);
       }
       return response.data.project;
     } catch (error) {
-      handleError(error, 'Error al actualizar el estado');
+      handleError(error, MESSAGES.ERROR.PROJECT.UPDATE);
       throw error;
     }
   };
@@ -203,10 +206,10 @@ export const ProjectProvider = ({ children }) => {
       const response = await axiosInstance.delete(`/${id}`);
       if (response.data.success) {
         await Promise.all([fetchProjects(), fetchProjectStats()]);
-        showNotification(response.data.message, 'success');
+        notify.success(response.data.message);
       }
     } catch (error) {
-      handleError(error, 'Error al eliminar el proyecto');
+      handleError(error, MESSAGES.ERROR.PROJECT.DELETE);
       throw error;
     }
   };
@@ -217,7 +220,7 @@ export const ProjectProvider = ({ children }) => {
       const response = await axiosInstance.get(`/client/${clientId}`);
       return response.data.projects || [];
     } catch (error) {
-      handleError(error, 'Error al obtener proyectos por cliente');
+      handleError(error, MESSAGES.ERROR.PROJECT.BY_CLIENT);
       throw error;
     }
   };
@@ -247,18 +250,9 @@ export const ProjectProvider = ({ children }) => {
         };
       });
     } catch (error) {
-      handleError(error, 'Error al obtener clientes');
+      handleError(error, MESSAGES.ERROR.CLIENT.LOAD);
       return []; // Devolver array vacío en caso de error
     }
-  };
-
-  // Función para mostrar notificaciones
-  const showNotification = (message, type = 'info') => {
-    setNotification({
-      open: true,
-      message,
-      type
-    });
   };
 
   // Alternativa usando form-urlencoded
@@ -278,13 +272,13 @@ export const ProjectProvider = ({ children }) => {
 
       if (response.data.success) {
         await Promise.all([fetchProjects(), fetchProjectStats()]);
-        showNotification(response.data.message || 'Proyecto actualizado exitosamente', 'success');
+        notify.success(response.data.message || MESSAGES.SUCCESS.PROJECT.UPDATE);
       }
 
       return response.data.project;
     } catch (error) {
       logger.error('Error al actualizar el proyecto:', error.response?.data || error.message);
-      handleError(error, 'Error al actualizar el proyecto');
+      handleError(error, MESSAGES.ERROR.PROJECT.UPDATE);
       throw error;
     }
   };

@@ -1,33 +1,15 @@
-import axios from 'axios';
-import { store } from '../redux/store';
+import api from './api';
 import logger from '../utils/logger';
-
-const API_URL = `${import.meta.env.VITE_API_URL}/tasks`;
-
-// Helper function to get the authentication token from Redux store
-const getAuthToken = () => {
-  const state = store.getState();
-  return state.auth?.accessToken || localStorage.getItem('accessToken');
-};
-
-// Helper to create headers with authentication token
-const getHeaders = () => ({
-  headers: {
-    'Content-Type': 'application/json',
-    'accesstoken': getAuthToken()
-  }
-});
 
 export const taskService = {
   async createTask(task) {
     logger.debug('API Request - Create Task:', task);
-    const response = await axios.post(API_URL, task, getHeaders());
+    const response = await api.post('/tasks', task);
     logger.debug('API Response - Create Task:', response.data);
     return response.data;
   },
 
   async createOrUpdateTask(task) {
-    // If task has an ID, update it; otherwise, create a new task
     if (task.id || task.taskId) {
       const taskId = task.id || task.taskId;
       logger.debug('Updating existing task:', taskId);
@@ -43,13 +25,9 @@ export const taskService = {
       logger.error('Error: taskId is undefined or null');
       throw new Error('Task ID is required');
     }
-    
+
     logger.debug('API Request - Update Task Status:', taskId, status);
-    const response = await axios.put(
-      `${API_URL}/${taskId}/status`, 
-      { status }, 
-      getHeaders()
-    );
+    const response = await api.put(`/tasks/${taskId}/status`, { status });
     logger.debug('API Response - Update Task Status:', response.data);
     return response.data;
   },
@@ -59,31 +37,30 @@ export const taskService = {
       logger.error('Error: Task ID is undefined or null', task);
       throw new Error('Task ID is required');
     }
-    
+
     logger.debug('API Request - Update Task:', id, task);
-    const response = await axios.put(`${API_URL}/${id}`, task, getHeaders());
+    const response = await api.put(`/tasks/${id}`, task);
     logger.debug('API Response - Update Task:', response.data);
     return response.data;
   },
 
   async getTaskById(id) {
     logger.debug('API Request - Get Task by ID:', id);
-    const response = await axios.get(`${API_URL}/${id}`, getHeaders());
+    const response = await api.get(`/tasks/${id}`);
     logger.debug('API Response - Get Task by ID:', response.data);
     return response.data;
   },
 
   async deleteTask(id) {
     logger.debug('API Request - Delete Task:', id);
-    const response = await axios.delete(`${API_URL}/${id}`, getHeaders());
+    const response = await api.delete(`/tasks/${id}`);
     logger.debug('API Response - Delete Task:', response.data);
     return response.data;
   },
 
   async listTasks(filters = {}) {
     logger.debug('API Request - List Tasks with filters:', filters);
-    const params = new URLSearchParams(filters);
-    const response = await axios.get(`${API_URL}?${params}`, getHeaders());
+    const response = await api.get('/tasks', { params: filters });
     logger.debug('API Response - List Tasks:', response.data);
     return response.data;
   },
@@ -94,10 +71,7 @@ export const taskService = {
       const cleanFilters = Object.fromEntries(
         Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
       );
-      const response = await axios.get(`${API_URL}/with-project-details`, {
-        params: cleanFilters,
-        ...getHeaders()
-      });
+      const response = await api.get('/tasks/with-project-details', { params: cleanFilters });
       logger.debug('API Response - Get Tasks with Project Details:', response.data);
       return response.data;
     } catch (error) {
@@ -117,18 +91,13 @@ export const taskService = {
       const cleanFilters = Object.fromEntries(
         Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
       );
-      
-      // Primero intenta con el endpoint detallado
-      const response = await axios.get(`${API_URL}/all/detailed`, {
-        params: cleanFilters,
-        ...getHeaders()
-      });
-      
+
+      const response = await api.get('/tasks/all/detailed', { params: cleanFilters });
+
       logger.debug('API Response - Get Detailed Tasks:', response.data);
       return response.data;
     } catch (error) {
       logger.error('API Error - Get Detailed Tasks:', error);
-      // Si falla el endpoint detallado, usa el endpoint regular
       if (error.response?.status === 404) {
         logger.warn('Endpoint detallado no encontrado, usando endpoint regular');
         return this.listTasks(filters);
@@ -136,70 +105,56 @@ export const taskService = {
       throw error;
     }
   },
-  
+
   async getTasksByProject(projectId) {
-    const response = await axios.get(`${API_URL}/project/${projectId}`, getHeaders());
+    const response = await api.get(`/tasks/project/${projectId}`);
     return response.data;
   },
-  
+
   async getTasksByWorker(workerId) {
-    const response = await axios.get(`${API_URL}/worker/${workerId}`, getHeaders());
+    const response = await api.get(`/tasks/worker/${workerId}`);
     return response.data;
   },
-  
+
   async getTasksByStatus(status) {
-    const response = await axios.get(`${API_URL}/status/${status}`, getHeaders());
+    const response = await api.get(`/tasks/status/${status}`);
     return response.data;
   },
-  
-  // Admin endpoints
+
   async getTaskStats() {
-    const response = await axios.get(`${API_URL}/admin/stats`, getHeaders());
+    const response = await api.get('/tasks/admin/stats');
     return response.data;
   },
-  
+
   async getTasksByDateRange(startDate, endDate) {
-    const response = await axios.get(
-      `${API_URL}/admin/date-range?startDate=${startDate}&endDate=${endDate}`,
-      getHeaders()
-    );
+    const response = await api.get('/tasks/admin/date-range', {
+      params: { startDate, endDate },
+    });
     return response.data;
   },
-  
+
   async bulkUpdateTaskStatus(taskIds, status) {
-    const response = await axios.post(
-      `${API_URL}/admin/bulk-update-status`,
-      { taskIds, status },
-      getHeaders()
-    );
+    const response = await api.post('/tasks/admin/bulk-update-status', { taskIds, status });
     return response.data;
   },
-  
+
   async bulkAssignTasks(taskIds, workerId) {
-    const response = await axios.post(
-      `${API_URL}/admin/bulk-assign`,
-      { taskIds, workerId },
-      getHeaders()
-    );
+    const response = await api.post('/tasks/admin/bulk-assign', { taskIds, workerId });
     return response.data;
   },
-  
-  // Additional endpoints
+
   async getAllTasks() {
-    const response = await axios.get(`${API_URL}/all`, getHeaders());
+    const response = await api.get('/tasks/all');
     return response.data;
   },
-  
+
   async getDetailedTaskById(id) {
-    const response = await axios.get(`${API_URL}/detailed/${id}`, getHeaders());
+    const response = await api.get(`/tasks/detailed/${id}`);
     return response.data;
   },
-  
+
   async getWorkerPerformance(workerId) {
-    const response = await axios.get(
-      `${API_URL}/admin/worker-performance/${workerId}`,
-      getHeaders()
-    );
+    const response = await api.get(`/tasks/admin/worker-performance/${workerId}`);
     return response.data;
   }
 };

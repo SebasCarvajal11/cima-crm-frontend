@@ -17,7 +17,7 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   border: '1px solid',
   borderColor: theme.palette.divider,
   '& .MuiTableCell-head': {
-    backgroundColor: "#8e3031",
+    backgroundColor: "primary.main",
     color: theme.palette.common.white,
     fontWeight: 600,
     fontSize: '0.95rem',
@@ -28,7 +28,7 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   '& .MuiTableRow-root': {
     transition: 'all 0.3s ease',
     borderBottom: `1px solid ${theme.palette.divider}`,
-    color: '#000000',
+    color: 'text.primary',
     '&:hover': {
       backgroundColor: alpha(theme.palette.primary.main, 0.04),
       transform: 'translateY(-1px)',
@@ -36,10 +36,10 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   },
   '& .file-name': {
     fontWeight: 500,
-    color: "#8e3031",
+    color: "primary.main",
   },
   '& .file-info': {
-    color: '#000000',
+    color: 'text.primary',
     fontSize: '0.875rem',
   },
 }));
@@ -66,19 +66,19 @@ export const ExcelFileList = () => {
             <TableRow key={file.fileId}>
               <TableCell>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <FileIcon sx={{ mr: 2, color: '#592d2d' }} />
-                  <Typography className="file-name" sx={{ color: '#000000' }}>
+                  <FileIcon sx={{ mr: 2, color: 'primary.main' }} />
+                  <Typography className="file-name" sx={{ color: 'text.primary' }}>
                     {file.originalName || 'Sin nombre'}
                   </Typography>
                 </Box>
               </TableCell>
               <TableCell className="file-info">
-                <Typography variant="body2" sx={{ color: '#000000' }}>
+                <Typography variant="body2" sx={{ color: 'text.primary' }}>
                   Subido el: {file.uploadedAt ? new Date(file.uploadedAt).toLocaleString('es-ES') : 'Fecha no disponible'}
                 </Typography>
               </TableCell>
               <TableCell className="file-info">
-                <Typography variant="body2" sx={{ color: '#000000' }}>
+                <Typography variant="body2" sx={{ color: 'text.primary' }}>
                   {file.fileSize ? `${(file.fileSize / 1024).toFixed(2)} KB` : 'Tamaño no disponible'}
                 </Typography>
               </TableCell>
@@ -87,7 +87,7 @@ export const ExcelFileList = () => {
                   variant="contained"
                   startIcon={<DownloadIcon />}
                   onClick={() => handleDownload(file.fileId)}
-                  sx={{ backgroundColor: '#592d2d', '&:hover': { backgroundColor: '#8e3031' } }}
+                  sx={{ backgroundColor: 'primary.main', '&:hover': { backgroundColor: 'primary.dark' } }}
                 >
                   Descargar
                 </Button>

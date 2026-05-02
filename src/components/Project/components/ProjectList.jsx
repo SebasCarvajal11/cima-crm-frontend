@@ -131,7 +131,7 @@ const ProjectList = ({ projects = [], loading, onEdit, onDelete }) => {
                       onClick={() => handleRequestSort(header.toLowerCase())}
                       sx={{
                         color: 'var(--color-brand-primary-light) !important',
-                        '&.MuiTableSortLabel-root:hover': { color: '#f0f0f0' },
+                        '&.MuiTableSortLabel-root:hover': { color: 'grey.100' },
                         '& .MuiTableSortLabel-icon': { color: 'white !important' },
                       }}
                     >
@@ -174,7 +174,7 @@ const ProjectList = ({ projects = [], loading, onEdit, onDelete }) => {
                       <Tooltip title="Eliminar proyecto">
                         <Button
                           variant="contained"
-                          sx={{ bgcolor: '#d32f2f', '&:hover': { bgcolor: '#b71c1c' } }}
+                          sx={{ bgcolor: 'error.main', '&:hover': { bgcolor: 'error.dark' } }}
                           size="small"
                           onClick={() => handleDelete(project)}
                         >
