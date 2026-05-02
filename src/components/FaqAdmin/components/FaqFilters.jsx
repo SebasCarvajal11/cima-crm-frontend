@@ -48,7 +48,7 @@ export default function FaqFilters() {
           />
         </Grid>
         <Grid item xs={12} md={6}>
-          <div className="flex gap-2.5 flex-wrap">
+          <div className="flex fluid-gap flex-wrap">
             <Button
               variant={activeFilter === 'all' ? 'contained' : 'outlined'}
               color="primary"

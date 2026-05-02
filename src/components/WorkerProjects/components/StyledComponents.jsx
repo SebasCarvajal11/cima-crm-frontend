@@ -12,7 +12,7 @@ export const StyledCard = styled(Card)(({ theme }) => ({
   position: 'relative',
   overflow: 'visible',
   '&:hover': {
-    transform: 'translateY(-8px)',
+    transform: 'translateY(-0.5rem)',
     boxShadow: theme.shadows[8],
   },
   '&::before': {

@@ -5,24 +5,31 @@ export const EnhancedTableContainer = styled(TableContainer)(() => ({
   background: 'var(--color-surface)',
   borderRadius: '1.25rem',
   boxShadow: '0 0 50px 0 rgba(82, 63, 105, 0.15)',
-  overflow: 'hidden',
+  overflowX: 'auto',
   border: '1px solid var(--color-border)',
+  '& .MuiTable-root': {
+    minWidth: '42rem',
+  },
 }));
 
 export const TableToolbar = styled('div')(() => ({
-  padding: '1.25rem 1.5rem',
+  padding: 'clamp(0.75rem, 3vw, 1.25rem) clamp(1rem, 4vw, 1.5rem)',
   background: 'var(--color-surface)',
   borderBottom: '1px solid var(--color-border)',
   display: 'flex',
+  flexWrap: 'wrap',
   justifyContent: 'space-between',
   alignItems: 'center',
-  gap: '1rem',
+  gap: 'clamp(0.5rem, 2vw, 1rem)',
 }));
 
 export const SearchBar = styled('div')(() => ({
   position: 'relative',
   flex: '1',
+  maxWidth: '100%',
+  '@media (min-width: 40rem)': {
     maxWidth: '25rem',
+  },
   '& .MuiInputBase-root': {
     width: '100%',
     background: 'rgba(243, 246, 249, 0.7)',
@@ -32,7 +39,7 @@ export const SearchBar = styled('div')(() => ({
     },
   },
   '& .MuiInputBase-input': {
-    padding: '0.75rem 0.75rem 0.75rem 2.8125rem',
+    padding: '0.75rem 0.75rem 0.75rem clamp(2rem, 5vw, 2.8125rem)',
   },
   '& .MuiSvgIcon-root': {
     position: 'absolute',
@@ -48,8 +55,8 @@ export const StyledTableHead = styled(TableHead)(() => ({
     background: 'var(--color-brand-primary-light)',
     color: 'var(--color-surface)',
     fontWeight: 600,
-    fontSize: '0.95rem',
-    padding: '1rem 1.5rem',
+    fontSize: 'clamp(0.8125rem, 0.5vw + 0.7rem, 0.95rem)',
+    padding: '0.75rem clamp(0.5rem, 2vw, 1rem)',
     borderBottom: '1px solid var(--color-border)',
     whiteSpace: 'nowrap',
   },
@@ -61,7 +68,7 @@ export const StyledTableRow = styled(TableRow)(() => ({
     backgroundColor: 'rgba(243, 246, 249, 0.7)',
   },
   '& .MuiTableCell-root': {
-    padding: '1rem 1.5rem',
+    padding: '0.75rem clamp(0.5rem, 2vw, 1rem)',
     borderBottom: '1px solid var(--color-border)',
     color: 'var(--color-gray-700)',
   },

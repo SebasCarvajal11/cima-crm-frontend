@@ -34,7 +34,7 @@ const ProjectFilter = () => {
         variant="outlined"
         size="small"
       />
-      <FormControl variant="outlined" size="small" className="min-w-[150px]">
+      <FormControl variant="outlined" size="small" className="min-w-[9.375rem]">
         <InputLabel>Estado</InputLabel>
         <Select
           value={statusFilter}

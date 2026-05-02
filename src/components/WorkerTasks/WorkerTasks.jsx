@@ -123,8 +123,8 @@ const WorkerTasks = () => {
       )}
 
       {tasks.length === 0 ? (
-        <Paper className="p-12 text-center rounded-2xl bg-white shadow-sm border border-gray-100">
-          <TaskIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+        <Paper className="fluid-padding-lg text-center rounded-2xl bg-white shadow-sm border border-gray-100">
+          <TaskIcon sx={{ fontSize: '4rem', color: 'text.disabled', mb: 2 }} />
           <Typography variant="h6" color="text.secondary">
             No tienes tareas asignadas en este momento.
           </Typography>
@@ -142,7 +142,7 @@ const WorkerTasks = () => {
                     transition={{ duration: 0.3, delay: index * 0.05 }}
                   >
                     <Card className="h-full rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col">
-                      <CardContent className="flex-grow p-6">
+                      <CardContent className="flex-grow fluid-padding">
                         <Box className="flex justify-between items-start mb-4">
                           <Chip
                             icon={getStatusIcon(task.status)}
@@ -161,8 +161,8 @@ const WorkerTasks = () => {
                         </Typography>
 
                         <Box className="flex items-center gap-2 mb-4">
-                          <Avatar sx={{ width: 24, height: 24, bgcolor: 'var(--color-brand-primary)' }}>
-                            <TaskIcon sx={{ fontSize: 14 }} />
+                          <Avatar sx={{ width: '1.5rem', height: '1.5rem', bgcolor: 'var(--color-brand-primary)' }}>
+                            <TaskIcon sx={{ fontSize: '0.875rem' }} />
                           </Avatar>
                           <Typography variant="body2" color="text.secondary" className="font-medium">
                             {task.projectName || `Proyecto #${task.projectId}`}
@@ -188,12 +188,12 @@ const WorkerTasks = () => {
                       
                       <Box className="px-6 py-3 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
                         <Box className="flex items-center gap-1 text-gray-500">
-                          <ScheduleIcon sx={{ fontSize: 14 }} />
+                          <ScheduleIcon sx={{ fontSize: '0.875rem' }} />
                           <Typography variant="caption">
                             Creado: {new Date(task.createdAt || Date.now()).toLocaleDateString()}
                           </Typography>
                         </Box>
-                        {updatingId === taskId && <CircularProgress size={16} />}
+                        {updatingId === taskId && <CircularProgress size="1rem" />}
                       </Box>
                     </Card>
                   </motion.div>

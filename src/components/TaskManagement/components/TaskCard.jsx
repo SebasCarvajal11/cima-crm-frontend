@@ -127,7 +127,7 @@ const TaskCard = ({ task, index }) => {
 
       <div className="flex justify-between items-center text-xs text-gray-500 border-t border-gray-100 pt-3">
         <div className="flex items-center gap-2">
-          <Avatar sx={{ width: 24, height: 24, bgcolor: 'grey.900' }}>
+          <Avatar sx={{ width: '1.5rem', height: '1.5rem', bgcolor: 'grey.900' }}>
             {task.workerName ? (
               task.workerName.charAt(0).toUpperCase()
             ) : (

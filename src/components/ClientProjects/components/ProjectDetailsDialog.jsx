@@ -37,7 +37,7 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
       PaperProps={{ className: 'rounded-3xl shadow-2xl overflow-hidden' }}
     >
       <DialogTitle className="p-0">
-        <Box className="bg-gradient-to-r from-brand-primary to-brand-primary-light p-8 text-white relative">
+        <Box className="bg-gradient-to-r from-brand-primary to-brand-primary-light fluid-padding-lg text-white relative">
           <Box className="flex items-center gap-4">
             <Box className="p-3 bg-white/20 backdrop-blur-md rounded-2xl">
               <ProjectIcon fontSize="large" />
@@ -57,10 +57,10 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
         </Box>
       </DialogTitle>
 
-      <DialogContent className="p-8">
+      <DialogContent className="fluid-padding-lg">
         <Grid container spacing={4}>
           <Grid item xs={12}>
-            <Box className="p-6 bg-gray-50 rounded-2xl">
+            <Box className="fluid-padding bg-gray-50 rounded-2xl">
               <Typography variant="subtitle1" className="font-bold text-gray-800 mb-3 flex items-center gap-2">
                 <DescriptionIcon className="text-brand-primary" />
                 Descripción del Proyecto
@@ -77,13 +77,13 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
             </Typography>
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
-                <Box className="p-4 border border-gray-100 rounded-2xl">
+                <Box className="fluid-padding border border-gray-100 rounded-2xl">
                   <Typography variant="caption" className="text-gray-400 uppercase font-bold block mb-2">Estado</Typography>
                   <Chip label={project.status} color={getStatusColor(project.status)} className="font-bold px-4" />
                 </Box>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <Box className="p-4 border border-gray-100 rounded-2xl h-full flex flex-col justify-center">
+                <Box className="fluid-padding border border-gray-100 rounded-2xl h-full flex flex-col justify-center">
                   <Box className="flex justify-between mb-2">
                     <Typography variant="caption" className="text-gray-400 uppercase font-bold">Progreso General</Typography>
                     <Typography variant="body2" className="font-bold text-brand-primary">{project.progress || 0}%</Typography>
@@ -110,7 +110,7 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
                   { label: 'Pendientes', count: project.taskStats.pending, color: 'bg-yellow-50 text-yellow-600' },
                 ].map((stat) => (
                   <Grid item xs={6} sm={3} key={stat.label}>
-                    <Box className={`p-4 text-center rounded-2xl ${stat.color}`}>
+                    <Box className={`fluid-padding text-center rounded-2xl ${stat.color}`}>
                       <Typography variant="h4" className="font-bold mb-1">{stat.count}</Typography>
                       <Typography variant="caption" className="font-bold uppercase opacity-80">{stat.label}</Typography>
                     </Box>
@@ -121,21 +121,21 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
           )}
 
           <Grid item xs={12} md={6}>
-            <Box className="p-6 border border-gray-100 rounded-2xl h-full">
+            <Box className="fluid-padding border border-gray-100 rounded-2xl h-full">
               <Typography variant="subtitle1" className="font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <ContactsIcon className="text-brand-primary" /> Información de Contacto
               </Typography>
               <List dense className="p-0">
                 <ListItem className="px-0">
-                  <ListItemIcon className="min-w-[40px]"><PersonIcon color="primary" /></ListItemIcon>
+                  <ListItemIcon className="min-w-[2.5rem]"><PersonIcon color="primary" /></ListItemIcon>
                   <ListItemText primary="Responsable" secondary={project.client?.name || '-'} />
                 </ListItem>
                 <ListItem className="px-0">
-                  <ListItemIcon className="min-w-[40px]"><EmailIcon color="primary" /></ListItemIcon>
+                  <ListItemIcon className="min-w-[2.5rem]"><EmailIcon color="primary" /></ListItemIcon>
                   <ListItemText primary="Email" secondary={project.client?.email || '-'} />
                 </ListItem>
                 <ListItem className="px-0">
-                  <ListItemIcon className="min-w-[40px]"><PhoneIcon color="primary" /></ListItemIcon>
+                  <ListItemIcon className="min-w-[2.5rem]"><PhoneIcon color="primary" /></ListItemIcon>
                   <ListItemText primary="Teléfono" secondary={project.client?.contactInfo || '-'} />
                 </ListItem>
               </List>
@@ -143,20 +143,20 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <Box className="p-6 border border-gray-100 rounded-2xl h-full">
+            <Box className="fluid-padding border border-gray-100 rounded-2xl h-full">
               <Typography variant="subtitle1" className="font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <ScheduleIcon className="text-brand-primary" /> Fechas del Proyecto
               </Typography>
               <List dense className="p-0">
                 <ListItem className="px-0">
-                  <ListItemIcon className="min-w-[40px]"><CalendarIcon color="primary" /></ListItemIcon>
+                  <ListItemIcon className="min-w-[2.5rem]"><CalendarIcon color="primary" /></ListItemIcon>
                   <ListItemText
                     primary="Fecha de Creación"
                     secondary={new Date(project.createdAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
                   />
                 </ListItem>
                 <ListItem className="px-0">
-                  <ListItemIcon className="min-w-[40px]"><UpdateIcon color="primary" /></ListItemIcon>
+                  <ListItemIcon className="min-w-[2.5rem]"><UpdateIcon color="primary" /></ListItemIcon>
                   <ListItemText
                     primary="Última Actualización"
                     secondary={new Date(project.updatedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -169,7 +169,7 @@ export default function ProjectDetailsDialog({ open, onClose, project }) {
       </DialogContent>
 
       <Divider />
-      <DialogActions className="p-6 bg-gray-50">
+      <DialogActions className="fluid-padding bg-gray-50">
         <Button
           onClick={onClose}
           variant="contained"

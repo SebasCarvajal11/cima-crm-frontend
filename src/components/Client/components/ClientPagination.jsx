@@ -7,15 +7,17 @@ export const ClientPagination = () => {
   return (
     <Box
       sx={{
-        padding: '1.25rem',
+        padding: 'clamp(0.75rem, 3vw, 1.25rem)',
         display: 'flex',
+        flexDirection: { xs: 'column', sm: 'row' },
         justifyContent: 'space-between',
-        alignItems: 'center',
+        alignItems: { xs: 'stretch', sm: 'center' },
+        gap: '0.75rem',
         borderTop: '1px solid',
         borderColor: 'divider',
       }}
     >
-      <Typography sx={{ color: 'text.secondary' }}>
+      <Typography sx={{ color: 'text.secondary', textAlign: { xs: 'center', sm: 'left' } }}>
         Mostrando {paginatedClients.length} de {clients.length} clientes
       </Typography>
       <Pagination
@@ -24,7 +26,10 @@ export const ClientPagination = () => {
         onChange={handlePageChange}
         variant="outlined"
         shape="rounded"
+        siblingCount={0}
+        boundaryCount={1}
         sx={{
+          alignSelf: 'center',
           '& .MuiPaginationItem-root': {
             borderColor: 'divider',
             color: 'text.secondary',

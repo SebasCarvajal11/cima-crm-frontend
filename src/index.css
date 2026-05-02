@@ -118,6 +118,22 @@
   gap: clamp(1rem, 3vw, 2rem);
 }
 
+/* Responsive table column visibility */
+@layer utilities {
+  .hide-mobile {
+    display: none;
+  }
+  .hide-tablet {
+    display: none;
+  }
+  @media (min-width: 40rem) {
+    .hide-mobile { display: table-cell; }
+  }
+  @media (min-width: 48rem) {
+    .hide-tablet { display: table-cell; }
+  }
+}
+
 /* Media containment */
 @layer base {
   body {

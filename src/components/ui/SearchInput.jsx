@@ -9,7 +9,7 @@ export function SearchInput({ value, onChange, placeholder = 'Buscar...', onClea
       placeholder={placeholder}
       value={value}
       onChange={onChange}
-      sx={{ minWidth: 250, ...sx }}
+      sx={{ minWidth: 'clamp(14rem, 50vw, 15.625rem)', ...sx }}
       slotProps={{
         input: {
           startAdornment: (

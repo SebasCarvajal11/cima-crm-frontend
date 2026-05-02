@@ -28,7 +28,7 @@ export default function ProjectCard({ project, index, onViewDetails }) {
           }`}
         />
 
-        <CardContent className="flex-grow p-6">
+        <CardContent className="flex-grow fluid-padding">
           <Box className="flex justify-between items-start mb-4">
             <Typography variant="h6" className="font-bold text-gray-800 group-hover:text-brand-primary transition-colors">
               {project.projectName}

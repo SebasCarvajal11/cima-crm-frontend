@@ -11,6 +11,8 @@ export const RoleChangeDialog = ({ open, userName, newRole, onClose, onConfirm }
   <Dialog
     open={open}
     onClose={onClose}
+    maxWidth="xs"
+    fullWidth
     PaperProps={{ className: "rounded-2xl" }}
   >
     <DialogTitle className="font-bold text-gray-800">

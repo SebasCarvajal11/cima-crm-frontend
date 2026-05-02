@@ -126,7 +126,7 @@ export const BulkActionDialog = ({ open, selectedTasks, onClose, onSuccess, toke
           color="primary"
           disabled={loading || (bulkAction.action === 'assign' && !bulkAction.workerId)}
         >
-          {loading ? <CircularProgress size={24} /> : 'Aplicar'}
+          {loading ? <CircularProgress size="1.5rem" /> : 'Aplicar'}
         </Button>
       </DialogActions>
     </Dialog>

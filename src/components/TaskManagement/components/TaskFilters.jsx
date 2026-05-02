@@ -51,7 +51,7 @@ const TaskFilters = () => {
         }}
       />
 
-      <FormControl variant="outlined" size="small" sx={{ minWidth: 150 }}>
+      <FormControl variant="outlined" size="small" sx={{ minWidth: '9.375rem' }}>
         <InputLabel>Estado</InputLabel>
         <Select
           value={statusFilter}
@@ -65,7 +65,7 @@ const TaskFilters = () => {
         </Select>
       </FormControl>
 
-      <FormControl variant="outlined" size="small" sx={{ minWidth: 150 }}>
+      <FormControl variant="outlined" size="small" sx={{ minWidth: '9.375rem' }}>
         <InputLabel>Proyecto</InputLabel>
         <Select
           value={projectFilter}

@@ -91,12 +91,12 @@ const ProjectStatus = () => {
         />
       </Box>
 
-      <TableContainer component={Paper} elevation={3}>
+      <TableContainer component={Paper} elevation={3} sx={{ overflowX: 'auto', '& .MuiTable-root': { minWidth: '35rem' } }}>
         <Table>
           <TableHead>
             <TableRow sx={{ backgroundColor: 'grey.100' }}>
-              {['Nombre del Proyecto', 'Cliente', 'Descripción', 'Estado', 'Fecha de Creación', 'Última Actualización', 'Acciones'].map((header) => (
-                <TableCell key={header} sx={{ fontWeight: 600, color: 'text.primary' }}>{header}</TableCell>
+              {['Nombre del Proyecto', 'Cliente', 'Descripción', 'Estado', 'Fecha de Creación', 'Última Actualización', 'Acciones'].map((header, i) => (
+                <TableCell key={header} sx={{ fontWeight: 600, color: 'text.primary' }} className={[2, 4, 5].includes(i) ? 'hide-mobile' : undefined}>{header}</TableCell>
               ))}
             </TableRow>
           </TableHead>
@@ -110,12 +110,12 @@ const ProjectStatus = () => {
                     <Typography variant="caption" color="textSecondary">{project.client.email}</Typography>
                   </Box>
                 </TableCell>
-                <TableCell>{project.description}</TableCell>
+                <TableCell className="hide-mobile">{project.description}</TableCell>
                 <TableCell>
                   <Chip label={project.status} color={getStatusColor(project.status)} size="small" />
                 </TableCell>
-                <TableCell>{new Date(project.createdAt).toLocaleDateString()}</TableCell>
-                <TableCell>{new Date(project.updatedAt).toLocaleDateString()}</TableCell>
+                <TableCell className="hide-mobile">{new Date(project.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell className="hide-mobile">{new Date(project.updatedAt).toLocaleDateString()}</TableCell>
                 <TableCell>
                   <Tooltip title="Ver detalles">
                     <IconButton

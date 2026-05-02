@@ -25,21 +25,29 @@ export const UserTableRow = ({ user, onEdit, onDelete }) => {
               background: user.name
                 ? `linear-gradient(135deg, ${stringToColor(user.name)} 0%, ${adjustColor(stringToColor(user.name), -20)} 100%)`
                 : 'linear-gradient(135deg, grey.900 0%, grey.700 100%)',
+              width: '2rem',
+              height: '2rem',
+              fontSize: '0.75rem',
+              flexShrink: 0,
             }}
           >
             {getInitials(user.name)}
           </Avatar>
-          <Typography sx={{ color: 'text.primary', fontWeight: 500 }}>
+          <Typography noWrap sx={{ color: 'text.primary', fontWeight: 500, maxWidth: '10rem' }}>
             {user.name}
           </Typography>
         </Box>
       </TableCell>
-      <TableCell>{user.email}</TableCell>
+      <TableCell>
+        <Typography noWrap sx={{ maxWidth: '12rem', fontSize: 'inherit' }}>
+          {user.email}
+        </Typography>
+      </TableCell>
       <TableCell>
         <StatusChip status={user.role}>{user.role}</StatusChip>
       </TableCell>
-      <TableCell>{formatDate(user.createdAt)}</TableCell>
-      <TableCell>{formatDate(user.updatedAt)}</TableCell>
+      <TableCell className="hide-mobile">{formatDate(user.createdAt)}</TableCell>
+      <TableCell className="hide-mobile">{formatDate(user.updatedAt)}</TableCell>
       <TableCell align="right">
         <IconButton onClick={() => onEdit(user)} sx={{ color: 'var(--color-brand-primary)' }}>
           <EditIcon />

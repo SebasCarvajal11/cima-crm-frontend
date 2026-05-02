@@ -35,7 +35,7 @@ const StatCard = ({ title, value, icon, borderColor, barColor }) => (
       variant="determinate"
       value={100}
       sx={{
-        height: 6,
+        height: '0.375rem',
         borderRadius: 3,
         bgcolor: 'rgba(0,0,0,0.05)',
         '& .MuiLinearProgress-bar': {

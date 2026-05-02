@@ -24,7 +24,7 @@ export default function ProjectCard({ project, onViewTasks }) {
 
         <Divider className="my-4" />
 
-        <Typography variant="body2" color="text.secondary" className="mb-4 min-h-[60px]">
+        <Typography variant="body2" color="text.secondary" className="mb-4 min-h-[3.75rem]">
           <DescriptionIcon className="text-base mr-2 align-text-bottom" />
           {project.description || 'Sin descripción disponible'}
         </Typography>

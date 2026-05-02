@@ -18,7 +18,7 @@ export const ClientTableToolbar = () => {
           InputProps={{ disableUnderline: true }}
         />
       </SearchBar>
-      <Box sx={{ display: 'flex', gap: 2 }}>
+      <Box sx={{ display: 'flex', gap: 'clamp(0.5rem, 2vw, 1rem)', flexWrap: 'wrap' }}>
         <Button variant="contained" startIcon={<FilterListIcon />}>
           Filtrar
         </Button>

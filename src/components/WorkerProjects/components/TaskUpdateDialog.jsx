@@ -7,7 +7,7 @@ export default function TaskUpdateDialog({ open, onClose, onUpdate, status, onSt
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Actualizar Estado de Tarea</DialogTitle>
-      <DialogContent className="min-w-[300px]">
+      <DialogContent className="min-w-[18.75rem]">
         <FormControl fullWidth className="mt-4">
           <InputLabel>Estado</InputLabel>
           <Select

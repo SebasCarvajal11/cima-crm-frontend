@@ -137,7 +137,7 @@ export const CreateTaskDialog = ({ open, onClose, onSuccess, token, fallbackTask
         <DialogActions>
           <Button onClick={onClose} color="inherit">Cancelar</Button>
           <Button type="submit" variant="contained" color="primary" disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : 'Crear'}
+            {loading ? <CircularProgress size="1.5rem" /> : 'Crear'}
           </Button>
         </DialogActions>
       </form>

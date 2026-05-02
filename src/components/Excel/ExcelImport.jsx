@@ -13,13 +13,13 @@ const ExcelManagerContainer = () => {
   const { selectedProject, error, success } = state;
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: '2rem' }}>
       <Paper 
         elevation={0}
         sx={{ 
-          p: 4, 
-          mb: 4,
-          borderRadius: 4,
+          p: '2rem', 
+          mb: '2rem',
+          borderRadius: '2rem',
           background: 'linear-gradient(135deg, #f8faff 0%, white 100%)',
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.05)',
         }}
@@ -30,7 +30,7 @@ const ExcelManagerContainer = () => {
             sx={{ 
               fontWeight: 700, 
               color: 'primary.main', 
-              mb: 1,
+              mb: '0.5rem',
               background: 'linear-gradient(90deg, var(--color-brand-primary), var(--color-brand-primary))',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -38,7 +38,7 @@ const ExcelManagerContainer = () => {
           >
             Gestor de Documentos
           </Typography>
-          <Typography variant="subtitle1" color="text.primary" sx={{ mb: 4 }}>
+            <Typography variant="subtitle1" color="text.primary" sx={{ mb: '2rem' }}>
             Gestiona y organiza archivos de cualquier tipo para tus proyectos
           </Typography>
 
@@ -49,13 +49,13 @@ const ExcelManagerContainer = () => {
               <ExcelUploader />
 
               {error && (
-                <Alert severity="error" sx={{ mt: 3, borderRadius: 2 }} variant="filled">
+                <Alert severity="error" sx={{ mt: '1.5rem', borderRadius: '1rem' }} variant="filled">
                   {error}
                 </Alert>
               )}
 
               {success && (
-                <Alert severity="success" sx={{ mt: 3, borderRadius: 2 }} variant="filled">
+                <Alert severity="success" sx={{ mt: '1.5rem', borderRadius: '1rem' }} variant="filled">
                   {success}
                 </Alert>
               )}
@@ -66,18 +66,18 @@ const ExcelManagerContainer = () => {
             <Box 
               sx={{ 
                 textAlign: 'center', 
-                py: 8, 
+                py: '4rem', 
                 bgcolor: 'background.paper',
-                borderRadius: 4,
+                borderRadius: '2rem',
                 border: '1px dashed',
                 borderColor: 'divider',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 2,
+                gap: '1rem',
               }}
             >
-              <ProjectIcon sx={{ fontSize: 48, color: 'var(--color-brand-primary)', opacity: 0.5 }} />
+              <ProjectIcon sx={{ fontSize: '3rem', color: 'var(--color-brand-primary)', opacity: 0.5 }} />
               <Typography variant="h6" color="text.secondary">
                 Seleccione un proyecto para gestionar sus documentos
               </Typography>

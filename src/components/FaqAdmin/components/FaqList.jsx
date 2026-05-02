@@ -34,7 +34,7 @@ export default function FaqList() {
   }
 
   return (
-    <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 fluid-gap-lg">
       {filteredFaqs.map((faq) => (
         <FaqCard key={faq.faqId} faq={faq} />
       ))}

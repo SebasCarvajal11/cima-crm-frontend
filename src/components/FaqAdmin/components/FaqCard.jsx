@@ -24,7 +24,7 @@ export default function FaqCard({ faq }) {
   if (isEditing) {
     return (
       <Card className="transition-all bg-white rounded-xl overflow-hidden shadow-sm border-t-3 border-gray-200">
-        <CardContent className="mb-6 bg-white rounded-xl p-5 shadow-md border-l-4 border-info">
+        <CardContent className="mb-6 bg-white rounded-xl fluid-padding shadow-md border-l-4 border-info">
           <Typography variant="h6" gutterBottom>Editar Pregunta</Typography>
           <TextField
             fullWidth
@@ -72,7 +72,7 @@ export default function FaqCard({ faq }) {
 
   return (
     <Card className="transition-all bg-white rounded-xl overflow-hidden shadow-sm border-t-3 border-gray-200 hover:shadow-lg hover:-translate-y-1">
-      <CardContent className="p-5">
+      <CardContent className="fluid-padding">
         <Chip
           label={faq.isDeleted ? 'Borrador' : 'Activa'}
           color={faq.isDeleted ? 'default' : 'success'}

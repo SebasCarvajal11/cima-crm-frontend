@@ -22,10 +22,10 @@ const Login = () => {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
-      <div className="flex-1 flex justify-center items-center bg-gray-50 p-6">
+      <div className="flex-1 flex justify-center items-center bg-gray-50 fluid-padding">
         <div className="bg-white p-8 md:p-10 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.1)] w-full max-w-md">
-          <h2 className="text-2xl text-center text-gray-800 mb-2 font-bold tracking-tight">Sistema de gestión de CIMA</h2>
-          <h3 className="text-base text-center text-brand-primary mb-6 font-medium">Inicia sesión con tus credenciales asignadas</h3>
+          <h2 className="fluid-text-2xl text-center text-gray-800 mb-2 font-bold tracking-tight">Sistema de gestión de CIMA</h2>
+          <h3 className="fluid-text-base text-center text-brand-primary mb-6 font-medium">Inicia sesión con tus credenciales asignadas</h3>
           
           <form onSubmit={handleSubmit} className="flex flex-col">
             <label htmlFor="email" className="sr-only">Correo electrónico</label>
@@ -59,7 +59,7 @@ const Login = () => {
               {status === 'loading' ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </button>
             
-            {error && <p className="text-red-500 text-center text-sm mt-4 font-medium">{error}</p>}
+            {error && <p className="text-red-500 text-center fluid-text-sm mt-4 font-medium">{error}</p>}
           </form>
         </div>
       </div>

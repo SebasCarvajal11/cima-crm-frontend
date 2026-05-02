@@ -21,12 +21,12 @@ const StatCard = ({ icon, value, label, gradient, iconColor }) => (
     <Paper
       elevation={3}
       sx={{
-        p: 3,
+        p: '1.5rem',
         borderRadius: '0.75rem',
         background: gradient,
         transition: 'transform 0.3s, box-shadow 0.3s',
         '&:hover': {
-          transform: 'translateY(-5px)',
+          transform: 'translateY(-0.3125rem)',
           boxShadow: '0 10px 20px rgba(0,0,0,0.1)',
         },
       }}
@@ -90,17 +90,17 @@ const TaskStats = () => {
       <Typography
         variant="h5"
         sx={{
-          mb: 4,
+          mb: '2rem',
           display: 'flex',
           alignItems: 'center',
           color: 'text.primary',
           fontWeight: 600,
         }}
       >
-        <BarChartIcon sx={{ mr: 1 }} /> Estadísticas de Tareas
+        <BarChartIcon sx={{ mr: '0.5rem' }} /> Estadísticas de Tareas
       </Typography>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={3} sx={{ mb: '2rem' }}>
         <StatCard
           icon={<AssignmentIcon fontSize="large" />}
           value={stats?.total || 0}
@@ -135,10 +135,10 @@ const TaskStats = () => {
         <Grid item xs={12} md={6}>
           <Paper
             elevation={3}
-            sx={{ p: 3, borderRadius: '0.75rem', height: '100%', background: 'white' }}
+            sx={{ p: '1.5rem', borderRadius: '0.75rem', height: '100%', background: 'white' }}
           >
-            <Typography variant="h6" sx={{ mb: 3, display: 'flex', alignItems: 'center', fontWeight: 600 }}>
-              <BarChartIcon sx={{ mr: 1, color: 'info.main' }} /> Distribución de Tareas
+            <Typography variant="h6" sx={{ mb: '1.5rem', display: 'flex', alignItems: 'center', fontWeight: 600 }}>
+              <BarChartIcon sx={{ mr: '0.5rem', color: 'info.main' }} /> Distribución de Tareas
             </Typography>
             <div className="flex flex-col gap-4">
               <ProgressBar label="Completadas" colorClass="bg-green-500" percentage={completedPct} />
@@ -151,10 +151,10 @@ const TaskStats = () => {
         <Grid item xs={12} md={6}>
           <Paper
             elevation={3}
-            sx={{ p: 3, borderRadius: '0.75rem', height: '100%', background: 'white' }}
+            sx={{ p: '1.5rem', borderRadius: '0.75rem', height: '100%', background: 'white' }}
           >
-            <Typography variant="h6" sx={{ mb: 3, display: 'flex', alignItems: 'center', fontWeight: 600 }}>
-              <PersonIcon sx={{ mr: 1, color: 'purple.600' }} /> Resumen de tareas
+            <Typography variant="h6" sx={{ mb: '1.5rem', display: 'flex', alignItems: 'center', fontWeight: 600 }}>
+              <PersonIcon sx={{ mr: '0.5rem', color: 'purple.600' }} /> Resumen de tareas
             </Typography>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-5">
               <div className="flex items-center p-4 bg-gray-50 rounded-lg hover:-translate-y-1 hover:shadow-md transition-all duration-200">

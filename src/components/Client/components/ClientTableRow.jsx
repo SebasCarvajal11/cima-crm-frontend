@@ -16,36 +16,45 @@ export const ClientTableRow = ({ client, onEdit, onDelete }) => {
               background: client.name
                 ? `linear-gradient(135deg, ${stringToColor(client.name)} 0%, ${adjustColor(stringToColor(client.name), -20)} 100%)`
                 : 'linear-gradient(135deg, grey.900 0%, grey.700 100%)',
+              width: '2rem',
+              height: '2rem',
+              fontSize: '0.75rem',
+              flexShrink: 0,
             }}
           >
             {getInitials(client.name)}
           </Avatar>
-          <Typography sx={{ color: 'text.primary', fontWeight: 500 }}>
+          <Typography noWrap sx={{ color: 'text.primary', fontWeight: 500, maxWidth: '10rem' }}>
             {client.name}
           </Typography>
         </Box>
       </TableCell>
-      <TableCell>{client.email}</TableCell>
+      <TableCell>
+        <Typography noWrap sx={{ maxWidth: '12rem', fontSize: 'inherit' }}>
+          {client.email}
+        </Typography>
+      </TableCell>
       <TableCell>
         <StatusChip status={client.role}>{client.role}</StatusChip>
       </TableCell>
-      <TableCell>
+      <TableCell className="hide-mobile">
         <Box
           sx={{
             display: 'inline-block',
-            px: 2,
-            py: 0.5,
+            px: '1rem',
+            py: '0.25rem',
             borderRadius: '0.25rem',
             bgcolor: getPlanColor(client.plan),
             color: 'white',
             fontWeight: 'medium',
+            whiteSpace: 'nowrap',
           }}
         >
           {client.plan || 'Oro'}
         </Box>
       </TableCell>
-      <TableCell>{client.address}</TableCell>
-      <TableCell>{client.phone || client.contactInfo}</TableCell>
+      <TableCell className="hide-tablet">{client.address}</TableCell>
+      <TableCell className="hide-tablet" sx={{ whiteSpace: 'nowrap' }}>{client.phone || client.contactInfo}</TableCell>
       <TableCell align="right">
         <IconButton onClick={() => onEdit(client)} sx={{ color: 'var(--color-brand-primary)' }}>
           <EditIcon />

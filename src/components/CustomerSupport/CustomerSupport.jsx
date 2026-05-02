@@ -3,12 +3,12 @@ import { Email as EmailIcon } from '@mui/icons-material';
 
 const CustomerSupport = () => {
   return (
-    <div className="flex justify-center items-center min-h-[70vh] p-5 bg-gray-50">
+    <div className="flex justify-center items-center min-h-[70vh] fluid-padding bg-gray-50">
       <div className="w-full max-w-lg bg-white rounded-xl shadow-xl overflow-hidden hover:-translate-y-1 transition-transform">
-        <div className="bg-gray-950 text-white p-5 text-center">
+        <div className="bg-gray-950 text-white fluid-padding text-center">
           <h2 className="text-xl sm:text-[1.75rem] font-semibold m-0">Soporte al Cliente</h2>
         </div>
-        <div className="p-8 flex flex-col items-center text-center">
+        <div className="fluid-padding-lg flex flex-col items-center text-center">
           <div className="w-20 h-20 rounded-full flex justify-center items-center mb-5 bg-brand-primary-light/10 text-brand-primary">
             <EmailIcon fontSize="large" />
           </div>

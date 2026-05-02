@@ -22,13 +22,13 @@ export default function TasksModal({ open, onClose, tasks, onUpdateTask }) {
           </Box>
         </ModalHeader>
 
-        <Box className="p-6 flex-grow overflow-auto">
+        <Box className="fluid-padding flex-grow overflow-auto">
           <TableContainer
             className="rounded shadow-sm"
             sx={{
               '& .MuiTable-root': {
                 borderCollapse: 'separate',
-                borderSpacing: '0 8px',
+                borderSpacing: '0 0.5rem',
               },
             }}
           >
@@ -37,8 +37,8 @@ export default function TasksModal({ open, onClose, tasks, onUpdateTask }) {
                 <TableRow>
                   <TableCell className="font-semibold text-brand-primary">Descripción</TableCell>
                   <TableCell className="font-semibold text-brand-primary">Estado</TableCell>
-                  <TableCell className="font-semibold text-brand-primary">Fecha de Creación</TableCell>
-                  <TableCell className="font-semibold text-brand-primary">Última Actualización</TableCell>
+                  <TableCell className="font-semibold text-brand-primary hide-mobile">Fecha de Creación</TableCell>
+                  <TableCell className="font-semibold text-brand-primary hide-mobile">Última Actualización</TableCell>
                   <TableCell className="font-semibold text-brand-primary">Acciones</TableCell>
                 </TableRow>
               </TableHead>
@@ -52,8 +52,8 @@ export default function TasksModal({ open, onClose, tasks, onUpdateTask }) {
                     <TableCell>
                       <StatusChip status={task.status} label={task.status} />
                     </TableCell>
-                    <TableCell>{new Date(task.createdAt).toLocaleDateString()}</TableCell>
-                    <TableCell>{new Date(task.updatedAt).toLocaleDateString()}</TableCell>
+                    <TableCell className="hide-mobile">{new Date(task.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell className="hide-mobile">{new Date(task.updatedAt).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <Tooltip title="Actualizar Estado" arrow>
                         <Button
@@ -84,7 +84,7 @@ export default function TasksModal({ open, onClose, tasks, onUpdateTask }) {
           )}
         </Box>
 
-        <Box className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end">
+        <Box className="fluid-padding border-t border-gray-200 bg-gray-50 flex justify-end">
           <Button
             onClick={onClose}
             variant="contained"

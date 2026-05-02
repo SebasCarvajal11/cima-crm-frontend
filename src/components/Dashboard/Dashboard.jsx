@@ -115,7 +115,7 @@ const Dashboard = () => {
         <div className="relative w-64 h-full">
           <IconButton
             onClick={() => setDrawerOpen(false)}
-            sx={{ position: 'absolute', right: 8, top: 8, color: 'white', zIndex: 10 }}
+            sx={{ position: 'absolute', right: '0.5rem', top: '0.5rem', color: 'white', zIndex: 10 }}
           >
             <CloseIcon />
           </IconButton>

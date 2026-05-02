@@ -46,7 +46,7 @@ const AdminDashboard = () => {
       {selectedView === "dashboard" && (
         <Fade in timeout={500}>
           <div className="flex flex-col items-center max-w-6xl mx-auto w-full">
-            <header className="mb-16 text-center">
+            <header className="mb-8 text-center">
               <Typography 
                 variant="h3" 
                 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight"
@@ -68,7 +68,7 @@ const AdminDashboard = () => {
                     onClick={() => setSelectedView(item.id)}
                     className="h-full cursor-pointer rounded-3xl bg-white border border-gray-100 transition-all duration-500 ease-out hover:-translate-y-3 hover:shadow-[0_30px_60px_rgba(0,0,0,0.12)] shadow-sm overflow-hidden group"
                   >
-                    <CardContent className="p-10 h-full flex flex-col items-center text-center relative">
+                    <CardContent className="fluid-padding-lg h-full flex flex-col items-center text-center relative">
                       <div className={cn('absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500', item.gradient)}></div>
                       
                       <div className="relative z-10">
@@ -82,7 +82,7 @@ const AdminDashboard = () => {
                           {item.description}
                         </Typography>
                         
-                        <div className="mt-8 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
+                        <div className="mt-6 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
                           <Button 
                             variant="text" 
                             className="text-brand-primary font-bold normal-case flex items-center gap-2 mx-auto"

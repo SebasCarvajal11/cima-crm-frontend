@@ -21,7 +21,7 @@ export default function ProjectProgressDialog({ open, onClose, details }) {
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth
       PaperProps={{ sx: { borderRadius: 2, boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)' } }}
     >
-      <DialogTitle sx={{ borderBottom: '1px solid var(--color-border)', px: 3, py: 2, backgroundColor: 'var(--color-background)' }}>
+      <DialogTitle sx={{ borderBottom: '1px solid var(--color-border)', px: '1.5rem', py: '1rem', backgroundColor: 'var(--color-background)' }}>
         <Typography variant="h5" component="div" sx={{ fontWeight: 600 }}>
           {details.projectName}
         </Typography>
@@ -30,10 +30,10 @@ export default function ProjectProgressDialog({ open, onClose, details }) {
         </Typography>
       </DialogTitle>
 
-      <DialogContent sx={{ p: 3 }}>
+      <DialogContent sx={{ p: '1.5rem' }}>
         <Grid container spacing={4}>
           <Grid item xs={12} md={6}>
-            <Box sx={{ width: '15.625rem', margin: '0 auto', p: 3, backgroundColor: 'white', borderRadius: 2, boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)' }}>
+            <Box sx={{ width: '15.625rem', margin: '0 auto', p: '1.5rem', backgroundColor: 'white', borderRadius: '1rem', boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)' }}>
               <CircularProgressbar
                 value={details.progress}
                 text={`${details.progress}%`}
@@ -48,8 +48,8 @@ export default function ProjectProgressDialog({ open, onClose, details }) {
             </Box>
           </Grid>
           <Grid item xs={12} md={6}>
-            <Paper elevation={0} sx={{ p: 3, backgroundColor: 'var(--color-background)', borderRadius: 2 }}>
-              <Typography variant="h6" gutterBottom sx={{ color: 'info.main', mb: 2 }}>
+            <Paper elevation={0} sx={{ p: '1.5rem', backgroundColor: 'var(--color-background)', borderRadius: '1rem' }}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'info.main', mb: '1rem' }}>
                 Estadísticas de Tareas
               </Typography>
               <Grid container spacing={2}>
@@ -72,8 +72,8 @@ export default function ProjectProgressDialog({ open, onClose, details }) {
             </Paper>
           </Grid>
           <Grid item xs={12}>
-            <Paper elevation={0} sx={{ p: 3, backgroundColor: 'var(--color-background)', borderRadius: 2 }}>
-              <Typography variant="h6" gutterBottom sx={{ color: 'info.main', mb: 2 }}>
+            <Paper elevation={0} sx={{ p: '1.5rem', backgroundColor: 'var(--color-background)', borderRadius: '1rem' }}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'info.main', mb: '1rem' }}>
                 Estado de las Tareas
               </Typography>
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
@@ -83,7 +83,7 @@ export default function ProjectProgressDialog({ open, onClose, details }) {
                     label={task.status}
                     color={getStatusColor(task.status)}
                     size="medium"
-                    sx={{ m: 0.5, px: 2, borderRadius: 2, fontWeight: 500 }}
+                    sx={{ m: '0.25rem', px: '1rem', borderRadius: '1rem', fontWeight: 500 }}
                   />
                 ))}
               </Box>
@@ -92,11 +92,11 @@ export default function ProjectProgressDialog({ open, onClose, details }) {
         </Grid>
       </DialogContent>
 
-      <DialogActions sx={{ p: 2.5, borderTop: '1px solid var(--color-border)' }}>
+      <DialogActions sx={{ p: '1.25rem', borderTop: '1px solid var(--color-border)' }}>
         <Button
           onClick={onClose}
           variant="contained"
-          sx={{ borderRadius: 2, textTransform: 'none', px: 3, backgroundColor: 'grey.900', '&:hover': { backgroundColor: 'grey.800' } }}
+          sx={{ borderRadius: '1rem', textTransform: 'none', px: '1.5rem', backgroundColor: 'grey.900', '&:hover': { backgroundColor: 'grey.800' } }}
         >
           Cerrar
         </Button>

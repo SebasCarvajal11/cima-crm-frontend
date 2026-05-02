@@ -20,7 +20,7 @@ export const ClientDashboardSearchBar = () => {
             </InputAdornment>
           ),
         }}
-        sx={{ maxWidth: 400 }}
+        sx={{ maxWidth: '25rem' }}
       />
     </Paper>
   );

@@ -142,7 +142,7 @@ export const EditTaskDialog = ({ open, task, onClose, onSuccess, token, fallback
         <DialogActions>
           <Button onClick={onClose} color="inherit">Cancelar</Button>
           <Button type="submit" variant="contained" color="primary" disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : 'Actualizar'}
+            {loading ? <CircularProgress size="1.5rem" /> : 'Actualizar'}
           </Button>
         </DialogActions>
       </form>

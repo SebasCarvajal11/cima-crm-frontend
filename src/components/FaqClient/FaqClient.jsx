@@ -61,14 +61,14 @@ const FaqClient = () => {
 
   if (error) {
     return (
-      <Container maxWidth="md" sx={{ py: 8 }}>
+      <Container maxWidth="md" sx={{ py: '4rem' }}>
         <Alert severity="error">{error}</Alert>
       </Container>
     );
   }
 
   return (
-    <Container maxWidth="md" sx={{ py: 8 }}>
+    <Container maxWidth="md" sx={{ py: '4rem' }}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -77,12 +77,12 @@ const FaqClient = () => {
         <Paper 
           elevation={3} 
           sx={{ 
-            p: 4, 
-            borderRadius: 3,
+            p: '2rem', 
+            borderRadius: '1.5rem',
             background: 'linear-gradient(to right bottom, white, var(--color-background))'
           }}
         >
-          <Box sx={{ mb: 5, textAlign: 'center' }}>
+          <Box sx={{ mb: '2.5rem', textAlign: 'center' }}>
             <Typography 
               variant="h3" 
               component="h1" 
@@ -99,10 +99,10 @@ const FaqClient = () => {
             <Typography variant="subtitle1" color="text.secondary">
               Encuentra respuestas a las preguntas más comunes sobre nuestra plataforma
             </Typography>
-            <Divider sx={{ mt: 3 }} />
+            <Divider sx={{ mt: '1.5rem' }} />
           </Box>
 
-          <Box sx={{ mt: 4 }}>
+          <Box sx={{ mt: '2rem' }}>
             {faqs.length > 0 ? (
               faqs.map((faq, index) => (
                 <motion.div
@@ -115,8 +115,8 @@ const FaqClient = () => {
                     expanded={expanded === `panel${faq.faqId}`} 
                     onChange={handleChange(`panel${faq.faqId}`)}
                     sx={{
-                      mb: 2,
-                      borderRadius: '8px',
+                      mb: '1rem',
+                      borderRadius: '0.5rem',
                       '&:before': { display: 'none' },
                       boxShadow: expanded === `panel${faq.faqId}` ? 3 : 1,
                       transition: 'all 0.3s ease',
@@ -131,25 +131,25 @@ const FaqClient = () => {
                       id={`panel${faq.faqId}-header`}
                       sx={{
                         backgroundColor: expanded === `panel${faq.faqId}` ? 'rgba(33, 150, 243, 0.08)' : 'transparent',
-                        borderRadius: '8px',
+                        borderRadius: '0.5rem',
                         '&.Mui-expanded': {
                           borderBottomLeftRadius: 0,
                           borderBottomRightRadius: 0,
                         }
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <QuestionIcon color="primary" />
                         <Typography variant="h6" sx={{ fontWeight: 500 }}>
                           {faq.question}
                         </Typography>
                       </Box>
                     </AccordionSummary>
-                    <AccordionDetails sx={{ pt: 2, pb: 3, px: 4 }}>
+                    <AccordionDetails sx={{ pt: '1rem', pb: '1.5rem', px: '2rem' }}>
                       <Typography variant="body1" paragraph>
                         {faq.answer}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'right', mt: 2 }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'right', mt: '1rem' }}>
                         Actualizado: {formatDate(faq.createdAt)}
                       </Typography>
                     </AccordionDetails>
@@ -157,7 +157,7 @@ const FaqClient = () => {
                 </motion.div>
               ))
             ) : (
-              <Box sx={{ textAlign: 'center', py: 5 }}>
+              <Box sx={{ textAlign: 'center', py: '2.5rem' }}>
                 <Typography variant="h6" color="text.secondary">
                   No hay preguntas frecuentes disponibles en este momento.
                 </Typography>

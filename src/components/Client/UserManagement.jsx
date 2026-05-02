@@ -38,7 +38,7 @@ function TabPanel({ children, value, index, ...other }) {
       {...other}
       className="w-full"
     >
-      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ pt: '1.5rem' }}>{children}</Box>}
     </div>
   );
 }
@@ -72,7 +72,7 @@ const ClientListContent = () => {
 
   if (error) {
     return (
-      <Typography color="error" sx={{ p: 4, textAlign: 'center' }}>
+      <Typography color="error" sx={{ p: '2rem', textAlign: 'center' }}>
         {error}
       </Typography>
     );
@@ -90,9 +90,9 @@ const ClientListContent = () => {
                 <TableCell>Usuario</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Rol</TableCell>
-                <TableCell>Plan</TableCell>
-                <TableCell>Dirección</TableCell>
-                <TableCell>Teléfono</TableCell>
+                <TableCell className="hide-mobile">Plan</TableCell>
+                <TableCell className="hide-tablet">Dirección</TableCell>
+                <TableCell className="hide-tablet">Teléfono</TableCell>
                 <TableCell align="right">Acciones</TableCell>
               </TableRow>
             </StyledTableHead>
@@ -129,11 +129,11 @@ const UserManagement = () => {
 
   return (
     <ClientProvider>
-      <Box sx={{ p: 5, background: 'linear-gradient(135deg, #f6f9fc 0%, #f1f5f9 100%)', minHeight: '100vh' }}>
+      <Box className="fluid-padding-lg" sx={{ background: 'linear-gradient(135deg, #f6f9fc 0%, #f1f5f9 100%)', minHeight: '100vh' }}>
         <ToastContainer />
 
-        <Box sx={{ mb: 6, textAlign: 'center', position: 'relative', '&::after': { content: '""', position: 'absolute', bottom: '-0.9375rem', left: '50%', transform: 'translateX(-50%)', width: '3.75rem', height: '0.25rem', background: 'var(--color-brand-primary-light)', borderRadius: '0.125rem' } }}>
-            <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+        <Box sx={{ mb: '3rem', textAlign: 'center', position: 'relative', '&::after': { content: '""', position: 'absolute', bottom: '-0.9375rem', left: '50%', transform: 'translateX(-50%)', width: '3.75rem', height: '0.25rem', background: 'var(--color-brand-primary-light)', borderRadius: '0.125rem' } }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary', mb: '0.5rem' }}>
             Gestión de Usuarios
           </Typography>
             <Typography variant="body1" sx={{ color: 'text.secondary' }}>
@@ -147,7 +147,7 @@ const UserManagement = () => {
             bgcolor: 'background.paper',
             borderRadius: '0.625rem',
             boxShadow: '0 0 20px 0 rgba(82, 63, 105, 0.1)',
-            mb: 3,
+            mb: '1.5rem',
           }}
         >
           <Tabs

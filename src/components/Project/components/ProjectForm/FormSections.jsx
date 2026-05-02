@@ -17,7 +17,7 @@ export function ClientSection() {
   return (
     <FormSection>
       <Box display="flex" alignItems="center" mb={2}>
-        <BusinessIcon sx={{ mr: 1, color: 'var(--color-brand-primary)' }} />
+        <BusinessIcon sx={{ mr: '0.5rem', color: 'var(--color-brand-primary)' }} />
         <Typography variant="subtitle1" sx={{ color: 'var(--color-brand-primary)' }}>
           Información del Cliente
         </Typography>
@@ -38,9 +38,9 @@ export function ClientSection() {
                 <Box display="flex" alignItems="center" width="100%">
                   <Avatar
                     sx={{
-                      width: 32,
-                      height: 32,
-                      mr: 1.5,
+                      width: '2rem',
+                      height: '2rem',
+                      mr: '0.75rem',
                       bgcolor: client.id % 2 === 0 ? 'var(--color-brand-primary-light)' : 'var(--color-brand-primary)',
                     }}
                   >
@@ -72,10 +72,10 @@ export function DetailsSection() {
 
   return (
     <>
-      <Divider sx={{ my: 3 }} />
+      <Divider sx={{ my: '1.5rem' }} />
       <FormSection>
         <Box display="flex" alignItems="center" mb={2}>
-          <DescriptionIcon sx={{ mr: 1, color: 'var(--color-brand-primary)' }} />
+          <DescriptionIcon sx={{ mr: '0.5rem', color: 'var(--color-brand-primary)' }} />
           <Typography variant="subtitle1" sx={{ color: 'var(--color-brand-primary)' }}>
             Detalles del Proyecto
           </Typography>
@@ -117,7 +117,7 @@ export function StatusSection() {
   return (
     <FormSection>
       <Box display="flex" alignItems="center" mb={2}>
-        <ScheduleIcon sx={{ mr: 1, color: 'var(--color-brand-primary)' }} />
+        <ScheduleIcon sx={{ mr: '0.5rem', color: 'var(--color-brand-primary)' }} />
         <Typography variant="subtitle1" sx={{ color: 'var(--color-brand-primary)' }}>
           Estado del Proyecto
         </Typography>

@@ -22,7 +22,7 @@ export function Header({ title, onClose }) {
   return (
     <StyledDialogTitle>
       <Box display="flex" alignItems="center">
-        <AssignmentIcon sx={{ mr: 1, color: 'white' }} />
+        <AssignmentIcon sx={{ mr: '0.5rem', color: 'white' }} />
         <Typography variant="h6">{title}</Typography>
       </Box>
       <IconButton onClick={onClose} size="small" sx={{ color: 'white' }}>
@@ -36,9 +36,9 @@ export function Content({ children }) {
   const { state: { loading, error } } = useProjectFormContext();
 
   return (
-    <DialogContent sx={{ pt: 3, overflowX: 'hidden' }}>
+    <DialogContent sx={{ pt: '1.5rem', overflowX: 'hidden' }}>
       {loading ? (
-        <Box display="flex" justifyContent="center" my={3}>
+        <Box display="flex" justifyContent="center" my="1.5rem">
           <CircularProgress />
         </Box>
       ) : error ? (
@@ -58,7 +58,7 @@ export function Actions({ onCancel, submitLabel }) {
   const { state: { isValid, loading, isSubmitting }, actions: { handleSubmit } } = useProjectFormContext();
 
   return (
-    <DialogActions sx={{ px: 3, py: 2, bgcolor: 'grey.50' }}>
+    <DialogActions sx={{ px: '1.5rem', py: '1rem', bgcolor: 'grey.50' }}>
       <Button
         onClick={onCancel}
         variant="contained"
@@ -77,14 +77,14 @@ export function Actions({ onCancel, submitLabel }) {
         variant="contained"
         disabled={!isValid || loading || isSubmitting}
         sx={{
-          ml: 2,
+          ml: '1rem',
           color: 'white',
           bgcolor: 'var(--color-brand-primary)',
           '&:hover': { bgcolor: 'var(--color-brand-primary-light)' },
           '&.Mui-disabled': { bgcolor: 'rgba(89, 45, 45, 0.3)', color: 'rgba(255, 255, 255, 0.7)' },
         }}
       >
-        {isSubmitting ? <CircularProgress size={24} color="inherit" /> : submitLabel}
+        {isSubmitting ? <CircularProgress size="1.5rem" color="inherit" /> : submitLabel}
       </Button>
     </DialogActions>
   );

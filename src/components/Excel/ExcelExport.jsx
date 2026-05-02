@@ -1,33 +1,36 @@
-import React from 'react';
+import { Button, Box, Typography } from '@mui/material';
+import DownloadIcon from '@mui/icons-material/Download';
 import * as XLSX from 'xlsx';
 
 const ExcelExport = ({ data, fileName }) => {
-    
-    const handleExport = () => {
-        if (!data || data.length === 0) {
-            alert('No hay datos para exportar.');
-            return;
-        }
+  const handleExport = () => {
+    if (!data || data.length === 0) {
+      alert('No hay datos para exportar.');
+      return;
+    }
 
-        // Crear un libro de trabajo (workbook) y una hoja (worksheet)
-        const worksheet = XLSX.utils.json_to_sheet(data);  // Convertir los datos JSON a hoja Excel
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Datos");
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Datos');
+    XLSX.writeFile(workbook, `${fileName}.xlsx`);
+  };
 
-        // Exportar el archivo Excel
-        XLSX.writeFile(workbook, `${fileName}.xlsx`);
-    };
-
-    return (
-        <div className="excel-export-container">
-            <h2>Exportar datos a Excel</h2>
-            
-            {/* Botón para exportar los datos */}
-            <button onClick={handleExport} disabled={!data || data.length === 0}>
-                Exportar a Excel
-            </button>
-        </div>
-    );
+  return (
+    <Box className="flex flex-col items-center gap-4 fluid-padding">
+      <Typography variant="h6" className="fluid-text-lg font-semibold text-gray-800">
+        Exportar datos a Excel
+      </Typography>
+      <Button
+        variant="contained"
+        startIcon={<DownloadIcon />}
+        onClick={handleExport}
+        disabled={!data || data.length === 0}
+        className="bg-brand-primary hover:bg-brand-primary-light"
+      >
+        Exportar a Excel
+      </Button>
+    </Box>
+  );
 };
 
 export default ExcelExport;

@@ -135,8 +135,8 @@ const UsersInterface = ({ token }) => {
             <TableCell>Usuario</TableCell>
             <TableCell>Email</TableCell>
             <TableCell>Rol</TableCell>
-            <TableCell>Fecha de creaci&oacute;n</TableCell>
-            <TableCell>&Uacute;ltima actualizaci&oacute;n</TableCell>
+            <TableCell className="hide-mobile">Fecha de creaci&oacute;n</TableCell>
+            <TableCell className="hide-mobile">&Uacute;ltima actualizaci&oacute;n</TableCell>
             <TableCell align="right">Acciones</TableCell>
           </TableRow>
         </StyledTableHead>

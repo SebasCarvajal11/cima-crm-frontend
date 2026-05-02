@@ -86,7 +86,7 @@ const ProjectList = ({ projects = [], loading, onEdit, onDelete }) => {
           <TableHead>
             <TableRow>
               <TableCell colSpan={5}>
-                <Skeleton animation="wave" height={50} />
+                <Skeleton animation="wave" height="3.125rem" />
               </TableCell>
             </TableRow>
           </TableHead>
@@ -118,7 +118,7 @@ const ProjectList = ({ projects = [], loading, onEdit, onDelete }) => {
         }}
       />
 
-      <TableContainer component={Paper} sx={{ mt: 2, boxShadow: 3, borderRadius: 2, '& .MuiTable-root': { minWidth: 650 } }}>
+        <TableContainer component={Paper} sx={{ mt: 2, boxShadow: 3, borderRadius: 2, '& .MuiTable-root': { minWidth: '40.625rem' } }}>
         <Table>
           <TableHead>
             <TableRow sx={{ backgroundColor: 'var(--color-brand-primary)' }}>
